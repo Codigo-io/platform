@@ -2,8 +2,8 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: 'triage,todo,bug'
-assignees: 'jazielguerrero'
+labels: bug, todo, triage
+assignees: JazielGuerrero
 
 ---
 
