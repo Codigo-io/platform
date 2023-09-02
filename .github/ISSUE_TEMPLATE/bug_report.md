@@ -1,5 +1,5 @@
 ---
-name: Issue report
+name: Bug report
 about: Create a report to help us improve
 title: ''
 labels: 'triage,todo,bug'
