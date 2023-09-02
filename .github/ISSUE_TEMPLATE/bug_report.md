@@ -2,7 +2,7 @@
 name: Issue report
 about: Create a report to help us improve
 title: ''
-labels: 'triage'
+labels: 'triage,todo,bug'
 assignees: 'jazielguerrero'
 
 ---
@@ -21,8 +21,13 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Código CLI version:**
- - Version [e.g. v0.1.0]
+**Platform version:**
+ - CLI Version [e.g. v0.1.0]
+ - GenService Version [e.g. v0.1.0]
 
+**Extension (mark with an X the extension):**
+ - Solana Native [ ]
+ - Solana Anchor [ ]
+   
 **Additional context**
 Add any other context about the problem here.
