@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: bug, todo, triage
+labels: bug, triage
 assignees: JazielGuerrero
 
 ---
