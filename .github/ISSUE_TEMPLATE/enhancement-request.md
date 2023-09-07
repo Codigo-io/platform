@@ -2,7 +2,7 @@
 name: Enhancement request
 about: Suggest an idea of how we can improve the product
 title: ''
-labels: enhancement, todo, triage
+labels: enhancement, triage
 assignees: JazielGuerrero
 
 ---
