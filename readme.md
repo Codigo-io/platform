@@ -161,6 +161,13 @@ Finally, to run the test, execute the following command:
 npx ts-node app.ts
 ```
 
+After the execution completes, you should receive the following output:
+
+```shell
+{ counter: 1 }
+{ counter: 0 }
+```
+
 ## Next steps
 
 **Congratulations!** 🎉👏 you created your first Solana smart contract using the CIDL and integrated the generated TypeScript client library with an application. To summarize what we learned:
