@@ -7,7 +7,7 @@ Código is an AI-Powered Code Generation Platform for blockchain developers and 
 - You can immediately start using [Código Studio](https://studio.codigo.ai). Código Studio is a web-based IDE environment that comes with all the tools and programs to develop Solana programs using the CIDL.
 - You can work from your local environment by downloading the latest version of the [Código CLI](https://github.com/Codigo-io/platform/releases) that targets your operating system. After downloading, put the Código CLI in your preferred location and add this location to your environment PATH.
 
-## Quickstart
+## CIDL Quickstart
 
 In this Quickstart guide, you’ll learn how to start with Código’s Interface Description Language (CIDL) by building a simple Solana counter program.
 
