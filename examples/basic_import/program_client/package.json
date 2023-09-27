@@ -1,0 +1,19 @@
+{
+  "name": "validate_imports",
+  "version": "0.0.0",
+  "private": true,
+  "license": "Codigo",
+  "description": "Validates the CIDL import feature, this CIDL will import other CIDLs and won't add new inputs\nverifies the following in a CIDL import context:\n- The purpose of this CIDL is to validate all the supported features for an account\n- Verifies it can define a Non-PDA account with one field\n- Verifies it can define PDA account with one field and a static seed\n- Verifies it can define PDA account with one field, a static and dynamic seed\n- Verifies it can define PDA account with all the possible seeds data types\n- Verifies account space is calculated automatically\n- Verifies it can mark an account as mutable\n- Verifies it can mark an account as immutable\n- Verifies it can generate the code to initialize an account in \"Singleton mode\" a.k.a init\n- Verifies it can generate the code to initialize an account in \"Non-Singleton mode\" a.k.a init_if_needed\n- Verifies the fee payer is the default payer when using an initialization method without explicitly specifying the payer\n- Verifies it can close a Non-PDA account\n- Verifies it can close a PDA account\n- Verifies the fee payer is the default lamport receiver when a rent receiver is not specify\n- Verifies the usage of multiple signers\n- Verifies we can specify a rent-payer to an account when initializing\n- Verifies we can specify a rent-receiver to an account when closing it\n- Verifies we can map a signer to an account seed\n- Verifies we can map an input to an account seed\n- Verifies a Non-PDA account can be signer\n- Verifies all the supported types for PDA accounts\n- Verifies all the supported types for Non-PDA accounts\n- Verifies all the supported types for inputs\n- The business logic should assign the input to the account's field\n- The business logic test should verified that the input's values is the same value assign to the account's field\n- Verifies the owner of an account is the program id\n- Verifies the owner of an account is the program id when the owner property is omitted\n- Verifies the owner of an account is another (external) program\n- Verifies account length\n- Verifies PDA seeds\n- Verifies an account is a signer\n- Verifies signer's owner equals a type's owner\n- Verifies a signer matches exactly an address\n- Verifies a signer is an executable account",
+  "dependencies": {
+    "@solana/web3.js": "^1.78.3",
+    "borsh": "^1.0.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.7.0",
+    "ts-node": "^10.9.1"
+  }
+}
