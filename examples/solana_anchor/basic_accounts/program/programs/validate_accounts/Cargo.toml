@@ -1,0 +1,20 @@
+
+[package]
+name = "validate_accounts"
+version = "0.0.0"
+description = "- The purpose of this CIDL is to validate all the supported features for an account - Verifies it can define a Non-PDA account with one field - Verifies it can define PDA account with one field and a static seed - Verifies it can define PDA account with one field, a static and dynamic seed - Verifies it can define PDA account with all the possible seeds data types - Verifies account space is calculated automatically - Verifies it can mark an account as mutable - Verifies it can mark an account as immutable - Verifies it can generate the code to initialize an account in \"Singleton mode\" a.k.a init - Verifies it can generate the code to initialize an account in \"Non-Singleton mode\" a.k.a init_if_needed - Verifies the fee payer is the default payer when using an initialization method without explicitly specifying the payer - Verifies it can close a Non-PDA account - Verifies it can close a PDA account - Verifies the fee payer is the default lamport receiver when a rent receiver is not specify  Some useful links:    - [Blockchain Extensions](https://docs.codigo.ai/category/blockchain-extensions)   - [Learning the Basics](https://docs.codigo.ai/código-interface-description-language/learning-the-basics)   - [Building Solana Programs with CIDL: A Comprehensive Guide Part I](https://docs.codigo.ai/guides/part-1-building-solana-programs)"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "validate_accounts"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = { version = "0.28.0", features = ["init-if-needed"] }
