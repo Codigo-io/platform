@@ -1,0 +1,29 @@
+{
+  "name": "validate_state_compression",
+  "version": "0.0.0",
+  "private": true,
+  "license": "Codigo",
+  "author": {
+    "name": "Codigo",
+    "email": "support@codigo.ai",
+    "url": "https://codigo.ai"
+  },
+  "repository": {
+    "url": "https://github.com/Codigo-ai"
+  },
+  "description": "The purpose of this CIDL is to validate the basic use case of State Compression\n- Verifies we can initialize a merkle tree\n- Verifies we can transfer the authority of the merkle tree\n- Verifies we can close the merkle tree account\n- Verifies we can compress an account using the different modes\n- Verifies big max depth",
+  "dependencies": {
+    "@solana/spl-account-compression": "^0.1.10",
+    "@solana/web3.js": "^1.78.3",
+    "borsh": "^1.0.0",
+    "bs58": "^5.0.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.7.0",
+    "ts-node": "^10.9.1"
+  }
+}
