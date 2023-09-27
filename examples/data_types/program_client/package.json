@@ -1,0 +1,19 @@
+{
+  "name": "validate_data_types",
+  "version": "0.0.0",
+  "private": true,
+  "license": "Codigo",
+  "description": "The purpose of this CIDL is to validate all the supported data types.\n- Verifies all the supported types for PDA accounts\n- Verifies all the supported types for Non-PDA accounts\n- Verifies all the supported types for inputs\n- The business logic should assign the input to the account's field\n- The business logic test should verified that the input's values is the same value assign to the account's field",
+  "dependencies": {
+    "@solana/web3.js": "^1.78.3",
+    "borsh": "^1.0.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.7.0",
+    "ts-node": "^10.9.1"
+  }
+}
