@@ -1,0 +1,27 @@
+Streaming transaction logs mentioning EdFcxcCZvYnTssF9MKZJxEERWNwJrbFdhHDgxNfqajnE. Confirmed commitment
+Transaction executed in slot 5:
+  Signature: 3ZD4SU97guBnJt7P5eDSe5ttTLQEbJAgiwJS8JurH16ihYJx34PDLfTbnnbMDBA12bju3k4eUTVZG66fz11sQaEz
+  Status: Ok
+  Log Messages:
+    Program EdFcxcCZvYnTssF9MKZJxEERWNwJrbFdhHDgxNfqajnE invoke [1]
+    Program log: Instruction: CreateUserRecord
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program EdFcxcCZvYnTssF9MKZJxEERWNwJrbFdhHDgxNfqajnE consumed 10032 of 200000 compute units
+    Program EdFcxcCZvYnTssF9MKZJxEERWNwJrbFdhHDgxNfqajnE success
+Transaction executed in slot 6:
+  Signature: 5aegQoMxqGVUd6ieA4ffAXbpBr8v4joikhBQfacHhAnmJuBoM6vRcmfT4JH1J8XcyrP4JL1QzkNyPJjDMo1nsZQs
+  Status: Ok
+  Log Messages:
+    Program EdFcxcCZvYnTssF9MKZJxEERWNwJrbFdhHDgxNfqajnE invoke [1]
+    Program log: Instruction: RegisterIncome
+    Program EdFcxcCZvYnTssF9MKZJxEERWNwJrbFdhHDgxNfqajnE consumed 4779 of 200000 compute units
+    Program EdFcxcCZvYnTssF9MKZJxEERWNwJrbFdhHDgxNfqajnE success
+Transaction executed in slot 7:
+  Signature: 4QE7uiPNbjsg4i7To6mF1cBuDgMQLindZvHWTD81SKkRvJTtisWt5wzYping21Fh4GWxsyyvvvrH8oHNx3gxtVL9
+  Status: Ok
+  Log Messages:
+    Program EdFcxcCZvYnTssF9MKZJxEERWNwJrbFdhHDgxNfqajnE invoke [1]
+    Program log: Instruction: RegisterOutcome
+    Program EdFcxcCZvYnTssF9MKZJxEERWNwJrbFdhHDgxNfqajnE consumed 4776 of 200000 compute units
+    Program EdFcxcCZvYnTssF9MKZJxEERWNwJrbFdhHDgxNfqajnE success
