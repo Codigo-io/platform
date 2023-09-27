@@ -1,0 +1,566 @@
+cidl: "0.8"
+info:
+  name: validate_data_types
+  title: Validate Data Types
+  summary: |-
+    The purpose of this CIDL is to validate all the supported data types.
+    - Verifies all the supported types for PDA accounts
+    - Verifies all the supported types for Non-PDA accounts
+    - Verifies all the supported types for inputs
+    - The business logic should assign the input to the account's field
+    - The business logic test should verified that the input's values is the same value assign to the account's field
+  version: 0.0.0
+  license:
+    name: Codigo
+    url: https://codigo.ai/documents/Codigo---Terms-of-Service.pdf
+types:
+  MasterTypesNonPDA:
+    fields:
+      # Native types
+      - name: u8_type
+        type: u8
+      - name: u16_type
+        type: u16
+      - name: u32_type
+        type: u32
+      - name: u64_type
+        type: u64
+      - name: u128_type
+        type: u128
+      #      - name: u256_type
+      #        type: u256
+      - name: i8_type
+        type: i8
+      - name: i16_type
+        type: i16
+      - name: i32_type
+        type: i32
+      - name: i64_type
+        type: i64
+      - name: i128_type
+        type: i128
+      #      - name: i256_type
+      #        type: i256
+      - name: string_type
+        type: string
+        solana:
+          attributes: [ cap:10 ]
+      - name: bool_type
+        type: bool
+      - name: f32_type
+        type: f32
+      - name: f64_type
+        type: f64
+
+      # Extended type
+      - name: pubkey_type
+        type: sol:pubkey
+
+      # Options
+      - name: u8_type_option
+        type: rs:option<u8>
+      - name: u16_type_option
+        type: rs:option<u16>
+      - name: u32_type_option
+        type: rs:option<u32>
+      - name: u64_type_option
+        type: rs:option<u64>
+      - name: u128_type_option
+        type: rs:option<u128>
+      #      - name: u256_type_option
+      #        type: rs:option<u256>
+      - name: i8_type_option
+        type: rs:option<i8>
+      - name: i16_type_option
+        type: rs:option<i16>
+      - name: i32_type_option
+        type: rs:option<i32>
+      - name: i64_type_option
+        type: rs:option<i64>
+      - name: i128_type_option
+        type: rs:option<i128>
+      #      - name: i256_type_option
+      #        type: rs:option<i256>
+      - name: string_type_option
+        type: rs:option<string>
+        solana:
+          attributes: [ cap:10 ]
+      - name: bool_type_option
+        type: rs:option<bool>
+      - name: f32_type_option
+        type: rs:option<f32>
+      - name: f64_type_option
+        type: rs:option<f64>
+      - name: pubkey_type_option
+        type: rs:option<sol:pubkey>
+
+      # Vector
+      - name: u8_type_vector
+        type: rs:vec<u8>
+        solana:
+          attributes: [ cap:10 ]
+      - name: u16_type_vector
+        type: rs:vec<u16>
+        solana:
+          attributes: [ cap:10 ]
+      - name: u32_type_vector
+        type: rs:vec<u32>
+        solana:
+          attributes: [ cap:10 ]
+      - name: u64_type_vector
+        type: rs:vec<u64>
+        solana:
+          attributes: [ cap:10 ]
+      - name: u128_type_vector
+        type: rs:vec<u128>
+        solana:
+          attributes: [ cap:10 ]
+      #      - name: u256_type_vector
+      #        type: rs:vec<u256>
+      #        solana:
+      #          attributes: [ cap:10 ]
+      - name: i8_type_vector
+        type: rs:vec<i8>
+        solana:
+          attributes: [ cap:10 ]
+      - name: i16_type_vector
+        type: rs:vec<i16>
+        solana:
+          attributes: [ cap:10 ]
+      - name: i32_type_vector
+        type: rs:vec<i32>
+        solana:
+          attributes: [ cap:10 ]
+      - name: i64_type_vector
+        type: rs:vec<i64>
+        solana:
+          attributes: [ cap:10 ]
+      - name: i128_type_vector
+        type: rs:vec<i128>
+        solana:
+          attributes: [ cap:10 ]
+      #      - name: i256_type_vector
+      #        type: rs:vec<i256>
+      #        solana:
+      #          attributes: [ cap:10 ]
+      # Not supported: The CIDL spec doesn't define how to set a capacity for the vector and for the string
+      #      - name: string_type
+      #        type: rs:vec<string>
+      #        solana:
+      #          attributes: [cap:10]
+      - name: bool_type_vector
+        type: rs:vec<bool>
+        solana:
+          attributes: [ cap:10 ]
+      - name: f32_type_vector
+        type: rs:vec<f32>
+        solana:
+          attributes: [ cap:10 ]
+      - name: f64_type_vector
+        type: rs:vec<f64>
+        solana:
+          attributes: [ cap:10 ]
+      - name: pubkey_type_vector
+        type: rs:vec<sol:pubkey>
+        solana:
+          attributes: [ cap:10 ]
+  MasterTypesPDA:
+    solana:
+      seeds:
+        - name: master_type_pda
+    fields:
+      # Native types
+      - name: u8_type
+        type: u8
+      - name: u16_type
+        type: u16
+      - name: u32_type
+        type: u32
+      - name: u64_type
+        type: u64
+      - name: u128_type
+        type: u128
+      #      - name: u256_type
+      #        type: u256
+      - name: i8_type
+        type: i8
+      - name: i16_type
+        type: i16
+      - name: i32_type
+        type: i32
+      - name: i64_type
+        type: i64
+      - name: i128_type
+        type: i128
+      #      - name: i256_type
+      #        type: i256
+      - name: string_type
+        type: string
+        solana:
+          attributes: [ cap:10 ]
+      - name: bool_type
+        type: bool
+      - name: f32_type
+        type: f32
+      - name: f64_type
+        type: f64
+
+      # Extended type
+      - name: pubkey_type
+        type: sol:pubkey
+
+      # Options
+      - name: u8_type_option
+        type: rs:option<u8>
+      - name: u16_type_option
+        type: rs:option<u16>
+      - name: u32_type_option
+        type: rs:option<u32>
+      - name: u64_type_option
+        type: rs:option<u64>
+      - name: u128_type_option
+        type: rs:option<u128>
+      #      - name: u256_type_option
+      #        type: rs:option<u256>
+      - name: i8_type_option
+        type: rs:option<i8>
+      - name: i16_type_option
+        type: rs:option<i16>
+      - name: i32_type_option
+        type: rs:option<i32>
+      - name: i64_type_option
+        type: rs:option<i64>
+      - name: i128_type_option
+        type: rs:option<i128>
+      #      - name: i256_type_option
+      #        type: rs:option<i256>
+      - name: string_type_option
+        type: rs:option<string>
+        solana:
+          attributes: [ cap:10 ]
+      - name: bool_type_option
+        type: rs:option<bool>
+      - name: f32_type_option
+        type: rs:option<f32>
+      - name: f64_type_option
+        type: rs:option<f64>
+      - name: pubkey_type_option
+        type: rs:option<sol:pubkey>
+
+      # Vector
+      - name: u8_type_vector
+        type: rs:vec<u8>
+        solana:
+          attributes: [ cap:10 ]
+      - name: u16_type_vector
+        type: rs:vec<u16>
+        solana:
+          attributes: [ cap:10 ]
+      - name: u32_type_vector
+        type: rs:vec<u32>
+        solana:
+          attributes: [ cap:10 ]
+      - name: u64_type_vector
+        type: rs:vec<u64>
+        solana:
+          attributes: [ cap:10 ]
+      - name: u128_type_vector
+        type: rs:vec<u128>
+        solana:
+          attributes: [ cap:10 ]
+      #      - name: u256_type_vector
+      #        type: rs:vec<u256>
+      #        solana:
+      #          attributes: [ cap:10 ]
+      - name: i8_type_vector
+        type: rs:vec<i8>
+        solana:
+          attributes: [ cap:10 ]
+      - name: i16_type_vector
+        type: rs:vec<i16>
+        solana:
+          attributes: [ cap:10 ]
+      - name: i32_type_vector
+        type: rs:vec<i32>
+        solana:
+          attributes: [ cap:10 ]
+      - name: i64_type_vector
+        type: rs:vec<i64>
+        solana:
+          attributes: [ cap:10 ]
+      - name: i128_type_vector
+        type: rs:vec<i128>
+        solana:
+          attributes: [ cap:10 ]
+      #      - name: i256_type_vector
+      #        type: rs:vec<i256>
+      #        solana:
+      #          attributes: [ cap:10 ]
+      # Not supported: The CIDL spec doesn't define how to set a capacity for the vector and for the string
+      #      - name: string_type
+      #        type: rs:vec<string>
+      #        solana:
+      #          attributes: [cap:10]
+      - name: bool_type_vector
+        type: rs:vec<bool>
+        solana:
+          attributes: [ cap:10 ]
+      - name: f32_type_vector
+        type: rs:vec<f32>
+        solana:
+          attributes: [ cap:10 ]
+      - name: f64_type_vector
+        type: rs:vec<f64>
+        solana:
+          attributes: [ cap:10 ]
+      - name: pubkey_type_vector
+        type: rs:vec<sol:pubkey>
+        solana:
+          attributes: [ cap:10 ]
+methods:
+  - name: instruction1
+    summary: Test MasterTypeNonPDA types
+    inputs:
+      - name: account
+        type: MasterTypesNonPDA
+        solana:
+          attributes: [ init ]
+      # Native types
+      - name: u8_type
+        type: u8
+      - name: u16_type
+        type: u16
+      - name: u32_type
+        type: u32
+      - name: u64_type
+        type: u64
+      - name: u128_type
+        type: u128
+      #      - name: u256_type
+      #        type: u256
+      - name: i8_type
+        type: i8
+      - name: i16_type
+        type: i16
+      - name: i32_type
+        type: i32
+      - name: i64_type
+        type: i64
+      - name: i128_type
+        type: i128
+      #      - name: i256_type
+      #        type: i256
+      - name: string_type
+        type: string
+      - name: bool_type
+        type: bool
+      - name: f32_type
+        type: f32
+      - name: f64_type
+        type: f64
+
+      # Extended type
+      - name: pubkey_type
+        type: sol:pubkey
+      - name: account_info_type
+        type: sol:account_info
+      - name: account_info_type_mut
+        type: sol:account_info
+        solana:
+          attributes: [mut]
+
+      # Options
+      - name: u8_type_option
+        type: rs:option<u8>
+      - name: u16_type_option
+        type: rs:option<u16>
+      - name: u32_type_option
+        type: rs:option<u32>
+      - name: u64_type_option
+        type: rs:option<u64>
+      - name: u128_type_option
+        type: rs:option<u128>
+      #      - name: u256_type_option
+      #        type: rs:option<u256>
+      - name: i8_type_option
+        type: rs:option<i8>
+      - name: i16_type_option
+        type: rs:option<i16>
+      - name: i32_type_option
+        type: rs:option<i32>
+      - name: i64_type_option
+        type: rs:option<i64>
+      - name: i128_type_option
+        type: rs:option<i128>
+      #      - name: i256_type_option
+      #        type: rs:option<i256>
+      - name: string_type_option
+        type: rs:option<string>
+      - name: bool_type_option
+        type: rs:option<bool>
+      - name: f32_type_option
+        type: rs:option<f32>
+      - name: f64_type_option
+        type: rs:option<f64>
+      - name: pubkey_type_option
+        type: rs:option<sol:pubkey>
+
+      # Vector
+      - name: u8_type_vector
+        type: rs:vec<u8>
+      - name: u16_type_vector
+        type: rs:vec<u16>
+      - name: u32_type_vector
+        type: rs:vec<u32>
+      - name: u64_type_vector
+        type: rs:vec<u64>
+      - name: u128_type_vector
+        type: rs:vec<u128>
+      #      - name: u256_type_vector
+      #        type: rs:vec<u256>
+      - name: i8_type_vector
+        type: rs:vec<i8>
+      - name: i16_type_vector
+        type: rs:vec<i16>
+      - name: i32_type_vector
+        type: rs:vec<i32>
+      - name: i64_type_vector
+        type: rs:vec<i64>
+      - name: i128_type_vector
+        type: rs:vec<i128>
+      #      - name: i256_type_vector
+      #        type: rs:vec<i256>
+      # Not supported: The CIDL spec doesn't define how to set a capacity for the vector and for the string
+      #      - name: string_type
+      #        type: rs:vec<string>
+      - name: bool_type_vector
+        type: rs:vec<bool>
+      - name: f32_type_vector
+        type: rs:vec<f32>
+      - name: f64_type_vector
+        type: rs:vec<f64>
+      - name: pubkey_type_vector
+        type: rs:vec<sol:pubkey>
+  - name: instruction2
+    summary: Test MasterTypePDA types
+    inputs:
+      - name: account
+        type: MasterTypesPDA
+        solana:
+          attributes: [ init]
+      # Native types
+      - name: u8_type
+        type: u8
+      - name: u16_type
+        type: u16
+      - name: u32_type
+        type: u32
+      - name: u64_type
+        type: u64
+      - name: u128_type
+        type: u128
+      #      - name: u256_type
+      #        type: u256
+      - name: i8_type
+        type: i8
+      - name: i16_type
+        type: i16
+      - name: i32_type
+        type: i32
+      - name: i64_type
+        type: i64
+      - name: i128_type
+        type: i128
+      #      - name: i256_type
+      #        type: i256
+      - name: string_type
+        type: string
+      - name: bool_type
+        type: bool
+      - name: f32_type
+        type: f32
+      - name: f64_type
+        type: f64
+
+      # Extended type
+      - name: pubkey_type
+        type: sol:pubkey
+      - name: account_info_type
+        type: sol:account_info
+      - name: account_info_type_mut
+        type: sol:account_info
+        solana:
+          attributes: [mut]
+
+      # Options
+      - name: u8_type_option
+        type: rs:option<u8>
+      - name: u16_type_option
+        type: rs:option<u16>
+      - name: u32_type_option
+        type: rs:option<u32>
+      - name: u64_type_option
+        type: rs:option<u64>
+      - name: u128_type_option
+        type: rs:option<u128>
+      #      - name: u256_type_option
+      #        type: rs:option<u256>
+      - name: i8_type_option
+        type: rs:option<i8>
+      - name: i16_type_option
+        type: rs:option<i16>
+      - name: i32_type_option
+        type: rs:option<i32>
+      - name: i64_type_option
+        type: rs:option<i64>
+      - name: i128_type_option
+        type: rs:option<i128>
+      #      - name: i256_type_option
+      #        type: rs:option<i256>
+      - name: string_type_option
+        type: rs:option<string>
+      - name: bool_type_option
+        type: rs:option<bool>
+      - name: f32_type_option
+        type: rs:option<f32>
+      - name: f64_type_option
+        type: rs:option<f64>
+      - name: pubkey_type_option
+        type: rs:option<sol:pubkey>
+
+      # Vector
+      - name: u8_type_vector
+        type: rs:vec<u8>
+      - name: u16_type_vector
+        type: rs:vec<u16>
+      - name: u32_type_vector
+        type: rs:vec<u32>
+      - name: u64_type_vector
+        type: rs:vec<u64>
+      - name: u128_type_vector
+        type: rs:vec<u128>
+      #      - name: u256_type_vector
+      #        type: rs:vec<u256>
+      - name: i8_type_vector
+        type: rs:vec<i8>
+      - name: i16_type_vector
+        type: rs:vec<i16>
+      - name: i32_type_vector
+        type: rs:vec<i32>
+      - name: i64_type_vector
+        type: rs:vec<i64>
+      - name: i128_type_vector
+        type: rs:vec<i128>
+      #      - name: i256_type_vector
+      #        type: rs:vec<i256>
+      # Not supported: The CIDL spec doesn't define how to set a capacity for the vector and for the string
+      #      - name: string_type
+      #        type: rs:vec<string>
+      - name: bool_type_vector
+        type: rs:vec<bool>
+      - name: f32_type_vector
+        type: rs:vec<f32>
+      - name: f64_type_vector
+        type: rs:vec<f64>
+      - name: pubkey_type_vector
+        type: rs:vec<sol:pubkey>
