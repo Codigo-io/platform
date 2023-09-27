@@ -1,8 +1,9 @@
 import * as anchor from "@coral-xyz/anchor";
 import * as anchorCounterClient from "../client/validate_counter";
 import chai from "chai";
-import { assert, expect } from "chai";
+import { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
+import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 chai.use(chaiAsPromised);
 
 describe("workspace", () => {
@@ -38,7 +39,7 @@ describe("workspace", () => {
     let counterAddress = anchorCounterClient.deriveCounter({user: adminKeypair.publicKey})
 
     await expect(anchorCounterClient.fetchCounter(counterAddress)).to.be.rejected;
-    
+
     await anchorCounterClient.InitCounterSendAndConfirm(adminKeypair);
 
     await expect(anchorCounterClient.fetchCounter(counterAddress)).to.not.be.rejected;
@@ -52,10 +53,10 @@ describe("workspace", () => {
   })
   it("Inits if needed and increments a counter", async ()=> {
     let rentPayerBefore = await provider.connection.getBalance(rentPayer.publicKey)
-    
+
     await anchorCounterClient.InitIfNeededAndIncrementSendAndConfirm(adminKeypair, rentPayer)
     let rentPayerAfter = await provider.connection.getBalance(rentPayer.publicKey)
-    
+
     let counterAddress = anchorCounterClient.deriveCounter({user: rentPayer.publicKey})
     let counter = await anchorCounterClient.fetchCounter(counterAddress)
 
@@ -65,14 +66,14 @@ describe("workspace", () => {
 
   it("Closes an account and send lamports to specified rent-receiver", async ()=> {
     let rentPayerBefore = await provider.connection.getBalance(rentPayer.publicKey)
-    
+
     await anchorCounterClient.CloseCounterSendAndConfirm(adminKeypair, rentPayer)
     let rentPayerAfter = await provider.connection.getBalance(rentPayer.publicKey)
-    
+
     let counterAddress = anchorCounterClient.deriveCounter({user: rentPayer.publicKey})
     await expect(anchorCounterClient.fetchCounter(counterAddress)).to.be.rejected;
 
     expect(rentPayerBefore).to.lt(rentPayerAfter);
   })
-  
+
 });
