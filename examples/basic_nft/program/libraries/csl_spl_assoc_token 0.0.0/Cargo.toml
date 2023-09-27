@@ -1,0 +1,26 @@
+# This file is auto-generated from the CIDL source.
+# Editing this file directly is not recommended as it may be overwritten.
+
+[package]
+name = "csl_spl_assoc_token"
+version = "0.0.0"
+edition = "2021"
+license = "codigo"
+publish = false
+
+authors = ["Codigo <support@codigo.ai>"]
+description = """
+
+"""
+homepage = "https://codigo.ai"
+repository = "https://github.com/Codigo-ai"
+
+[dependencies]
+solana-program = ">=1.14, <1.17"
+spl-associated-token-account = { version = "2.0.0", features = ["no-entrypoint"] }
+csl_spl_token = { path = "../csl_spl_token 0.0.0", version = "0.0.0"}
+
+
+[lib]
+crate-type = ["cdylib", "lib"]
+path = "./lib.rs"

@@ -1,0 +1,53 @@
+[workspace]
+members = ["libraries/*"]
+
+[package]
+name = "validate_basic_nft"
+version = "0.0.0"
+edition = "2021"
+license = "codigo"
+publish = false
+
+authors = ["Codigo <support@codigo.ai>"]
+description = """
+The purpose of this CIDL is to validate the basic use case of NFT: Digital art and Collectibles
+- Verifies we can mint a Token
+- Verifies we can transfer
+- Verifies we can burn
+"""
+homepage = "https://codigo.ai"
+repository = "https://github.com/Codigo-ai"
+
+[dependencies]
+solana-program = ">=1.14, <1.17"
+borsh = "0.10.3"
+thiserror = "1"
+num-derive = "0.4"
+num-traits = "0.2"
+num_enum = "0.7.0"
+assert_matches = {version = "~1.5.0", optional = true}
+solana-logger = {version = ">=1.14, <1.17", optional = true}
+solana-program-test = {version = ">=1.14, <1.17", optional = true}
+solana-sdk = {version = ">=1.14, <1.17", optional = true}
+solana-validator = {version = ">=1.14, <1.17", optional = true}
+solana-rpc-client = {version = ">=1.14, <1.17", optional = true}
+
+spl-token = { version = "4.0.0", features = ["no-entrypoint"] }
+spl-associated-token-account = { version = "2.0.0", features = ["no-entrypoint"] }
+csl_spl_token = { path = "libraries/csl_spl_token 0.0.0", version = "0.0.0"}
+csl_spl_assoc_token = { path = "libraries/csl_spl_assoc_token 0.0.0", version = "0.0.0"}
+
+
+[features]
+test-sbf = [
+    "assert_matches",
+    "solana-sdk/default",
+    "solana-logger",
+    "solana-program-test",
+    "solana-validator",
+    "solana-rpc-client"
+]
+
+[lib]
+crate-type = ["cdylib", "lib"]
+path = "./lib.rs"
