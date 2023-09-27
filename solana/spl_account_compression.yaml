@@ -1,0 +1,210 @@
+cidl: "0.8"
+info:
+  name: csl_spl_account_compression
+  title: |-
+    Código Standard Library for Solana Programs Library
+  summary:
+  version: 0.0.0
+  contact:
+    name: Codigo
+    web: https://codigo.ai
+    git: https://github.com/Codigo-ai
+    email: support@codigo.ai
+  license:
+    name: Codigo
+    url: https://codigo.ai/documents/Codigo---Terms-of-Service.pdf
+methods:
+  - name: init_empty_merkle_tree
+    summary: |-
+      Creates a new merkle tree with maximum leaf capacity of `power(2, max_depth)` and a minimum concurrency limit of `max_buffer_size`.
+
+      Concurrency limit represents the # of replace instructions that can be successfully executed with proofs dated for the same root. For example, a maximum buffer size of 1024
+      means that a minimum of 1024 replaces can be executed before a new proof must be generated for the next replace instruction.
+
+      Concurrency limit should be determined by empirically testing the demand for state built on top of SPL Compression.
+
+      For instructions on enabling the canopy, see [canopy].
+    solana:
+      signers:
+        - name: authority
+    inputs:
+      - name: merkle_tree
+        type: sol:account_info
+        description: The merkle tree account.
+        solana:
+          attributes: [mut]
+          owner: cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK
+      - name: authority
+        type: sol:account_info
+        description: Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
+      - name: noop
+        type: sol:account_info
+        description: Program used to emit changelogs as cpi instruction data.
+        solana:
+          address: noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV
+      - name: account_compression
+        type: sol:account_info
+        description: Account Compression program it self
+        solana:
+          address: cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK
+      - name: max_depth
+        type: u32
+      - name: max_buffer_size
+        type: u32
+  - name: replace_leaf
+    summary: |-
+      Executes an instruction that overwrites a leaf node. Composing programs should check that the data hashed into previous_leaf matches the authority information necessary to execute this instruction.
+    solana:
+      signers:
+        - name: authority
+    inputs:
+      - name: merkle_tree
+        type: sol:account_info
+        description: The merkle tree account.
+        solana:
+          attributes: [mut]
+          owner: cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK
+      - name: authority
+        type: sol:account_info
+        description: Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
+      - name: noop
+        type: sol:account_info
+        description: Program used to emit changelogs as cpi instruction data.
+        solana:
+          address: noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV
+      - name: root
+        type: rs:vec<u8>
+      - name: previous_leaf
+        type: rs:vec<u8>
+      - name: new_leaf
+        type: rs:vec<u8>
+      - name: index
+        type: u32
+  - name: transfer_authority
+    summary: |-
+      Transfers `authority`.", "Requires `authority` to sign
+    solana:
+      signers:
+        - name: authority
+    inputs:
+      - name: merkle_tree
+        type: sol:account_info
+        description: The merkle tree account.
+        solana:
+          attributes: [mut]
+          owner: cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK
+      - name: authority
+        type: sol:account_info
+        description: Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
+      - name: new_authority
+        type: sol:pubkey
+  - name: verify_leaf
+    summary: |-
+      Verifies a provided proof and leaf. If invalid, throws an error.
+    inputs:
+      - name: merkle_tree
+        type: sol:account_info
+        description: The merkle tree account.
+        solana:
+          owner: cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK
+      - name: root
+        type: rs:vec<u8>
+      - name: leaf
+        type: rs:vec<u8>
+      - name: index
+        type: u32
+  - name: append
+    summary: |-
+      This instruction allows the tree's `authority` to append a new leaf to the tree without having to supply a proof.
+
+      Learn more about SPL
+      ConcurrentMerkleTree
+      https://github.com/solana-labs/solana-program-library/tree/master/libraries/concurrent-merkle-tree
+    solana:
+      signers:
+        - name: authority
+    inputs:
+      - name: merkle_tree
+        type: sol:account_info
+        description: The merkle tree account.
+        solana:
+          attributes: [mut]
+          owner: cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK
+      - name: authority
+        type: sol:account_info
+        description: Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
+      - name: noop
+        type: sol:account_info
+        description: Program used to emit changelogs as cpi instruction data.
+        solana:
+          address: noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV
+      - name: leaf
+        type: rs:vec<u8>
+  - name: insert_or_append
+    summary: |-
+      This instruction takes a proof, and will attempt to write the given leaf
+      to the specified index in the tree. If the insert operation fails, the leaf will be appended to the tree.
+      It is up to the indexer to parse the final location of the leaf from the emitted changelog.
+    solana:
+      signers:
+        - name: authority
+    inputs:
+      - name: merkle_tree
+        type: sol:account_info
+        description: The merkle tree account.
+        solana:
+          attributes: [mut]
+          owner: cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK
+      - name: authority
+        type: sol:account_info
+        description: Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
+      - name: noop
+        type: sol:account_info
+        description: Program used to emit changelogs as cpi instruction data.
+        solana:
+          address: noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV
+      - name: root
+        type: rs:vec<u8>
+      - name: leaf
+        type: rs:vec<u8>
+      - name: index
+        type: u32
+  - name: close_empty_tree
+    summary: |-
+      Close the tree and give back lamports to the recipient spesified.
+    solana:
+      signers:
+        - name: authority
+    inputs:
+      - name: merkle_tree
+        type: sol:account_info
+        description: The merkle tree account.
+        solana:
+          attributes: [mut]
+          owner: cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK
+      - name: authority
+        type: sol:account_info
+        description: Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
+      - name: recipient
+        type: sol:account_info
+        description: The SOL recevier.
+        solana:
+          attributes: [mut]
+  - name: save_application_data
+    summary: |-
+      Save a custom data to the chain
+    inputs:
+      - name: noop
+        type: sol:account_info
+        description: Noop program
+        solana:
+          address: noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV
+      - name: discriminator
+        type: u32
+        description: Compressed account index starting by 1
+      - name: hash
+        type: rs:vec<u8>
+      - name: merkle_tree
+        type: sol:pubkey
+      - name: data
+        type: rs:vec<u8>

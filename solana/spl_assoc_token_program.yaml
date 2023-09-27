@@ -1,0 +1,99 @@
+cidl: "0.8"
+info:
+  name: csl_spl_assoc_token
+  title: |-
+    Código Standard Library for Solana Programs Library
+  summary:
+  version: 0.0.0
+  contact:
+    name: Codigo
+    web: https://codigo.ai
+    git: https://github.com/Codigo-ai
+    email: support@codigo.ai
+  license:
+    name: Codigo
+    url: https://codigo.ai/documents/Codigo---Terms-of-Service.pdf
+methods:
+  - name: create
+    summary: |-
+      Creates an associated token account for the given wallet address and token mint.
+      Returns an error if the account exists.
+    solana:
+      signers:
+        - name: funding
+    inputs:
+      - name: funding
+        type: sol:account_info
+        description: Funding account (must be a system account)
+        solana:
+          owner: 11111111111111111111111111111111
+          attributes: [ mut ]
+      - name: assoc_token_account
+        type: csl_spl_token.Account
+        description: Associated token account address to be created
+        solana:
+          attributes: [ init ]
+          seeds:
+            wallet: wallet
+            token_program: token_program
+            mint: mint
+      - name: wallet
+        type: sol:account_info
+        description: Wallet address for the new associated token account
+        solana:
+          owner: 11111111111111111111111111111111
+      - name: mint
+        type: csl_spl_token.Mint
+        description: The token mint for the new associated token account
+      - name: system_program
+        type: sol:account_info
+        description: System program
+        solana:
+          address: 11111111111111111111111111111111
+      - name: token_program
+        type: sol:account_info
+        description: SPL Token program
+        solana:
+          address: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+  - name: create_idempotent
+    summary: |-
+      Creates an associated token account for the given wallet address and token mint,
+      if it doesn't already exist.  Returns an error if the account exists,
+      but with a different owner.
+    solana:
+      signers:
+        - name: funding
+    inputs:
+      - name: funding
+        type: sol:account_info
+        description: Funding account (must be a system account)
+        solana:
+          owner: 11111111111111111111111111111111
+          attributes: [ mut ]
+      - name: assoc_token_account
+        type: csl_spl_token.Account
+        description: Associated token account address to be created
+        solana:
+          attributes: [ init ]
+          seeds:
+            wallet: wallet
+            token_program: token_program
+            mint: mint
+      - name: wallet
+        type: sol:account_info
+        description: Wallet address for the new associated token account
+        solana:
+          owner: 11111111111111111111111111111111
+      - name: mint
+        type: csl_spl_token.Mint
+        description: The token mint for the new associated token account
+      - name: system_program
+        type: sol:account_info
+        description: System program
+        solana:
+          address: 11111111111111111111111111111111
+      - name: token_program
+        type: sol:account_info
+        description: SPL Token program
+        solana:
+          address: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
