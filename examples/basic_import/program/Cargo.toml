@@ -1,0 +1,84 @@
+[workspace]
+members = ["libraries/*"]
+
+[package]
+name = "validate_imports"
+version = "0.0.0"
+edition = "2021"
+license = "codigo"
+publish = false
+
+
+description = """
+Validates the CIDL import feature, this CIDL will import other CIDLs and won't add new inputs
+verifies the following in a CIDL import context:
+- The purpose of this CIDL is to validate all the supported features for an account
+- Verifies it can define a Non-PDA account with one field
+- Verifies it can define PDA account with one field and a static seed
+- Verifies it can define PDA account with one field, a static and dynamic seed
+- Verifies it can define PDA account with all the possible seeds data types
+- Verifies account space is calculated automatically
+- Verifies it can mark an account as mutable
+- Verifies it can mark an account as immutable
+- Verifies it can generate the code to initialize an account in "Singleton mode" a.k.a init
+- Verifies it can generate the code to initialize an account in "Non-Singleton mode" a.k.a init_if_needed
+- Verifies the fee payer is the default payer when using an initialization method without explicitly specifying the payer
+- Verifies it can close a Non-PDA account
+- Verifies it can close a PDA account
+- Verifies the fee payer is the default lamport receiver when a rent receiver is not specify
+- Verifies the usage of multiple signers
+- Verifies we can specify a rent-payer to an account when initializing
+- Verifies we can specify a rent-receiver to an account when closing it
+- Verifies we can map a signer to an account seed
+- Verifies we can map an input to an account seed
+- Verifies a Non-PDA account can be signer
+- Verifies all the supported types for PDA accounts
+- Verifies all the supported types for Non-PDA accounts
+- Verifies all the supported types for inputs
+- The business logic should assign the input to the account's field
+- The business logic test should verified that the input's values is the same value assign to the account's field
+- Verifies the owner of an account is the program id
+- Verifies the owner of an account is the program id when the owner property is omitted
+- Verifies the owner of an account is another (external) program
+- Verifies account length
+- Verifies PDA seeds
+- Verifies an account is a signer
+- Verifies signer's owner equals a type's owner
+- Verifies a signer matches exactly an address
+- Verifies a signer is an executable account
+"""
+
+
+
+[dependencies]
+solana-program = ">=1.14, <1.17"
+borsh = "0.10.3"
+thiserror = "1"
+num-derive = "0.4"
+num-traits = "0.2"
+num_enum = "0.7.0"
+assert_matches = {version = "~1.5.0", optional = true}
+solana-logger = {version = ">=1.14, <1.17", optional = true}
+solana-program-test = {version = ">=1.14, <1.17", optional = true}
+solana-sdk = {version = ">=1.14, <1.17", optional = true}
+solana-validator = {version = ">=1.14, <1.17", optional = true}
+solana-rpc-client = {version = ">=1.14, <1.17", optional = true}
+
+validate_accounts = { path = "libraries/validate_accounts 0.0.0", version = "0.0.0"}
+validate_advanced_cases = { path = "libraries/validate_advanced_cases 0.0.0", version = "0.0.0"}
+validate_data_types = { path = "libraries/validate_data_types 0.0.0", version = "0.0.0"}
+
+
+[features]
+test-sbf = [
+    "assert_matches",
+    "solana-sdk/default",
+    "solana-logger",
+    "solana-program-test",
+    "solana-validator",
+    "solana-rpc-client"
+]
+
+[lib]
+crate-type = ["cdylib", "lib"]
+path = "./lib.rs"
