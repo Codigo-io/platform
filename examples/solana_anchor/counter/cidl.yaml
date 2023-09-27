@@ -1,0 +1,83 @@
+cidl: "0.8"
+info:
+  name: validate_counter
+  title: Validate Counter
+  summary: |
+    The purpose of this CIDL is to test basic functionality:
+    - PDA init/init_if_needed
+    - Rent payer other than fee_payer
+    - serdes of u64
+    - mut / signer input attrs
+  version: 0.0.0
+  contact:
+    name: Codigo
+    web: https://codigo.ai
+    git: https://github.com/Codigo-ai
+    email: support@codigo.ai
+  license:
+    name: Codigo
+    url: https://codigo.ai/documents/Codigo---Terms-of-Service.pdf
+types:
+  Counter:
+    summary: Account to increment
+    solana:
+      owner: self
+      seeds:
+        - name: user
+          type: sol:pubkey
+    fields:
+      - name: count
+        type: u64
+        description: The current count.
+methods:
+  - name: init_counter
+    solana:
+      signers:
+        - name: fee_payer
+    inputs:
+      - name: counter
+        type: Counter
+        solana:
+          attributes: [ init ]
+          seeds:
+            user: fee_payer
+  - name: increment
+    summary: Increment counter account
+    solana:
+      signers:
+        - name: fee_payer
+    inputs:
+      - name: counter
+        type: Counter
+        solana:
+          attributes: [ mut ]
+          seeds:
+            user: fee_payer
+  - name: init_if_needed_and_increment
+    summary: Init if needed, and then increment counter account
+    solana:
+      signers:
+        - name: fee_payer
+        - name: rent_payer
+    inputs:
+      - name: counter
+        type: Counter
+        solana:
+          attributes: [ init_if_needed ]
+          rent-payer: rent_payer
+          seeds:
+            user: rent_payer
+  - name: close_counter
+    summary: close the counter account
+    solana:
+      signers:
+        - name: fee_payer
+        - name: rent_receiver
+    inputs:
+      - name: counter
+        type: Counter
+        solana:
+          attributes: [ close ]
+          rent-receiver: rent_receiver
+          seeds:
+            user: rent_receiver

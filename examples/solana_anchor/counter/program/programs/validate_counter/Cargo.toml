@@ -1,0 +1,20 @@
+
+[package]
+name = "validate_counter"
+version = "0.0.0"
+description = "The purpose of this CIDL is to test basic functionality: - PDA init/init_if_needed - Rent payer other than fee_payer - serdes of u64 - mut / signer input attrs "
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "validate_counter"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = { version = "0.28.0", features = ["init-if-needed"] }
