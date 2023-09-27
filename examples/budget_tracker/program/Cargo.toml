@@ -1,0 +1,53 @@
+
+[package]
+name = "budget_tracker"
+version = "0.0.1"
+edition = "2021"
+license = "mit"
+publish = false
+
+authors = ["Código <support@codigo.ai>"]
+description = """
+The purpose of this contract is to track the income and outcome of a given user. For this contract, we are going to 
+target the Solana blockchain. Thus, we define the data structure **Record** that will be transpiled to a PDA Account 
+based on the seeds defined in the solana extension. In addition, the contract defines three methods, also known as 
+instruction; through this method, we add behavior.
+
+Some useful links:
+
+  - [Blockchain Extensions](https://docs.codigo.ai/category/blockchain-extensions)
+  - [Learning the Basics](https://docs.codigo.ai/código-interface-description-language/learning-the-basics)
+  - [Building Solana Programs with CIDL: A Comprehensive Guide Part I](https://docs.codigo.ai/guides/part-1-building-solana-programs)
+"""
+homepage = "https://codigo.ai"
+repository = "https://github.com/Codigo-io/examples"
+
+[dependencies]
+solana-program = ">=1.14, <1.17"
+borsh = "0.10.3"
+thiserror = "1"
+num-derive = "0.4"
+num-traits = "0.2"
+num_enum = "0.7.0"
+assert_matches = {version = "~1.5.0", optional = true}
+solana-logger = {version = ">=1.14, <1.17", optional = true}
+solana-program-test = {version = ">=1.14, <1.17", optional = true}
+solana-sdk = {version = ">=1.14, <1.17", optional = true}
+solana-validator = {version = ">=1.14, <1.17", optional = true}
+solana-rpc-client = {version = ">=1.14, <1.17", optional = true}
+
+
+
+[features]
+test-sbf = [
+    "assert_matches",
+    "solana-sdk/default",
+    "solana-logger",
+    "solana-program-test",
+    "solana-validator",
+    "solana-rpc-client"
+]
+
+[lib]
+crate-type = ["cdylib", "lib"]
+path = "./lib.rs"
