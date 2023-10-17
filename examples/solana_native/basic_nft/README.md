@@ -163,7 +163,7 @@ cargo build-sbf
 ```
 If it gives an error then run the following command:
 ```shell
-cargo install build-bpf
+cd program/
 ```
 **I think this will work**
 
