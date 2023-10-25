@@ -8,7 +8,7 @@ Código is an AI-Powered Code Generation Platform for blockchain developers and 
 
 ## CIDL Quickstart
 
-In this Quickstart guide, you’ll learn how to start with Código’s Interface Description Language (CIDL) by building a simple Solana counter program.
+In this Quickstart guide, you’ll learn how to start with Código’s Interface Description Language (CIDL) by building a simple Solana basic NFT program.
 
 > If you are following along from your local environment, this guide assumes you have successfully installed and configured the Solana tool suite. If you are working from Código Studio, you don’t need to worry; the Solana tool suite comes installed and configured. 
 
@@ -111,7 +111,7 @@ After generating the Solana program and client library, two new directories will
 
 ### 3. Implement the business logic
 
-In the `program` directory, you will find a directory called `src`; inside this directory, there will be two `.rs` files named `mint.rs`, `burn.rs` and `transfer.rs`
+In the `program` directory, you will find a directory called `src`; inside this directory, there will be three `.rs` files named `mint.rs`, `burn.rs` and `transfer.rs`
 
 #### Mint business logic
 
@@ -156,16 +156,11 @@ csl_spl_token::src::cpi::transfer_checked(for_transfer_checked, 1, 0)?;
 
 ### 4. Build and deploy the program
 
-Open the terminal and navigate to the `program` directory, from there execute the following command:
+Open the terminal and navigate to the program directory by executing the command `cd program`, from there execute the following command:
 
 ```shell
 cargo build-sbf
 ```
-If it gives an error then run the following command:
-```shell
-cd program/
-```
-**I think this will work**
 
 Run a local Solana validator by opening a new terminal and typing the command:
 
@@ -178,7 +173,7 @@ solana-test-validator
 Deploy the program by opening a new terminal and navigating to the `program` directory; from there, execute the following command:
 
 ```shell
-solana program deploy target/deploy/counter.so
+solana program deploy target/deploy/nft.so
 ```
 
 After deploying the program, you will receive the program id; copy and paste it somewhere for later.
@@ -206,12 +201,11 @@ import {
 import {getMinimumBalanceForRentExemptAccount, getMint, TOKEN_PROGRAM_ID,} from "@solana/spl-token";
 
 async function main(feePayer: Keypair) {
-    const args = process.argv.slice(2);
-    const connection = new Connection("https://api.devnet.solana.com", {
+    const connection = new Connection("http://127.0.0.1:8899/", {
         commitment: "confirmed",
     });
 
-    const progId = new PublicKey(args[0]!);
+    const progId = new PublicKey("PASTE_YOUR_PROGRAM_ID");
 
     initializeClient(progId, connection);
 
@@ -400,7 +394,7 @@ fs.readFile(path.join(os.homedir(), ".config/solana/id.json")).then((file) =>
 Open the terminal, navigate to the `program_client` directory, and execute the following commands:
 
 ```shell
-npm install ts-node --save-dev
+npm install ts-node @solana/spl-token --save-dev
 ```
 
 Finally, to run the test, execute the following command:
