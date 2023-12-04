@@ -4,7 +4,7 @@ about: Create a report to help us improve
 title: ''
 labels: bug, triage
 assignees: JazielGuerrero
-
+projects: ["Codigo-io/projects/8"]
 ---
 
 **Describe the bug**
@@ -24,7 +24,6 @@ If applicable, add screenshots to help explain your problem.
 
 **Platform version:**
  - CLI Version [e.g. v0.1.0]
- - GenService Version [e.g. v0.1.0]
 
 **Extension (mark with an X the extension):**
  - Solana Native [ ]
