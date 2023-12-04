@@ -2,7 +2,7 @@ name: Bug Report
 description: Create a report to help us improve
 title: "[Bug]: "
 labels: ["bug", "triage"]
-projects: ["Codigo-io/projects/8"]
+projects: ["Codigo-io/8"]
 assignees: []
 body:
   - type: markdown
