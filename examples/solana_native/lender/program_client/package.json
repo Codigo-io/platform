@@ -1,0 +1,19 @@
+{
+  "name": "informal_lender",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "With this contract an informal lender can lend money through the blockchain.\nFor simplicity, the money will be SOL currency.",
+  "dependencies": {
+    "@solana/web3.js": "^1.78.3",
+    "borsh": "^1.0.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.7",
+    "ts-node": "^10.9.2"
+  }
+}
