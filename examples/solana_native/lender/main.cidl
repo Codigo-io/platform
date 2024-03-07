@@ -1,0 +1,175 @@
+cidl: "0.8"
+info:
+  name: informal_lender
+  title: Informal Lender
+  summary: |-
+    With this contract an informal lender can lend money through the blockchain.
+    For simplicity, the money will be SOL currency.
+  version: 0.1.0
+  license:
+    name: MIT
+    identifier: MIT
+solana:
+  seeds:
+    Broker:
+      items:
+        - name: broker
+    Loan:
+      items:
+        - name: loan
+        - name: client
+          type: sol:pubkey
+        - name: index
+          type: u32
+types:
+  Broker:
+    summary: |-
+      Broker is an account that can only exist once per contract.
+      It stores all the require information to lend money.
+    fields:
+      - name: delegate
+        type: sol:pubkey
+        description: Only this delegate can modify the Broker account
+      - name: capital
+        type: u128
+        description: The amount of money staked
+      - name: lended
+        type: u128
+        description: The amount of money lended
+      - name: revenue
+        type: u128
+        description: The amount of money earn
+      - name: fee
+        type: u8
+        description: The percentage a client needs to pay when paying a loan
+  Loan:
+    summary: |-
+      Loan is an account that will exist as many times is required
+      per client it stores a request to a Loan and if the loan is approved
+      it stores the amount payed.
+    fields:
+      - name: client
+        type: sol:pubkey
+        description: The client that owns this loan
+      - name: amount
+        type: u64
+        description: The amount of money the client borrow
+      - name: payed
+        type: u64
+        description: The amount of money this client has payed
+      - name: kyc_url
+        type: string
+        description: URL to the client's KYC document require by law
+        attributes: [ cap=96 ]
+      - name: fee
+        type: u8
+        description: The fee this client needs to pay for this loan when making payments
+      - name: approved
+        type: bool
+        description: Flag state if the loan was approved by the broker or not
+methods:
+  - name: create_broker
+    summary: |-
+      After deploying the contract this must be the first instruction
+      to call. It will configure the broker account.
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+      - input: delegate
+    inputs:
+      - name: delegate
+        type: sol:account
+        description: This will be the account that has permission to update the broker and approved request.
+        attributes: [ sol:writable ]
+      - name: broker
+        type: sol:account<Broker, seeds.Broker>
+        attributes: [ sol:init ]
+      - name: amount
+        type: u64
+        description: The amount to be added to the capital. It will be debited from the delegate account
+      - name: fee
+        type: u8
+  - name: add_capital_to_broker
+    summary: Through this instruction any one can add capital to the broker
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+      - input: delegate
+    inputs:
+      - name: delegate
+        type: sol:account
+        attributes: [ sol:writable ]
+      - name: broker
+        type: sol:account<Broker, seeds.Broker>
+        attributes: [ sol:writable ]
+      - name: amount
+        type: u64
+        description: The amount to be added to the capital. It will be debited from the delegate account
+  - name: request_loan
+    summary: This instruction is used by a client to request a loan
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+      - input: client
+    inputs:
+      - name: client
+        type: sol:account
+      - name: loan
+        type: sol:account<Loan, seeds.Loan(client=client)>
+        attributes: [ sol:init ]
+      - name: broker
+        type: sol:account<Broker, seeds.Broker>
+      - name: amount
+        type: u64
+        description: The request amount to borrow
+      - name: kyc_url
+        type: string
+  - name: approve_loan
+    summary: |-
+      Through this instruction the delegate can approve a loan.
+      Upon approval, the funds will be transfer from the broker
+      account to the client's account.
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+      - input: delegate
+    inputs:
+      - name: delegate
+        type: sol:account
+      - name: loan
+        type: sol:account<Loan, seeds.Loan(client=client)>
+        attributes: [ sol:writable ]
+      - name: broker
+        type: sol:account<Broker, seeds.Broker>
+        attributes: [ sol:writable ]
+      - name: client
+        type: sol:account
+        attributes: [ sol:writable ]
+  - name: pay_loan
+    summary: |-
+      A client can pay a loan through this instruction. When paying
+      the contract will calculate the interest based on the loan approved
+      fee. Additioanlly, it will transfer money from the client's account
+      to the broker account
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+      - input: client
+    inputs:
+      - name: client
+        type: sol:account
+        attributes: [ sol:writable ]
+      - name: loan
+        type: sol:account<Loan, seeds.Loan(client=client)>
+        attributes: [ sol:writable ]
+      - name: broker
+        type: sol:account<Broker, seeds.Broker>
+        attributes: [ sol:writable ]
+      - name: amount
+        type: u64
+        description: The amount to pay to the loan

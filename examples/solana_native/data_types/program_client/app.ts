@@ -4,8 +4,7 @@ import * as path from "path";
 import * as os from "os";
 import {
     deriveMasterTypesPdaPDA,
-    getMasterTypesNonPda,
-    getMasterTypesPda,
+    getState,
     initializeClient,
     instruction1SendAndConfirm,
     instruction2SendAndConfirm
@@ -72,7 +71,7 @@ async function main(feePayer: Keypair) {
             feePayer,
         }
     });
-    const masterNonPDAAccount = await getMasterTypesNonPda(masterNonPDA.publicKey);
+    const masterNonPDAAccount = await getState(masterNonPDA.publicKey);
     console.log(masterNonPDAAccount);
 
     await instruction2SendAndConfirm({
@@ -127,9 +126,9 @@ async function main(feePayer: Keypair) {
         }
     });
     const [masterTypesPdaPubKey] = deriveMasterTypesPdaPDA(progId);
-    const masterPDA = await getMasterTypesPda(masterTypesPdaPubKey);
+    const masterPDA = await getState(masterTypesPdaPubKey);
     console.info(masterPDA);
 }
 
 fs.readFile(path.join(os.homedir(), ".config/solana/id.json"))
-    .then(file => main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))));
+  .then(file => main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))));

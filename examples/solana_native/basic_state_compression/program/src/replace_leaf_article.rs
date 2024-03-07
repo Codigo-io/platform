@@ -12,11 +12,10 @@ use crate::generated::state::{
 /// 1. `[writable]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
 /// 3. `[]` noop: [AccountInfo] Program used to emit changelogs as cpi instruction data.
-/// 4. `[]` account_compression: [AccountInfo] Account Compression program it self
-/// 5. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 4. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
-/// - previous_leaf: [Pubkey] 
+/// - previous_leaf: [Vec<u8>] 
 /// - root: [Vec<u8>] 
 /// - index: [u32] 
 /// - name: [String] 

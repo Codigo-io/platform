@@ -2,9 +2,13 @@ use solana_program::account_info::AccountInfo;
 use solana_program::entrypoint::ProgramResult;
 use solana_program::pubkey::Pubkey;
 
-use crate::generated::state::{AccountPDA, Broker};
+use crate::generated::state::{
+	AccountPDA,
+	Broker,
+};
 
-/// Through this insturction any one can add capital to the broker
+
+/// Through this instruction any one can add capital to the broker
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] 

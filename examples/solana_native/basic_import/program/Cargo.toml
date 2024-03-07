@@ -51,34 +51,20 @@ verifies the following in a CIDL import context:
 
 
 [dependencies]
-solana-program = ">=1.14, <1.17"
+solana-program = ">=1.16, <1.18"
 borsh = "0.10.3"
 thiserror = "1"
 num-derive = "0.4"
 num-traits = "0.2"
 num_enum = "0.7.0"
-assert_matches = {version = "~1.5.0", optional = true}
-solana-logger = {version = ">=1.14, <1.17", optional = true}
-solana-program-test = {version = ">=1.14, <1.17", optional = true}
-solana-sdk = {version = ">=1.14, <1.17", optional = true}
-solana-validator = {version = ">=1.14, <1.17", optional = true}
-solana-rpc-client = {version = ">=1.14, <1.17", optional = true}
+ahash = "=0.8.6"
+toml_edit = "=0.21.0"
 
 validate_accounts = { path = "libraries/validate_accounts 0.0.0", version = "0.0.0"}
 validate_advanced_cases = { path = "libraries/validate_advanced_cases 0.0.0", version = "0.0.0"}
 validate_data_types = { path = "libraries/validate_data_types 0.0.0", version = "0.0.0"}
 
 
-[features]
-test-sbf = [
-    "assert_matches",
-    "solana-sdk/default",
-    "solana-logger",
-    "solana-program-test",
-    "solana-validator",
-    "solana-rpc-client"
-]
-
 [lib]
 crate-type = ["cdylib", "lib"]
-path = "lib.rs"
+path = "./lib.rs"

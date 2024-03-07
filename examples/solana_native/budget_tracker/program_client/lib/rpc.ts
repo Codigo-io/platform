@@ -29,7 +29,7 @@ export const initializeClient = (
     _connection = connection;
 };
 
-export enum BudgetTrackerInstruction {
+export enum ValidateBudgetTrackerInstruction {
 /**
  * To call once per account. Initialize a Record account. The total_balance of the account will be set to 0.
  *
@@ -40,7 +40,7 @@ export enum BudgetTrackerInstruction {
  *
  * Data:
  * - user_name: {@link string} The username to be assigned to the Record.name property
- * - user_record_seed_index: {@link number} Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+ * - user_record_seed_index: {@link number} Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
  */
     CreateUserRecord = 0,
 
@@ -53,7 +53,7 @@ export enum BudgetTrackerInstruction {
  *
  * Data:
  * - amount: {@link number} The amount to be registered as the income.
- * - user_record_seed_index: {@link number} Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+ * - user_record_seed_index: {@link number} Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
  */
     RegisterIncome = 1,
 
@@ -66,17 +66,16 @@ export enum BudgetTrackerInstruction {
  *
  * Data:
  * - amount: {@link number} Number to be added to the outcome accumulator
- * - user_record_seed_index: {@link number} Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+ * - user_record_seed_index: {@link number} Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
  */
     RegisterOutcome = 2,
 }
 
 export type CreateUserRecordArgs = {
-    feePayer: PublicKey;
-    userName: string;
-    userRecordSeedIndex: number;
+	feePayer: PublicKey;
+	userName: string;
+	userRecordSeedIndex: number;
 };
-
 
 /**
  * ### Returns a {@link TransactionInstruction}
@@ -89,35 +88,36 @@ export type CreateUserRecordArgs = {
  *
  * Data:
  * - user_name: {@link string} The username to be assigned to the Record.name property
- * - user_record_seed_index: {@link number} Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+ * - user_record_seed_index: {@link number} Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
  */
-export const createUserRecord = (args: CreateUserRecordArgs): TransactionInstruction => {
-    const data = serialize(
+export const createUserRecord = (args: CreateUserRecordArgs, remainingAccounts: Array<PublicKey> = []): TransactionInstruction => {
+		const data = serialize(
         {
             struct: {
                 id: "u8",
-                user_name: "string",
-                user_record_seed_index: "u8",
+								user_name: "string",
+								user_record_seed_index: "u8",
             },
         },
         {
-            id: BudgetTrackerInstruction.CreateUserRecord,
-            user_name: args.userName,
-            user_record_seed_index: args.userRecordSeedIndex,
+            id: ValidateBudgetTrackerInstruction.CreateUserRecord,
+						user_name: args.userName,
+						user_record_seed_index: args.userRecordSeedIndex,
         }
     );
 
-    const [userRecordPubkey] = pda.deriveRecordPDA({
-        signer: args.feePayer,
-        index: args.userRecordSeedIndex,
+		const [userRecordPubkey] = pda.deriveRecordCollectionPDA({
+				signer: args.feePayer,
+				index: args.userRecordSeedIndex,
     }, _programId);
 
     return new TransactionInstruction({
         data: Buffer.from(data),
         keys: [
-            {pubkey: args.feePayer, isSigner: true, isWritable: true},
-            {pubkey: userRecordPubkey, isSigner: false, isWritable: true},
-            {pubkey: new PublicKey("11111111111111111111111111111111"), isSigner: false, isWritable: false},
+						{pubkey: args.feePayer, isSigner: true, isWritable: true},
+						{pubkey: userRecordPubkey, isSigner: false, isWritable: true},
+						{pubkey: new PublicKey("11111111111111111111111111111111"), isSigner: false, isWritable: false},
+            ...remainingAccounts.map(e => ({pubkey: e, isSigner: false, isWritable: false})),
         ],
         programId: _programId,
     });
@@ -134,34 +134,38 @@ export const createUserRecord = (args: CreateUserRecordArgs): TransactionInstruc
  *
  * Data:
  * - user_name: {@link string} The username to be assigned to the Record.name property
- * - user_record_seed_index: {@link number} Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+ * - user_record_seed_index: {@link number} Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
  */
 export const createUserRecordSendAndConfirm = async (
-    args: Omit<CreateUserRecordArgs, "feePayer"> & { 
-        signers: { feePayer: Keypair, }
- }
+	args: Omit<CreateUserRecordArgs, "feePayer"> & {
+	  signers: {
+			feePayer: Keypair,
+	  }
+  }, 
+  remainingAccounts: Array<PublicKey> = []
 ): Promise<TransactionSignature> => {
-    const trx = new Transaction();
+  const trx = new Transaction();
 
 
-    trx.add(createUserRecord({
-        ...args,
-        feePayer: args.signers.feePayer.publicKey,
-    }));
+	trx.add(createUserRecord({
+		...args,
+		feePayer: args.signers.feePayer.publicKey,
+	}, remainingAccounts));
 
-    return await sendAndConfirmTransaction(
-        _connection,
-        trx,
-        [args.signers.feePayer, ]
-    );
+  return await sendAndConfirmTransaction(
+    _connection,
+    trx,
+    [
+				args.signers.feePayer,
+    ]
+  );
 };
 
 export type RegisterIncomeArgs = {
-    feePayer: PublicKey;
-    amount: number;
-    userRecordSeedIndex: number;
+	feePayer: PublicKey;
+	amount: number;
+	userRecordSeedIndex: number;
 };
-
 
 /**
  * ### Returns a {@link TransactionInstruction}
@@ -173,34 +177,35 @@ export type RegisterIncomeArgs = {
  *
  * Data:
  * - amount: {@link number} The amount to be registered as the income.
- * - user_record_seed_index: {@link number} Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+ * - user_record_seed_index: {@link number} Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
  */
-export const registerIncome = (args: RegisterIncomeArgs): TransactionInstruction => {
-    const data = serialize(
+export const registerIncome = (args: RegisterIncomeArgs, remainingAccounts: Array<PublicKey> = []): TransactionInstruction => {
+		const data = serialize(
         {
             struct: {
                 id: "u8",
-                amount: "u32",
-                user_record_seed_index: "u8",
+								amount: "u32",
+								user_record_seed_index: "u8",
             },
         },
         {
-            id: BudgetTrackerInstruction.RegisterIncome,
-            amount: args.amount,
-            user_record_seed_index: args.userRecordSeedIndex,
+            id: ValidateBudgetTrackerInstruction.RegisterIncome,
+						amount: args.amount,
+						user_record_seed_index: args.userRecordSeedIndex,
         }
     );
 
-    const [userRecordPubkey] = pda.deriveRecordPDA({
-        signer: args.feePayer,
-        index: args.userRecordSeedIndex,
+		const [userRecordPubkey] = pda.deriveRecordCollectionPDA({
+				signer: args.feePayer,
+				index: args.userRecordSeedIndex,
     }, _programId);
 
     return new TransactionInstruction({
         data: Buffer.from(data),
         keys: [
-            {pubkey: args.feePayer, isSigner: true, isWritable: true},
-            {pubkey: userRecordPubkey, isSigner: false, isWritable: true},
+						{pubkey: args.feePayer, isSigner: true, isWritable: true},
+						{pubkey: userRecordPubkey, isSigner: false, isWritable: true},
+            ...remainingAccounts.map(e => ({pubkey: e, isSigner: false, isWritable: false})),
         ],
         programId: _programId,
     });
@@ -216,34 +221,38 @@ export const registerIncome = (args: RegisterIncomeArgs): TransactionInstruction
  *
  * Data:
  * - amount: {@link number} The amount to be registered as the income.
- * - user_record_seed_index: {@link number} Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+ * - user_record_seed_index: {@link number} Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
  */
 export const registerIncomeSendAndConfirm = async (
-    args: Omit<RegisterIncomeArgs, "feePayer"> & { 
-        signers: { feePayer: Keypair, }
- }
+	args: Omit<RegisterIncomeArgs, "feePayer"> & {
+	  signers: {
+			feePayer: Keypair,
+	  }
+  }, 
+  remainingAccounts: Array<PublicKey> = []
 ): Promise<TransactionSignature> => {
-    const trx = new Transaction();
+  const trx = new Transaction();
 
 
-    trx.add(registerIncome({
-        ...args,
-        feePayer: args.signers.feePayer.publicKey,
-    }));
+	trx.add(registerIncome({
+		...args,
+		feePayer: args.signers.feePayer.publicKey,
+	}, remainingAccounts));
 
-    return await sendAndConfirmTransaction(
-        _connection,
-        trx,
-        [args.signers.feePayer, ]
-    );
+  return await sendAndConfirmTransaction(
+    _connection,
+    trx,
+    [
+				args.signers.feePayer,
+    ]
+  );
 };
 
 export type RegisterOutcomeArgs = {
-    feePayer: PublicKey;
-    amount: number;
-    userRecordSeedIndex: number;
+	feePayer: PublicKey;
+	amount: number;
+	userRecordSeedIndex: number;
 };
-
 
 /**
  * ### Returns a {@link TransactionInstruction}
@@ -255,34 +264,35 @@ export type RegisterOutcomeArgs = {
  *
  * Data:
  * - amount: {@link number} Number to be added to the outcome accumulator
- * - user_record_seed_index: {@link number} Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+ * - user_record_seed_index: {@link number} Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
  */
-export const registerOutcome = (args: RegisterOutcomeArgs): TransactionInstruction => {
-    const data = serialize(
+export const registerOutcome = (args: RegisterOutcomeArgs, remainingAccounts: Array<PublicKey> = []): TransactionInstruction => {
+		const data = serialize(
         {
             struct: {
                 id: "u8",
-                amount: "u32",
-                user_record_seed_index: "u8",
+								amount: "u32",
+								user_record_seed_index: "u8",
             },
         },
         {
-            id: BudgetTrackerInstruction.RegisterOutcome,
-            amount: args.amount,
-            user_record_seed_index: args.userRecordSeedIndex,
+            id: ValidateBudgetTrackerInstruction.RegisterOutcome,
+						amount: args.amount,
+						user_record_seed_index: args.userRecordSeedIndex,
         }
     );
 
-    const [userRecordPubkey] = pda.deriveRecordPDA({
-        signer: args.feePayer,
-        index: args.userRecordSeedIndex,
+		const [userRecordPubkey] = pda.deriveRecordCollectionPDA({
+				signer: args.feePayer,
+				index: args.userRecordSeedIndex,
     }, _programId);
 
     return new TransactionInstruction({
         data: Buffer.from(data),
         keys: [
-            {pubkey: args.feePayer, isSigner: true, isWritable: true},
-            {pubkey: userRecordPubkey, isSigner: false, isWritable: true},
+						{pubkey: args.feePayer, isSigner: true, isWritable: true},
+						{pubkey: userRecordPubkey, isSigner: false, isWritable: true},
+            ...remainingAccounts.map(e => ({pubkey: e, isSigner: false, isWritable: false})),
         ],
         programId: _programId,
     });
@@ -298,26 +308,31 @@ export const registerOutcome = (args: RegisterOutcomeArgs): TransactionInstructi
  *
  * Data:
  * - amount: {@link number} Number to be added to the outcome accumulator
- * - user_record_seed_index: {@link number} Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+ * - user_record_seed_index: {@link number} Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
  */
 export const registerOutcomeSendAndConfirm = async (
-    args: Omit<RegisterOutcomeArgs, "feePayer"> & { 
-        signers: { feePayer: Keypair, }
- }
+	args: Omit<RegisterOutcomeArgs, "feePayer"> & {
+	  signers: {
+			feePayer: Keypair,
+	  }
+  }, 
+  remainingAccounts: Array<PublicKey> = []
 ): Promise<TransactionSignature> => {
-    const trx = new Transaction();
+  const trx = new Transaction();
 
 
-    trx.add(registerOutcome({
-        ...args,
-        feePayer: args.signers.feePayer.publicKey,
-    }));
+	trx.add(registerOutcome({
+		...args,
+		feePayer: args.signers.feePayer.publicKey,
+	}, remainingAccounts));
 
-    return await sendAndConfirmTransaction(
-        _connection,
-        trx,
-        [args.signers.feePayer, ]
-    );
+  return await sendAndConfirmTransaction(
+    _connection,
+    trx,
+    [
+				args.signers.feePayer,
+    ]
+  );
 };
 
 // Getters

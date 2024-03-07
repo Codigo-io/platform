@@ -13,7 +13,7 @@
   },
   "description": "The purpose of this CIDL is to validate the basic use case of NFT: Digital art and Collectibles\n- Verifies we can mint a Token\n- Verifies we can transfer\n- Verifies we can burn",
   "dependencies": {
-    "@solana/spl-token": "^0.3.8",
+    "@solana/spl-token": "^0.4.1",
     "@solana/web3.js": "^1.78.3",
     "borsh": "^1.0.0",
     "typescript": "^5.1.6"
@@ -22,7 +22,6 @@
     "node": ">=14.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.7.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.2"
   }
 }

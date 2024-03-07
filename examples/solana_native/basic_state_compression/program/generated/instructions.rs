@@ -10,11 +10,11 @@ use crate::generated::errors::ValidateStateCompressionError;
 pub enum ValidateStateCompressionInstruction {
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` merkle_tree: [AccountInfo] 
+/// 1. `[writable, signer]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
 /// 3. `[]` noop: [AccountInfo] Program used to emit changelogs as cpi instruction data.
 /// 4. `[]` account_compression: [AccountInfo] Account Compression program it self
-/// 5. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 5. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 	InitializeMerkleTree,
 
 /// Accounts:
@@ -22,7 +22,7 @@ pub enum ValidateStateCompressionInstruction {
 /// 1. `[writable]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
 /// 3. `[]` noop: [AccountInfo] Program used to emit changelogs as cpi instruction data.
-/// 4. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 4. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
 /// - name: [String] 
@@ -35,7 +35,7 @@ pub enum ValidateStateCompressionInstruction {
 /// 1. `[writable]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
 /// 3. `[]` noop: [AccountInfo] Program used to emit changelogs as cpi instruction data.
-/// 4. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 4. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
 /// - root: [Vec<u8>] 
@@ -50,7 +50,7 @@ pub enum ValidateStateCompressionInstruction {
 /// 1. `[writable]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
 /// 3. `[]` noop: [AccountInfo] Program used to emit changelogs as cpi instruction data.
-/// 4. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 4. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
 /// - previous_leaf: [Vec<u8>] 
@@ -64,8 +64,7 @@ pub enum ValidateStateCompressionInstruction {
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
 /// 1. `[]` merkle_tree: [AccountInfo] 
-/// 2. `[]` noop: [AccountInfo] Noop program
-/// 3. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 2. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
 /// - leaf: [Vec<u8>] 
@@ -77,7 +76,7 @@ pub enum ValidateStateCompressionInstruction {
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
 /// 1. `[writable]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
-/// 3. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 3. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
 /// - new_authority: [Pubkey] 
@@ -88,7 +87,7 @@ pub enum ValidateStateCompressionInstruction {
 /// 1. `[writable]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
 /// 3. `[writable]` recipient: [AccountInfo] The SOL recevier.
-/// 4. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 4. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 	CloseEmptyTree,
 
 }

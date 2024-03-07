@@ -1,0 +1,31 @@
+
+[package]
+name = "validate_big_account"
+version = "0.0.0"
+edition = "2021"
+license = "codigo"
+publish = false
+
+
+description = """
+This CIDL is use to validate that accounts greater than 10KB (10_240) gets
+initialize on-client side.
+"""
+
+
+
+[dependencies]
+solana-program = ">=1.16, <1.18"
+borsh = "0.10.3"
+thiserror = "1"
+num-derive = "0.4"
+num-traits = "0.2"
+num_enum = "0.7.0"
+ahash = "=0.8.6"
+toml_edit = "=0.21.0"
+
+
+
+[lib]
+crate-type = ["cdylib", "lib"]
+path = "./lib.rs"

@@ -27,6 +27,9 @@ pub enum ValidateBasicNftError {
     #[error("Executable Account Expected")]
     ExecutableAccountExpected,
 
+	#[error("Account Already Closed")]
+	AccountAlreadyClosed,
+
  
 }
 
@@ -60,6 +63,7 @@ impl PrintProgramError for ValidateBasicNftError {
             ValidateBasicNftError::WrongAccountOwner => msg!("Error: Wrong account owner"),
             ValidateBasicNftError::InvalidAccountLen => msg!("Error: Invalid account length"),
             ValidateBasicNftError::ExecutableAccountExpected => msg!("Error: Executable account expected"),
+            ValidateBasicNftError::AccountAlreadyClosed => msg!("Error: Account Already Closed"),
  
         }
     }

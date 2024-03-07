@@ -18,82 +18,60 @@ methods:
     summary: |-
       Creates an associated token account for the given wallet address and token mint.
       Returns an error if the account exists.
-    solana:
-      signers:
-        - name: funding
+    signers:
+      - input: funding
     inputs:
       - name: funding
-        type: sol:account_info
+        type: sol:account
         description: Funding account (must be a system account)
-        solana:
-          owner: 11111111111111111111111111111111
-          attributes: [ mut ]
+        attributes: [ sol:writable, sol:owner=11111111111111111111111111111111 ]
       - name: assoc_token_account
-        type: csl_spl_token.Account
+        type: sol:account<csl_spl_token.Account, csl_spl_token.seeds.Account(wallet=wallet, token_program=token_program, mint=mint)>
         description: Associated token account address to be created
-        solana:
-          attributes: [ init ]
-          seeds:
-            wallet: wallet
-            token_program: token_program
-            mint: mint
+        attributes: [ sol:init, sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
       - name: wallet
-        type: sol:account_info
+        type: sol:account
         description: Wallet address for the new associated token account
-        solana:
-          owner: 11111111111111111111111111111111
+        attributes: [ sol:owner=11111111111111111111111111111111 ]
       - name: mint
-        type: csl_spl_token.Mint
+        type: sol:account<csl_spl_token.Mint>
         description: The token mint for the new associated token account
       - name: system_program
-        type: sol:account_info
+        type: sol:account
         description: System program
-        solana:
-          address: 11111111111111111111111111111111
+        attributes: [ sol:address=11111111111111111111111111111111 ]
       - name: token_program
-        type: sol:account_info
+        type: sol:account
         description: SPL Token program
-        solana:
-          address: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+        attributes: [ sol:address=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
   - name: create_idempotent
     summary: |-
       Creates an associated token account for the given wallet address and token mint,
       if it doesn't already exist.  Returns an error if the account exists,
       but with a different owner.
-    solana:
-      signers:
-        - name: funding
+    signers:
+      - input: funding
     inputs:
       - name: funding
-        type: sol:account_info
+        type: sol:account
         description: Funding account (must be a system account)
-        solana:
-          owner: 11111111111111111111111111111111
-          attributes: [ mut ]
+        attributes: [ sol:writable, sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
       - name: assoc_token_account
-        type: csl_spl_token.Account
+        type: sol:account<csl_spl_token.Account, csl_spl_token.seeds.Account(wallet=wallet, token_program=token_program, mint=mint)>
         description: Associated token account address to be created
-        solana:
-          attributes: [ init ]
-          seeds:
-            wallet: wallet
-            token_program: token_program
-            mint: mint
+        attributes: [ sol:init ]
       - name: wallet
-        type: sol:account_info
+        type: sol:account
         description: Wallet address for the new associated token account
-        solana:
-          owner: 11111111111111111111111111111111
+        attributes: [ sol:owner=11111111111111111111111111111111 ]
       - name: mint
-        type: csl_spl_token.Mint
+        type: sol:account<csl_spl_token.Mint>
         description: The token mint for the new associated token account
       - name: system_program
-        type: sol:account_info
+        type: sol:account
         description: System program
-        solana:
-          address: 11111111111111111111111111111111
+        attributes: [ sol:address=11111111111111111111111111111111 ]
       - name: token_program
-        type: sol:account_info
+        type: sol:account
         description: SPL Token program
-        solana:
-          address: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+        attributes: [ sol:address=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]

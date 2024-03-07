@@ -40,7 +40,3 @@ pub struct Record {
 	pub total_balance: i64,
 }
 
-impl Record {
-	pub const LEN: usize = 72; 
-	}
-

@@ -13,14 +13,24 @@ info:
   license:
     name: Codigo
     url: https://codigo.ai/documents/Codigo---Terms-of-Service.pdf
+solana:
+  seeds:
+    Account:
+      progid: ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL
+      items:
+        - name: wallet
+          type: sol:pubkey
+        - name: token_program
+          type: sol:pubkey
+        - name: mint
+          type: sol:pubkey
 types:
   Mint:
     summary: Mint data.
-    solana:
-      owner: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
     fields:
       - name: mint_authority
-        type: rs:c_option<sol:pubkey>
+        type: sol:pubkey?
+        attributes: [ sol:c_option ]
         description: |-
           Optional authority used to mint new tokens. The mint authority may only be provided during
           mint creation. If no mint authority is present then the mint has a fixed supply and no
@@ -35,19 +45,11 @@ types:
         type: bool
         description: Is `true` if this structure has been initialized
       - name: freeze_authority
-        type: rs:c_option<sol:pubkey>
+        type: sol:pubkey?
+        attributes: [ sol:c_option ]
         description: Optional authority to freeze token accounts.
   Account:
     summary: Account data
-    solana:
-      owner: ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL
-      seeds:
-        - name: wallet
-          type: sol:pubkey
-        - name: token_program
-          type: sol:pubkey
-        - name: mint
-          type: sol:pubkey
     fields:
       - name: mint
         type: sol:pubkey
@@ -59,7 +61,8 @@ types:
         type: u64
         description: The amount of tokens this account holds.
       - name: delegate
-        type: rs:c_option<sol:pubkey>
+        type: sol:pubkey?
+        attributes: [ sol:c_option ]
         description: |-
           If `delegate` is `Some` then `delegated_amount` represents
           the amount authorized by the delegate
@@ -70,7 +73,8 @@ types:
           AccountState enum can be Uninitialized, Initialized, Frozen.
           Default value is Uninitialized
       - name: is_native
-        type: rs:c_option<u64>
+        type: u64?
+        attributes: [ sol:c_option ]
         description: |-
           If is_native.is_some, this is a native token, and the value logs the rent-exempt reserve. An
           Account is required to be rent-exempt, so the value is used by the Processor to ensure that
@@ -79,27 +83,26 @@ types:
         type: u64
         description: The amount delegated
       - name: close_authority
-        type: rs:c_option<sol:pubkey>
+        type: sol:pubkey?
+        attributes: [ sol:c_option ]
         description: Optional authority to close the account.
 methods:
   - name: approve
     summary: |-
       Approves a delegate.  A delegate is given the authority over tokens on
       behalf of the source account's owner.
-    solana:
-      signers:
-        - name: owner
+    signers:
+      - input: owner
     inputs:
       - name: source
-        type: sol:account_info
+        type: sol:account
         description: The source account.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: delegate
-        type: sol:account_info
+        type: sol:account
         description: The delegate.
       - name: owner
-        type: sol:account_info
+        type: sol:account
         description: The source account owner.
       - name: amount
         type: u64
@@ -111,23 +114,22 @@ methods:
       This instruction differs from Approve in that the token mint and
       decimals value is checked by the caller.  This may be useful when
       creating transactions offline or within a hardware wallet.
-    solana:
-      signers:
-        - name: owner
+    signers:
+      - input: owner
     inputs:
       - name: source
-        type: sol:account_info
+        type: sol:account
         description: The source account.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: mint
-        type: Mint
+        type: sol:account<Mint>
+        attributes: [ sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
         description: The token mint.
       - name: delegate
-        type: sol:account_info
+        type: sol:account
         description: The delegate.
       - name: owner
-        type: sol:account_info
+        type: sol:account
         description: The source account owner.
       - name: amount
         type: u64
@@ -139,77 +141,65 @@ methods:
     summary: |-
       Burns tokens by removing them from an account.  `Burn` does not support
       accounts associated with the native mint, use `CloseAccount` instead.
-    solana:
-      signers:
-        - name: owner
+    signers:
+      - input: owner
     inputs:
       - name: account
-        type: Account
+        type: sol:account<Account, seeds.Account(wallet=wallet, token_program=token_program, mint=mint)>
         description: The account to burn from.
-        solana:
-          attributes: [ mut ]
-          seeds:
-            wallet: wallet
-            token_program: token_program
-            mint: mint
+        attributes: [ sol:writable, sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
       - name: mint
-        type: Mint
+        type: sol:account<Mint>
+        attributes: [ sol:writable, sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
         description: The token mint.
-        solana:
-          attributes: [ mut ]
       - name: owner
-        type: sol:account_info
+        type: sol:account
         description: The account's owner/delegate.
+        attributes: [ sol:uncheck_account ]
       - name: wallet
-        type: sol:account_info
+        type: sol:account
         description: Wallet address for the new associated token account
-        solana:
-          owner: 11111111111111111111111111111111
+        attributes: [ sol:owner=11111111111111111111111111111111 ]
       - name: token_program
-        type: sol:account_info
+        type: sol:account
         description: SPL Token program
-        solana:
-          address: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+        attributes: [ sol:address=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
       - name: amount
         type: u64
         description: The amount of tokens to burn.
   - name: freeze_account
     summary: Freeze an Initialized account using the Mint's freeze_authority (if set).
-    solana:
-      signers:
-        - name: owner
+    signers:
+      - input: owner
     inputs:
       - name: account
-        type: sol:account_info
+        type: sol:account
         description: The account to freeze.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: mint
-        type: Mint
+        type: sol:account<Mint>
+        attributes: [ sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
         description: The token mint.
       - name: owner
-        type: sol:account_info
+        type: sol:account
         description: The mint freeze authority.
   - name: close_account
     summary: |-
       Close an account by transferring all its SOL to the destination account.
       Non-native accounts may only be closed if its token amount is zero.
-    solana:
-      signers:
-        - name: owner
+    signers:
+      - input: owner
     inputs:
       - name: account
-        type: sol:account_info
+        type: sol:account
         description: The account to close.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: destination
-        type: sol:account_info
+        type: sol:account
         description: The destination account.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: owner
-        type: sol:account_info
+        type: sol:account
         description: The account's owner.
   - name: initialize_account
     summary: |-
@@ -228,21 +218,20 @@ methods:
       default-payer: false
     inputs:
       - name: account
-        type: sol:account_info
+        type: sol:account
         description: The account to initialize.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: mint
-        type: Mint
+        type: sol:account<Mint>
+        attributes: [ sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
         description: The mint this account will be associated with.
       - name: owner
-        type: sol:account_info
+        type: sol:account
         description: The new account's owner/multisignature.
       - name: rent_sysvar
-        type: sol:account_info
+        type: sol:account
         description: Rent sysvar
-        solana:
-          address: SysvarRent111111111111111111111111111111111
+        attributes: [ sol:address=SysvarRent111111111111111111111111111111111 ]
   - name: initialize_account2
     summary: |-
       Like InitializeAccount, but the owner pubkey is passed via instruction data
@@ -253,18 +242,17 @@ methods:
       default-payer: false
     inputs:
       - name: account
-        type: sol:account_info
+        type: sol:account
         description: The account to initialize.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: mint
-        type: Mint
+        type: sol:account<Mint>
+        attributes: [ sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
         description: The mint this account will be associated with.
       - name: rent_sysvar
-        type: sol:account_info
+        type: sol:account
         description: Rent sysvar
-        solana:
-          address: SysvarRent111111111111111111111111111111111
+        attributes: [ sol:address=SysvarRent111111111111111111111111111111111 ]
       - name: owner
         type: sol:pubkey
         description: The new account's owner/multisignature.
@@ -274,12 +262,12 @@ methods:
     summary: Like InitializeAccount2, but does not require the Rent sysvar to be provided
     inputs:
       - name: account
-        type: sol:account_info
+        type: sol:account
         description: The account to initialize.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: mint
-        type: Mint
+        type: sol:account<Mint>
+        attributes: [ sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
         description: The mint this account will be associated with.
       - name: owner
         type: sol:pubkey
@@ -297,13 +285,11 @@ methods:
       default-payer: false
     inputs:
       - name: mint
-        type: Mint
-        solana:
-          attributes: [ mut ]
+        type: sol:account<Mint>
+        attributes: [ sol:writable, sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
       - name: rent_sysvar
-        type: sol:account_info
-        solana:
-          address: SysvarRent111111111111111111111111111111111
+        type: sol:account
+        attributes: [ sol:address=SysvarRent111111111111111111111111111111111 ]
       - name: decimals
         type: u8
         description: Number of base 10 digits to the right of the decimal place.
@@ -311,7 +297,8 @@ methods:
         type: sol:pubkey
         description: The authority/multisignature to mint tokens.
       - name: freeze_authority
-        type: rs:c_option<sol:pubkey>
+        type: sol:pubkey?
+        attributes: [ sol:c_option ]
         description: The freeze authority/multisignature of the mint.
   - name: initialize_mint2
     summary: Like [`InitializeMint`], but does not require the Rent sysvar to be provided
@@ -319,9 +306,8 @@ methods:
       default-payer: false
     inputs:
       - name: mint
-        type: Mint
-        solana:
-          attributes: [ mut ]
+        type: sol:account<Mint>
+        attributes: [ sol:writable, sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
       - name: decimals
         type: u8
         description: Number of base 10 digits to the right of the decimal place.
@@ -329,77 +315,68 @@ methods:
         type: sol:pubkey
         description: The authority/multisignature to mint tokens.
       - name: freeze_authority
-        type: rs:c_option<sol:pubkey>
+        type: sol:pubkey?
+        attributes: [ sol:c_option ]
         description: The freeze authority/multisignature of the mint.
   - name: mint_to
     summary: Mints new tokens to an account.  The native mint does not support minting.
-    solana:
-      signers:
-        - name: owner
+    signers:
+      - input: owner
     inputs:
       - name: mint
-        type: Mint
+        type: sol:account<Mint>
+        attributes: [ sol:writable, sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
         description: The mint.
-        solana:
-          attributes: [ mut ]
       - name: assoc_token_account
-        type: Account
+        type: sol:account<Account, seeds.Account(wallet=wallet, token_program=token_program, mint=mint)>
         description: The account to mint tokens to.
-        solana:
-          attributes: [ mut ]
-          seeds:
-            wallet: wallet
-            token_program: token_program
-            mint: mint
+        attributes: [ sol:writable, sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
       - name: owner
-        type: sol:account_info
+        type: sol:account
         description: The mint's minting authority.
+        attributes: [ sol:uncheck_account ]
       - name: wallet
-        type: sol:account_info
+        type: sol:account
         description: Wallet address for the new associated token account
-        solana:
-          owner: 11111111111111111111111111111111
+        attributes: [ sol:owner=11111111111111111111111111111111 ]
       - name: token_program
-        type: sol:account_info
+        type: sol:account
         description: SPL Token program
-        solana:
-          address: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+        attributes: [ sol:address=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
       - name: amount
         type: u64
         description: The amount of new tokens to mint.
   - name: revoke
     summary: Revokes the delegate's authority.
-    solana:
-      signers:
-        - name: owner
+    signers:
+      - input: owner
     inputs:
       - name: source
-        type: sol:account_info
+        type: sol:account
         description: The source account.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: owner
-        type: sol:account_info
+        type: sol:account
         description: The source account owner.
   - name: set_authority
     summary: Sets a new authority of a mint or account.
-    solana:
-      signers:
-        - name: owner
+    signers:
+      - input: owner
     inputs:
       - name: mint
-        type: Mint
+        type: sol:account<Mint>
+        attributes: [ sol:writable, sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
         description: The mint or account to change the authority of.
-        solana:
-          attributes: [ mut ]
       - name: owner
-        type: sol:account_info
+        type: sol:account
         description: The current authority of the mint or account.
+        attributes: [ sol:uncheck_account ]
       - name: authority_type
         type: u8
         description: The type of authority to update.
       - name: new_authority
-        type: rs:c_option<sol:pubkey>
+        type: sol:pubkey?
+        attributes: [ sol:c_option ]
   - name: sync_native
     summary: |-
       Given a wrapped / native token account (a token account containing SOL)
@@ -411,26 +388,24 @@ methods:
       default-payer: false
     inputs:
       - name: account
-        type: sol:account_info
+        type: sol:account
         description: The native token account to sync with its underlying lamports.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
   - name: thaw_account
     summary: Thaw a Frozen account using the Mint's freeze_authority (if set).
-    solana:
-      signers:
-        - name: owner
+    signers:
+      - input: owner
     inputs:
       - name: account
-        type: sol:account_info
+        type: sol:account
         description: The account to freeze.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: mint
-        type: Mint
+        type: sol:account<Mint>
+        attributes: [ sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
         description: The token mint.
       - name: owner
-        type: sol:account_info
+        type: sol:account
         description: The mint freeze authority.
   - name: transfer
     summary: |-
@@ -438,22 +413,19 @@ methods:
       delegate.  If this account is associated with the native mint then equal
       amounts of SOL and Tokens will be transferred to the destination
       account.
-    solana:
-      signers:
-        - name: authority
+    signers:
+      - input: authority
     inputs:
       - name: source
-        type: sol:account_info
+        type: sol:account
         description: The source account.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: destination
-        type: sol:account_info
+        type: sol:account
         description: The destination account.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable ]
       - name: authority
-        type: sol:account_info
+        type: sol:account
         description: The source account's owner/delegate.
       - name: amount
         type: u64
@@ -468,26 +440,25 @@ methods:
       This instruction differs from Transfer in that the token mint and
       decimals value is checked by the caller.  This may be useful when
       creating transactions offline or within a hardware wallet.
-    solana:
-      signers:
-        - name: authority
+    signers:
+      - input: authority
     inputs:
       - name: source
-        type: sol:account_info
+        type: sol:account
         description: The source account.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable, sol:uncheck_account ]
       - name: mint
-        type: Mint
+        type: sol:account<Mint>
+        attributes: [ sol:owner=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
         description: The token mint.
       - name: destination
-        type: sol:account_info
+        type: sol:account
         description: The destination account.
-        solana:
-          attributes: [ mut ]
+        attributes: [ sol:writable, sol:uncheck_account ]
       - name: authority
-        type: sol:account_info
+        type: sol:account
         description: The source account's owner/delegate.
+        attributes: [ sol:uncheck_account ]
       - name: amount
         type: u64
         description: The amount of tokens to transfer.

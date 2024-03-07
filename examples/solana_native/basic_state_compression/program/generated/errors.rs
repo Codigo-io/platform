@@ -27,6 +27,9 @@ pub enum ValidateStateCompressionError {
     #[error("Executable Account Expected")]
     ExecutableAccountExpected,
 
+	#[error("Account Already Closed")]
+	AccountAlreadyClosed,
+
  
 }
 
@@ -60,6 +63,7 @@ impl PrintProgramError for ValidateStateCompressionError {
             ValidateStateCompressionError::WrongAccountOwner => msg!("Error: Wrong account owner"),
             ValidateStateCompressionError::InvalidAccountLen => msg!("Error: Invalid account length"),
             ValidateStateCompressionError::ExecutableAccountExpected => msg!("Error: Executable account expected"),
+            ValidateStateCompressionError::AccountAlreadyClosed => msg!("Error: Account Already Closed"),
  
         }
     }

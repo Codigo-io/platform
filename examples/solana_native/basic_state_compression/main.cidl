@@ -1,0 +1,120 @@
+cidl: "0.8"
+info:
+  name: validate_state_compression
+  title: Validate State Compression
+  summary: |-
+    The purpose of this CIDL is to validate the basic use case of State Compression
+    - Verifies we can initialize a merkle tree
+    - Verifies we can transfer the authority of the merkle tree
+    - Verifies we can close the merkle tree account
+    - Verifies we can compress an account using the different modes
+    - Verifies big max depth
+  version: 0.0.0
+  contact:
+    name: Codigo
+    web: https://codigo.ai
+    git: https://github.com/Codigo-ai
+    email: support@codigo.ai
+  license:
+    name: Codigo
+    url: https://codigo.ai/documents/Codigo---Terms-of-Service.pdf
+types:
+  Article:
+    fields:
+      - name: name
+        type: string
+      - name: description
+        type: string
+      - name: thumbnail
+        type: string
+methods:
+  - name: initialize_merkle_tree
+    uses:
+      - csl_spl_account_compression.init_empty_merkle_tree
+    inputs:
+      - name: merkle_tree
+        type: sol:merkle_tree
+        attributes: [ sol:init_if_needed, cap=50, sol:canopy=6 ]
+  - name: append_article
+    solana:
+      compress:
+        - type: Article
+          mode: append
+    inputs:
+      - name: merkle_tree
+        type: sol:merkle_tree
+      - name: name
+        type: string
+      - name: description
+        type: string
+      - name: thumbnail
+        type: string
+  - name: insert_or_append_article
+    solana:
+      compress:
+        - type: Article
+          mode: insert_or_append
+    inputs:
+      - name: merkle_tree
+        type: sol:merkle_tree
+        attributes: [ cap=50, sol:canopy=6 ]
+      - name: root
+        type: array<u8>
+      - name: index
+        type: u32
+      - name: name
+        type: string
+      - name: description
+        type: string
+      - name: thumbnail
+        type: string
+  - name: replace_leaf_article
+    solana:
+      compress:
+        - type: Article
+          mode: replace_leaf
+    inputs:
+      - name: merkle_tree
+        type: sol:merkle_tree
+        attributes: [ cap=50, sol:canopy=6 ]
+      - name: previous_leaf
+        type: array<u8>
+      - name: root
+        type: array<u8>
+      - name: index
+        type: u32
+      - name: name
+        type: string
+      - name: description
+        type: string
+      - name: thumbnail
+        type: string
+  - name: verify_leaf_article
+    solana:
+      compress:
+        - type: Article
+          mode: verify_leaf
+    inputs:
+      - name: merkle_tree
+        type: sol:merkle_tree
+        attributes: [ cap=50, sol:canopy=6 ]
+      - name: leaf
+        type: array<u8>
+      - name: root
+        type: array<u8>
+      - name: index
+        type: u32
+  - name: transfer_authority
+    uses:
+      - csl_spl_account_compression.transfer_authority
+    inputs:
+      - name: merkle_tree
+        type: sol:merkle_tree
+      - name: new_authority
+        type: sol:pubkey
+  - name: close_empty_tree
+    uses:
+      - csl_spl_account_compression.close_empty_tree
+    inputs:
+      - name: merkle_tree
+        type: sol:merkle_tree

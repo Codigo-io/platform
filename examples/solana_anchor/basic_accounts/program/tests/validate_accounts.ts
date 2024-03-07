@@ -1,478 +1,481 @@
-import * as anchor from "@coral-xyz/anchor";
-import * as validateAccountsClient from "../client/validate_accounts";
-import chai from "chai";
-import { assert, expect } from "chai";
+import { AnchorProvider, setProvider, web3 } from "@coral-xyz/anchor";
+import chai, { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
+import {
+    deriveDynamicPdaPDA,
+    derivePdaWithAllTypesPDA,
+    deriveStaticPdaPDA,
+    getState,
+    initializeClient,
+    instruction10SendAndConfirm,
+    instruction11SendAndConfirm,
+    instruction12SendAndConfirm,
+    instruction13SendAndConfirm,
+    instruction14SendAndConfirm,
+    instruction15SendAndConfirm,
+    instruction16SendAndConfirm,
+    instruction17SendAndConfirm,
+    instruction18SendAndConfirm,
+    instruction19SendAndConfirm,
+    instruction1SendAndConfirm,
+    instruction20SendAndConfirm,
+    instruction2SendAndConfirm,
+    instruction3SendAndConfirm,
+    instruction4SendAndConfirm,
+    instruction5SendAndConfirm,
+    instruction6SendAndConfirm,
+    instruction7SendAndConfirm,
+    instruction8SendAndConfirm,
+    instruction9SendAndConfirm,
+    safeInstruction17SendAndConfirm,
+} from "../app/program_client";
+
 chai.use(chaiAsPromised);
 
+const programId = new web3.PublicKey("5wtHhpJfLMC5Gx6aLvmPyzSLedjybJesXcaoT9BMxj5J");
+initializeClient(programId);
+
 describe("validate_accounts Anchor Tests e2e", () => {
-  const provider = anchor.AnchorProvider.env();
-  anchor.setProvider(provider);
+    const provider = AnchorProvider.env();
+    setProvider(provider);
 
-  // Use the default system wallet
-  const adminKeypair = (provider.wallet as NodeWallet).payer;
+    // Use the default system wallet
+    const adminKeypair = (provider.wallet as NodeWallet).payer;
 
-  const U8_DIN_SEED = 8;
-  const U16_DIN_SEED = 16;
-  const U32_DIN_SEED = 32;
-  const I8_DIN_SEED = -8;
-  const I16_DIN_SEED = -16;
-  const I32_DIN_SEED = -32;
-  const STRING_DIN_SEED = "string";
-  const PUBKEY_DIN_SEED = anchor.web3.Keypair.generate().publicKey;
+    const U8_DIN_SEED = 8;
+    const U16_DIN_SEED = 16;
+    const U32_DIN_SEED = 32;
+    const U64_DIN_SEED = BigInt(64);
+    const I8_DIN_SEED = -8;
+    const I16_DIN_SEED = -16;
+    const I32_DIN_SEED = -32;
+    const I64_DIN_SEED = BigInt(-64);
+    const STRING_DIN_SEED = "string";
+    const PUBKEY_DIN_SEED = web3.Keypair.generate().publicKey;
 
-  let nonPdaKP = anchor.web3.Keypair.generate();
-  let pdaStaticSeedAddr: anchor.web3.PublicKey;
-  let pdaStaticAndDynSeedAddr: anchor.web3.PublicKey;
-  let pdaVerifiesSeedsAddr: anchor.web3.PublicKey;
+    let nonPdaKP = web3.Keypair.generate();
+    let pdaStaticSeedAddr: web3.PublicKey;
+    let pdaStaticAndDynSeedAddr: web3.PublicKey;
+    let pdaVerifiesSeedsAddr: web3.PublicKey;
 
-  before(async () => {
-    pdaStaticSeedAddr =
-      await validateAccountsClient.derivePDAAccountWithOneStaticSeedAndOneField();
-    pdaStaticAndDynSeedAddr =
-      await validateAccountsClient.derivePDAAccountWithOneStaticAndDynamicSeedAndOneField(
-        { dynamic: U8_DIN_SEED }
-      );
-    pdaVerifiesSeedsAddr =
-      await validateAccountsClient.derivePDAAccountVerifiesSeedsTypes({
-        u8_type: U8_DIN_SEED,
-        u16_type: U16_DIN_SEED,
-        u32_type: U32_DIN_SEED,
-        i8_type: I8_DIN_SEED,
-        i16_type: I16_DIN_SEED,
-        i32_type: I32_DIN_SEED,
-        string_type: STRING_DIN_SEED,
-        pubkey_type: PUBKEY_DIN_SEED,
-      });
-  });
+    before(async () => {
+        [pdaStaticSeedAddr] = deriveStaticPdaPDA(programId);
+        [pdaStaticAndDynSeedAddr] = deriveDynamicPdaPDA(
+            { dynamic: U8_DIN_SEED },
+            programId,
+        );
+        [pdaVerifiesSeedsAddr] = derivePdaWithAllTypesPDA(
+            {
+                u8Type: U8_DIN_SEED,
+                u16Type: U16_DIN_SEED,
+                u32Type: U32_DIN_SEED,
+                u64Type: U64_DIN_SEED,
+                i8Type: I8_DIN_SEED,
+                i16Type: I16_DIN_SEED,
+                i32Type: I32_DIN_SEED,
+                i64Type: I64_DIN_SEED,
+                stringType: STRING_DIN_SEED,
+                pubkeyType: PUBKEY_DIN_SEED,
+            },
+            programId,
+        );
+    });
 
-  // Account Initialization (Ixs 9 to 12)
-  it("Inits and Mutates a NonPDAAccount", async () => {
-    await validateAccountsClient.Instruction9SendAndConfirm(
-      9,
-      adminKeypair,
-      nonPdaKP
-    );
-    let nonPdaAccount =
-      await validateAccountsClient.fetchNonPDAAccountWithOneField(
-        nonPdaKP.publicKey
-      );
-    expect(nonPdaAccount.field1).to.eq(9);
-  });
-  it("Inits and Mutates a PDAAccountWithOneStaticSeedAndOneField", async () => {
-    await validateAccountsClient.Instruction10SendAndConfirm(
-      10,
-      pdaStaticSeedAddr,
-      adminKeypair
-    );
-    let pdaStaticSeed =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticSeedAndOneField(
-        pdaStaticSeedAddr
-      );
-    expect(pdaStaticSeed.field1).to.eq(10);
-  });
-  it("Inits and Mutates a PDAAccountWithOneStaticAndDynamicSeedAndOneField", async () => {
-    await validateAccountsClient.Instruction11SendAndConfirm(
-      11,
-      U8_DIN_SEED,
-      pdaStaticAndDynSeedAddr,
-      adminKeypair
-    );
-    let pdaStaticAndDynSeed =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticAndDynamicSeedAndOneField(
-        pdaStaticAndDynSeedAddr
-      );
-    expect(pdaStaticAndDynSeed.field1).to.eq(11);
-  });
-  it("Inits and Mutates a PDAAccountVerifiesSeedsTypes", async () => {
-    await validateAccountsClient.Instruction12SendAndConfirm(
-      12,
-      U8_DIN_SEED,
-      U16_DIN_SEED,
-      U32_DIN_SEED,
-      I8_DIN_SEED,
-      I16_DIN_SEED,
-      I32_DIN_SEED,
-      STRING_DIN_SEED,
-      PUBKEY_DIN_SEED,
-      pdaVerifiesSeedsAddr,
-      adminKeypair
-    );
-    let pdaVerifiesSeedsTypes =
-      await validateAccountsClient.fetchPDAAccountVerifiesSeedsTypes(
-        pdaVerifiesSeedsAddr
-      );
-    expect(pdaVerifiesSeedsTypes.field1).to.eq(12);
-  });
-  // Account Mutation (Ixs 1 to 4)
-  it("Mutates a NonPDAAccount", async () => {
-    let nonPdaAccountBefore =
-      await validateAccountsClient.fetchNonPDAAccountWithOneField(
-        nonPdaKP.publicKey
-      );
-    expect(nonPdaAccountBefore.field1).to.eq(9);
+    it("Test init using Non-PDA account that has one field", async () => {
+        await instruction9SendAndConfirm({
+            input1: 9,
+            signers: {
+                account: nonPdaKP,
+                feePayer: adminKeypair,
+            },
+        });
+        const state = await getState(nonPdaKP.publicKey);
+        expect(state.field1).to.eq(9);
+    });
 
-    await validateAccountsClient.Instruction1SendAndConfirm(
-      1,
-      nonPdaKP.publicKey,
-      adminKeypair
-    );
-    let nonPdaAccountAfter =
-      await validateAccountsClient.fetchNonPDAAccountWithOneField(
-        nonPdaKP.publicKey
-      );
-    expect(nonPdaAccountAfter.field1).to.eq(1);
-  });
-  it("Mutates a PDAAccountWithOneStaticSeedAndOneField", async () => {
-    let pdaStaticSeedBefore =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticSeedAndOneField(
-        pdaStaticSeedAddr
-      );
-    expect(pdaStaticSeedBefore.field1).to.eq(10);
+    it("Test init using PDA account that has one static seed and one field", async () => {
+        await instruction10SendAndConfirm({
+            input1: 10,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        let state = await getState(pdaStaticSeedAddr);
+        expect(state.field1).to.eq(10);
+    });
 
-    await validateAccountsClient.Instruction2SendAndConfirm(
-      2,
-      pdaStaticSeedAddr,
-      adminKeypair
-    );
-    let pdaStaticSeedAfter =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticSeedAndOneField(
-        pdaStaticSeedAddr
-      );
-    expect(pdaStaticSeedAfter.field1).to.eq(2);
-  });
-  it("Mutates a PDAAccountWithOneStaticAndDynamicSeedAndOneField", async () => {
-    let pdaStaticAndDynSeedBefore =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticAndDynamicSeedAndOneField(
-        pdaStaticAndDynSeedAddr
-      );
-    expect(pdaStaticAndDynSeedBefore.field1).to.eq(11);
+    it("Test init using PDA account that has one static and dynamic seed, and one field", async () => {
+        await instruction11SendAndConfirm({
+            input1: 11,
+            accountSeedDynamic: U8_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        let state = await getState(pdaStaticAndDynSeedAddr);
+        expect(state.field1).to.eq(11);
+    });
 
-    await validateAccountsClient.Instruction3SendAndConfirm(
-      3,
-      U8_DIN_SEED,
-      pdaStaticAndDynSeedAddr,
-      adminKeypair
-    );
-    let pdaStaticAndDynSeedAfter =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticAndDynamicSeedAndOneField(
-        pdaStaticAndDynSeedAddr
-      );
-    expect(pdaStaticAndDynSeedAfter.field1).to.eq(3);
-  });
-  it("Mutates a PDAAccountVerifiesSeedsTypes", async () => {
-    let pdaVerifiesSeedsBefore =
-      await validateAccountsClient.fetchPDAAccountVerifiesSeedsTypes(
-        pdaVerifiesSeedsAddr
-      );
-    expect(pdaVerifiesSeedsBefore.field1).to.eq(12);
+    it("Test init using PDA account that has all the possible data types for dynamic seeds", async () => {
+        await instruction12SendAndConfirm({
+            input1: 12,
+            accountSeedU8Type: U8_DIN_SEED,
+            accountSeedU16Type: U16_DIN_SEED,
+            accountSeedU32Type: U32_DIN_SEED,
+            accountSeedU64Type: U64_DIN_SEED,
+            accountSeedI8Type: I8_DIN_SEED,
+            accountSeedI16Type: I16_DIN_SEED,
+            accountSeedI32Type: I32_DIN_SEED,
+            accountSeedI64Type: I64_DIN_SEED,
+            accountSeedStringType: STRING_DIN_SEED,
+            accountSeedPubkeyType: PUBKEY_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        let state = await getState(pdaVerifiesSeedsAddr);
+        expect(state.field1).to.eq(12);
+    });
 
-    await validateAccountsClient.Instruction4SendAndConfirm(
-      4,
-      U8_DIN_SEED,
-      U16_DIN_SEED,
-      U32_DIN_SEED,
-      I8_DIN_SEED,
-      I16_DIN_SEED,
-      I32_DIN_SEED,
-      STRING_DIN_SEED,
-      PUBKEY_DIN_SEED,
-      pdaVerifiesSeedsAddr,
-      adminKeypair
-    );
-    let pdaVerifiesSeedsAfter =
-      await validateAccountsClient.fetchPDAAccountVerifiesSeedsTypes(
-        pdaVerifiesSeedsAddr
-      );
-    expect(pdaVerifiesSeedsAfter.field1).to.eq(4);
-  });
-  // Immutable Accounts (Ix 5 to 8)
-  it("Cannot mutate a non-mutable NonPDAAccount", async () => {
-    // NOTICE: By 9/19/23, Anchor still does not throws an error when mutating a non mutable account, just fails silently.
-    // https://github.com/coral-xyz/anchor/issues/326
-    let nonPdaAccountBefore =
-      await validateAccountsClient.fetchNonPDAAccountWithOneField(
-        nonPdaKP.publicKey
-      );
+    it("Test mut using Non-PDA account that has one field", async () => {
+        let state = await getState(nonPdaKP.publicKey);
+        expect(state.field1).to.eq(9);
 
-    await validateAccountsClient.Instruction5SendAndConfirm(
-      nonPdaKP.publicKey,
-      adminKeypair
-    );
+        await instruction1SendAndConfirm({
+            input1: 1,
+            account: nonPdaKP.publicKey,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        state = await getState(nonPdaKP.publicKey);
+        expect(state.field1).to.eq(1);
+    });
 
-    let nonPdaAccountAfter =
-      await validateAccountsClient.fetchNonPDAAccountWithOneField(
-        nonPdaKP.publicKey
-      );
+    it("Test mut using PDA account that has one static seed and one field", async () => {
+        let state = await getState(pdaStaticSeedAddr);
+        expect(state.field1).to.eq(10);
 
-    expect(nonPdaAccountBefore.field1.toString()).to.eq(
-      nonPdaAccountAfter.field1.toString()
-    );
-  });
-  it("Cannot Mutate a non-mutable PDAAccountWithOneStaticSeedAndOneField", async () => {
-    let pdaStaticSeedBefore =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticSeedAndOneField(
-        pdaStaticSeedAddr
-      );
+        await instruction2SendAndConfirm({
+            input1: 2,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        state = await getState(pdaStaticSeedAddr);
+        expect(state.field1).to.eq(2);
+    });
 
-    await validateAccountsClient.Instruction6SendAndConfirm(
-      pdaStaticSeedAddr,
-      adminKeypair
-    );
-    let pdaStaticSeedAfter =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticSeedAndOneField(
-        pdaStaticSeedAddr
-      );
-    expect(pdaStaticSeedBefore.field1.toString()).to.eq(
-      pdaStaticSeedAfter.field1.toString()
-    );
-  });
-  it("Cannot Mutate a non-mutable PDAAccountWithOneStaticAndDynamicSeedAndOneField", async () => {
-    let pdaStaticAndDynSeedBefore =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticAndDynamicSeedAndOneField(
-        pdaStaticAndDynSeedAddr
-      );
+    it("Test mut using PDA account that has one static and dynamic seed, and one field", async () => {
+        let state = await getState(pdaStaticAndDynSeedAddr);
+        expect(state.field1).to.eq(11);
 
-    await validateAccountsClient.Instruction7SendAndConfirm(
-      U8_DIN_SEED,
-      pdaStaticAndDynSeedAddr,
-      adminKeypair
-    );
-    let pdaStaticAndDynSeedAfter =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticAndDynamicSeedAndOneField(
-        pdaStaticAndDynSeedAddr
-      );
-    expect(pdaStaticAndDynSeedBefore.field1.toString()).to.eq(
-      pdaStaticAndDynSeedAfter.field1.toString()
-    );
-  });
-  it("Cannot Mutate a non-mutable PDAAccountVerifiesSeedsTypes", async () => {
-    let pdaVerifiesSeedsBefore =
-      await validateAccountsClient.fetchPDAAccountVerifiesSeedsTypes(
-        pdaVerifiesSeedsAddr
-      );
+        await instruction3SendAndConfirm({
+            input1: 3,
+            accountSeedDynamic: U8_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        state = await getState(pdaStaticAndDynSeedAddr);
+        expect(state.field1).to.eq(3);
+    });
 
-    await validateAccountsClient.Instruction8SendAndConfirm(
-      U8_DIN_SEED,
-      U16_DIN_SEED,
-      U32_DIN_SEED,
-      I8_DIN_SEED,
-      I16_DIN_SEED,
-      I32_DIN_SEED,
-      STRING_DIN_SEED,
-      PUBKEY_DIN_SEED,
-      pdaVerifiesSeedsAddr,
-      adminKeypair
-    );
-    let pdaVerifiesSeedsAfter =
-      await validateAccountsClient.fetchPDAAccountVerifiesSeedsTypes(
-        pdaVerifiesSeedsAddr
-      );
-    expect(pdaVerifiesSeedsBefore.field1.toString()).to.eq(
-      pdaVerifiesSeedsAfter.field1.toString()
-    );
-  });
-  // Close accounts (Ixs 17 to 20)
-  it("Closes a NonPDAAccount & sends lamports to signer if rent-receiver not specified", async () => {
-    let signerBefore = await provider.connection.getBalance(
-      adminKeypair.publicKey
-    );
+    it("Test mut using PDA account that has all the possible data types for dynamic seeds", async () => {
+        let state = await getState(pdaVerifiesSeedsAddr);
+        expect(state.field1).to.eq(12);
 
-    await validateAccountsClient.Instruction17SendAndConfirm(
-      nonPdaKP.publicKey,
-      adminKeypair
-    );
-    await expect(
-      validateAccountsClient.fetchNonPDAAccountWithOneField(nonPdaKP.publicKey)
-    ).to.be.rejected;
+        await instruction4SendAndConfirm({
+            input1: 4,
+            accountSeedU8Type: U8_DIN_SEED,
+            accountSeedU16Type: U16_DIN_SEED,
+            accountSeedU32Type: U32_DIN_SEED,
+            accountSeedU64Type: U64_DIN_SEED,
+            accountSeedI8Type: I8_DIN_SEED,
+            accountSeedI16Type: I16_DIN_SEED,
+            accountSeedI32Type: I32_DIN_SEED,
+            accountSeedI64Type: I64_DIN_SEED,
+            accountSeedStringType: STRING_DIN_SEED,
+            accountSeedPubkeyType: PUBKEY_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        state = await getState(pdaVerifiesSeedsAddr);
+        expect(state.field1).to.eq(4);
+    });
 
-    let signerAfter = await provider.connection.getBalance(
-      adminKeypair.publicKey
-    );
-    expect(signerAfter).to.gt(signerBefore);
-  });
-  it("Closes a PDAAccountWithOneStaticSeedAndOneField & sends lamports to signer if rent-receiver not specified", async () => {
-    let signerBefore = await provider.connection.getBalance(
-      adminKeypair.publicKey
-    );
+    it("Test non-mut using Non-PDA account that has one field", async () => {
+        await instruction5SendAndConfirm({
+            account: nonPdaKP.publicKey,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        const state = await getState(nonPdaKP.publicKey);
+        expect(state.field1).to.eq(1);
+    });
 
-    await validateAccountsClient.Instruction18SendAndConfirm(
-      pdaStaticSeedAddr,
-      adminKeypair
-    );
-    await expect(
-      validateAccountsClient.fetchPDAAccountWithOneStaticSeedAndOneField(
-        pdaStaticSeedAddr
-      )
-    ).to.be.rejected;
+    it("Test non-mut using PDA account that has one static seed and one field", async () => {
+        await instruction6SendAndConfirm({
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        let state = await getState(pdaStaticSeedAddr);
+        expect(state.field1).to.eq(2);
+    });
 
-    let signerAfter = await provider.connection.getBalance(
-      adminKeypair.publicKey
-    );
-    expect(signerAfter).to.gt(signerBefore);
-  });
-  it("Closes a PDAAccountWithOneStaticAndDynamicSeedAndOneField & sends lamports to signer if rent-receiver not specified", async () => {
-    let signerBefore = await provider.connection.getBalance(
-      adminKeypair.publicKey
-    );
+    it("Test non-mut using PDA account that has one static and dynamic seed, and one field", async () => {
+        await instruction7SendAndConfirm({
+            accountSeedDynamic: U8_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        const state = await getState(pdaStaticAndDynSeedAddr);
+        expect(state.field1).to.eq(3);
+    });
 
-    await validateAccountsClient.Instruction19SendAndConfirm(
-      U8_DIN_SEED,
-      pdaStaticAndDynSeedAddr,
-      adminKeypair
-    );
-    await expect(
-      validateAccountsClient.fetchPDAAccountWithOneStaticAndDynamicSeedAndOneField(
-        pdaStaticAndDynSeedAddr
-      )
-    ).to.be.rejected;
+    it("Test non-mut using PDA account that has all the possible data types for dynamic seeds", async () => {
+        await instruction8SendAndConfirm({
+            accountSeedU8Type: U8_DIN_SEED,
+            accountSeedU16Type: U16_DIN_SEED,
+            accountSeedU32Type: U32_DIN_SEED,
+            accountSeedU64Type: U64_DIN_SEED,
+            accountSeedI8Type: I8_DIN_SEED,
+            accountSeedI16Type: I16_DIN_SEED,
+            accountSeedI32Type: I32_DIN_SEED,
+            accountSeedI64Type: I64_DIN_SEED,
+            accountSeedStringType: STRING_DIN_SEED,
+            accountSeedPubkeyType: PUBKEY_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        const state = await getState(pdaVerifiesSeedsAddr);
+        expect(state.field1).to.eq(4);
+    });
 
-    let signerAfter = await provider.connection.getBalance(
-      adminKeypair.publicKey
-    );
-    expect(signerAfter).to.gt(signerBefore);
-  });
-  it("Closes a PDAAccountVerifiesSeedsTypes & sends lamports to signer if rent-receiver not specified", async () => {
-    let signerBefore = await provider.connection.getBalance(
-      adminKeypair.publicKey
-    );
+    it("Test close_uncheck using Non-PDA account that has one field", async () => {
+        const feePayerLamports = await provider.connection.getBalance(
+            adminKeypair.publicKey,
+        );
+        await instruction17SendAndConfirm({
+            account: nonPdaKP.publicKey,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
 
-    await validateAccountsClient.Instruction20SendAndConfirm(
-      U8_DIN_SEED,
-      U16_DIN_SEED,
-      U32_DIN_SEED,
-      I8_DIN_SEED,
-      I16_DIN_SEED,
-      I32_DIN_SEED,
-      STRING_DIN_SEED,
-      PUBKEY_DIN_SEED,
-      pdaVerifiesSeedsAddr,
-      adminKeypair
-    );
-    await expect(
-      validateAccountsClient.fetchPDAAccountVerifiesSeedsTypes(
-        pdaVerifiesSeedsAddr
-      )
-    ).to.be.rejected;
+        // @ts-ignore
+        await expect(getState(nonPdaKP.publicKey)).to.be.rejected;
 
-    let signerAfter = await provider.connection.getBalance(
-      adminKeypair.publicKey
-    );
-    expect(signerAfter).to.gt(signerBefore);
-  });
-  // Init if needed (Ixs 13 to 16)
-  it("Inits_if_needed a NonPDAAccount", async () => {
-    await validateAccountsClient.Instruction13SendAndConfirm(
-      13,
-      adminKeypair,
-      nonPdaKP
-    );
-    let nonPdaAccount =
-      await validateAccountsClient.fetchNonPDAAccountWithOneField(
-        nonPdaKP.publicKey
-      );
-    expect(nonPdaAccount.field1).to.eq(13);
+        let currentFeePayerLamports = await provider.connection.getBalance(
+            adminKeypair.publicKey,
+        );
+        expect(currentFeePayerLamports).to.gt(feePayerLamports);
 
-    // The fn can be called even if account is already initialized
-    await validateAccountsClient.Instruction13SendAndConfirm(
-      26,
-      adminKeypair,
-      nonPdaKP
-    );
-    nonPdaAccount = await validateAccountsClient.fetchNonPDAAccountWithOneField(
-      nonPdaKP.publicKey
-    );
-    expect(nonPdaAccount.field1).to.eq(26);
-  });
-  it("Inits_if_needed a PDAAccountWithOneStaticSeedAndOneField", async () => {
-    await validateAccountsClient.Instruction14SendAndConfirm(
-      14,
-      pdaStaticSeedAddr,
-      adminKeypair
-    );
-    let pdaStaticSeed =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticSeedAndOneField(
-        pdaStaticSeedAddr
-      );
-    expect(pdaStaticSeed.field1).to.eq(14);
+        // Recreate account
+        await instruction9SendAndConfirm({
+            input1: 9,
+            signers: {
+                account: nonPdaKP,
+                feePayer: adminKeypair,
+            },
+        });
+    });
 
-    // The fn can be called even if account is already initialized
-    await validateAccountsClient.Instruction14SendAndConfirm(
-      28,
-      pdaStaticSeedAddr,
-      adminKeypair
-    );
-    pdaStaticSeed =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticSeedAndOneField(
-        pdaStaticSeedAddr
-      );
-    expect(pdaStaticSeed.field1).to.eq(28);
-  });
-  it("Inits_if_needed a PDAAccountWithOneStaticAndDynamicSeedAndOneField", async () => {
-    await validateAccountsClient.Instruction15SendAndConfirm(
-      15,
-      U8_DIN_SEED,
-      pdaStaticAndDynSeedAddr,
-      adminKeypair
-    );
-    let pdaStaticAndDynSeed =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticAndDynamicSeedAndOneField(
-        pdaStaticAndDynSeedAddr
-      );
-    expect(pdaStaticAndDynSeed.field1).to.eq(15);
+    it("Test `close` using Non-PDA account that has one field", async () => {
+        const feePayerLamports = await provider.connection.getBalance(
+            adminKeypair.publicKey,
+        );
+        await safeInstruction17SendAndConfirm({
+            signers: {
+                account: nonPdaKP,
+                feePayer: adminKeypair,
+            },
+        });
 
-    // The fn can be called even if account is already initialized
-    await validateAccountsClient.Instruction15SendAndConfirm(
-      30,
-      U8_DIN_SEED,
-      pdaStaticAndDynSeedAddr,
-      adminKeypair
-    );
-    pdaStaticAndDynSeed =
-      await validateAccountsClient.fetchPDAAccountWithOneStaticAndDynamicSeedAndOneField(
-        pdaStaticAndDynSeedAddr
-      );
-    expect(pdaStaticAndDynSeed.field1).to.eq(30);
-  });
-  it("Inits_if_needed a PDAAccountVerifiesSeedsTypes", async () => {
-    await validateAccountsClient.Instruction16SendAndConfirm(
-      16,
-      U8_DIN_SEED,
-      U16_DIN_SEED,
-      U32_DIN_SEED,
-      I8_DIN_SEED,
-      I16_DIN_SEED,
-      I32_DIN_SEED,
-      STRING_DIN_SEED,
-      PUBKEY_DIN_SEED,
-      pdaVerifiesSeedsAddr,
-      adminKeypair
-    );
-    let pdaVerifiesSeedsTypes =
-      await validateAccountsClient.fetchPDAAccountVerifiesSeedsTypes(
-        pdaVerifiesSeedsAddr
-      );
-    expect(pdaVerifiesSeedsTypes.field1).to.eq(16);
+        // @ts-ignore
+        await expect(getState(nonPdaKP.publicKey)).to.be.rejected;
 
-    // The fn can be called even if account is already initialized
-    await validateAccountsClient.Instruction16SendAndConfirm(
-      32,
-      U8_DIN_SEED,
-      U16_DIN_SEED,
-      U32_DIN_SEED,
-      I8_DIN_SEED,
-      I16_DIN_SEED,
-      I32_DIN_SEED,
-      STRING_DIN_SEED,
-      PUBKEY_DIN_SEED,
-      pdaVerifiesSeedsAddr,
-      adminKeypair
-    );
-    pdaVerifiesSeedsTypes =
-      await validateAccountsClient.fetchPDAAccountVerifiesSeedsTypes(
-        pdaVerifiesSeedsAddr
-      );
-    expect(pdaVerifiesSeedsTypes.field1).to.eq(32);
-  });
+        let currentFeePayerLamports = await provider.connection.getBalance(
+            adminKeypair.publicKey,
+        );
+        expect(currentFeePayerLamports).to.gt(feePayerLamports);
+    });
+
+    it("Test close using PDA account that has one static seed and one field", async () => {
+        const feePayerLamports = await provider.connection.getBalance(
+            adminKeypair.publicKey,
+        );
+        await instruction18SendAndConfirm({
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+
+        // @ts-ignore
+        await expect(getState(pdaStaticSeedAddr)).to.be.rejected;
+
+        let currentFeePayerLamports = await provider.connection.getBalance(
+            adminKeypair.publicKey,
+        );
+        expect(currentFeePayerLamports).to.gt(feePayerLamports);
+    });
+
+    it("Test close using PDA account that has one static and dynamic seed, and one field", async () => {
+        const feePayerLamports = await provider.connection.getBalance(
+            adminKeypair.publicKey,
+        );
+        await instruction19SendAndConfirm({
+            accountSeedDynamic: U8_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+
+        // @ts-ignore
+        await expect(getState(pdaStaticAndDynSeedAddr)).to.be.rejected;
+
+        let currentFeePayerLamports = await provider.connection.getBalance(
+            adminKeypair.publicKey,
+        );
+        expect(currentFeePayerLamports).to.gt(feePayerLamports);
+    });
+
+    it("Test close using PDA account that has all the possible data types for dynamic seeds", async () => {
+        const feePayerLamports = await provider.connection.getBalance(
+            adminKeypair.publicKey,
+        );
+        await instruction20SendAndConfirm({
+            accountSeedU8Type: U8_DIN_SEED,
+            accountSeedU16Type: U16_DIN_SEED,
+            accountSeedU32Type: U32_DIN_SEED,
+            accountSeedU64Type: U64_DIN_SEED,
+            accountSeedI8Type: I8_DIN_SEED,
+            accountSeedI16Type: I16_DIN_SEED,
+            accountSeedI32Type: I32_DIN_SEED,
+            accountSeedI64Type: I64_DIN_SEED,
+            accountSeedStringType: STRING_DIN_SEED,
+            accountSeedPubkeyType: PUBKEY_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+
+        // @ts-ignore
+        await expect(getState(pdaVerifiesSeedsAddr)).to.be.rejected;
+
+        let currentFeePayerLamports = await provider.connection.getBalance(
+            adminKeypair.publicKey,
+        );
+        expect(currentFeePayerLamports).to.gt(feePayerLamports);
+    });
+
+    it("Test init_if_needed using Non-PDA account that has one field", async () => {
+        await instruction13SendAndConfirm({
+            input1: 13,
+            signers: {
+                account: nonPdaKP,
+                feePayer: adminKeypair,
+            },
+        });
+        let state = await getState(nonPdaKP.publicKey);
+        expect(state.field1).to.eq(13);
+
+        await instruction13SendAndConfirm({
+            input1: 26,
+            signers: {
+                account: nonPdaKP,
+                feePayer: adminKeypair,
+            },
+        });
+        state = await getState(nonPdaKP.publicKey);
+        expect(state.field1).to.eq(26);
+    });
+
+    it("Test init_if_needed using PDA account that has one static seed and one field", async () => {
+        await instruction14SendAndConfirm({
+            input1: 14,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        let state = await getState(pdaStaticSeedAddr);
+        expect(state.field1).to.eq(14);
+
+        await instruction14SendAndConfirm({
+            input1: 28,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        state = await getState(pdaStaticSeedAddr);
+        expect(state.field1).to.eq(28);
+    });
+
+    it("Test init_if_needed using PDA account that has one static and dynamic seed, and one field", async () => {
+        await instruction15SendAndConfirm({
+            input1: 15,
+            accountSeedDynamic: U8_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        let state = await getState(pdaStaticAndDynSeedAddr);
+        expect(state.field1).to.eq(15);
+
+        await instruction15SendAndConfirm({
+            input1: 30,
+            accountSeedDynamic: U8_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        state = await getState(pdaStaticAndDynSeedAddr);
+        expect(state.field1).to.eq(30);
+    });
+
+    it("Inits_if_needed a PdaaccountVerifiesSeedsTypes", async () => {
+        await instruction16SendAndConfirm({
+            input1: 16,
+            accountSeedU8Type: U8_DIN_SEED,
+            accountSeedU16Type: U16_DIN_SEED,
+            accountSeedU32Type: U32_DIN_SEED,
+            accountSeedU64Type: U64_DIN_SEED,
+            accountSeedI8Type: I8_DIN_SEED,
+            accountSeedI16Type: I16_DIN_SEED,
+            accountSeedI32Type: I32_DIN_SEED,
+            accountSeedI64Type: I64_DIN_SEED,
+            accountSeedStringType: STRING_DIN_SEED,
+            accountSeedPubkeyType: PUBKEY_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        let state = await getState(pdaVerifiesSeedsAddr);
+        expect(state.field1).to.eq(16);
+
+        await instruction16SendAndConfirm({
+            input1: 32,
+            accountSeedU8Type: U8_DIN_SEED,
+            accountSeedU16Type: U16_DIN_SEED,
+            accountSeedU32Type: U32_DIN_SEED,
+            accountSeedU64Type: U64_DIN_SEED,
+            accountSeedI8Type: I8_DIN_SEED,
+            accountSeedI16Type: I16_DIN_SEED,
+            accountSeedI32Type: I32_DIN_SEED,
+            accountSeedI64Type: I64_DIN_SEED,
+            accountSeedStringType: STRING_DIN_SEED,
+            accountSeedPubkeyType: PUBKEY_DIN_SEED,
+            signers: {
+                feePayer: adminKeypair,
+            },
+        });
+        state = await getState(pdaVerifiesSeedsAddr);
+        expect(state.field1).to.eq(32);
+    });
 });

@@ -1,0 +1,18 @@
+{
+  "name": "validate_big_account",
+  "version": "0.0.0",
+  "private": true,
+  "license": "Codigo",
+  "description": "This CIDL is use to validate that accounts greater than 10KB (10_240) gets\ninitialize on-client side.",
+  "dependencies": {
+    "@solana/web3.js": "^1.78.3",
+    "borsh": "^1.0.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
+}

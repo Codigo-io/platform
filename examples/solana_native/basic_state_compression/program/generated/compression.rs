@@ -9,6 +9,8 @@ use csl_spl_account_compression::src::cpi::*;
 use crate::generated::state::*;
 use solana_program::keccak;
 
+const ARTICLE_DISCRIMINATOR: u32 = 1;
+
 pub fn compress_article_by_append(accounts: &[&AccountInfo], article: &Article) -> ProgramResult {
 	let merkle_tree_info = accounts[0];
 	let noop_info = accounts[2];
@@ -18,18 +20,16 @@ pub fn compress_article_by_append(accounts: &[&AccountInfo], article: &Article) 
 
 	let leaf = keccak::hashv(&[application_data_buffer.as_ref()]);
 	
+	
 	save_application_data(
 		&[noop_info],
-		Article::DISCRIMINATOR,
+		ARTICLE_DISCRIMINATOR,
 		leaf.as_ref().to_vec(),
 		*merkle_tree_info.key,
 		application_data_buffer,
 	)?;
 
-	append(
-		accounts,
-		leaf.as_ref().to_vec()
-	)?;
+	append(accounts, leaf.as_ref().to_vec())?;
 
 	Ok(())
 }
@@ -43,20 +43,16 @@ pub fn compress_article_by_insert_or_append(accounts: &[&AccountInfo], article: 
 
 	let leaf = keccak::hashv(&[application_data_buffer.as_ref()]);
 	
+	
 	save_application_data(
 		&[noop_info],
-		Article::DISCRIMINATOR,
+		ARTICLE_DISCRIMINATOR,
 		leaf.as_ref().to_vec(),
 		*merkle_tree_info.key,
 		application_data_buffer,
 	)?;
 
-	insert_or_append(
-		accounts,
-		root,
-		leaf.as_ref().to_vec(),
-		index
-	)?;
+	insert_or_append(accounts, root, leaf.as_ref().to_vec(), index)?;
 
 	Ok(())
 }
@@ -70,21 +66,16 @@ pub fn compress_article_by_replace_leaf(accounts: &[&AccountInfo], article: &Art
 
 	let leaf = keccak::hashv(&[application_data_buffer.as_ref()]);
 	
+	
 	save_application_data(
 		&[noop_info],
-		Article::DISCRIMINATOR,
+		ARTICLE_DISCRIMINATOR,
 		leaf.as_ref().to_vec(),
 		*merkle_tree_info.key,
 		application_data_buffer,
 	)?;
 
-	replace_leaf(
-		accounts,
-		root,
-		previous_leaf,
-		leaf.as_ref().to_vec(),
-		index
-	)?;
+	replace_leaf(accounts, root, previous_leaf, leaf.as_ref().to_vec(), index)?;
 
 	Ok(())
 }

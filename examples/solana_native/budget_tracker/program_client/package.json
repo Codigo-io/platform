@@ -1,5 +1,5 @@
 {
-  "name": "budget_tracker",
+  "name": "validate_budget_tracker",
   "version": "0.0.1",
   "private": true,
   "license": "MIT",
@@ -13,7 +13,7 @@
   },
   "description": "The purpose of this contract is to track the income and outcome of a given user. For this contract, we are going to \ntarget the Solana blockchain. Thus, we define the data structure **Record** that will be transpiled to a PDA Account \nbased on the seeds defined in the solana extension. In addition, the contract defines three methods, also known as \ninstruction; through this method, we add behavior.\n\nSome useful links:\n\n  - [Blockchain Extensions](https://docs.codigo.ai/category/blockchain-extensions)\n  - [Learning the Basics](https://docs.codigo.ai/código-interface-description-language/learning-the-basics)\n  - [Building Solana Programs with CIDL: A Comprehensive Guide Part I](https://docs.codigo.ai/guides/part-1-building-solana-programs)",
   "dependencies": {
-    "@solana/web3.js": "^1.78.3",
+    "@solana/web3.js": "^1.90.0",
     "borsh": "^1.0.0",
     "typescript": "^5.1.6"
   },
@@ -21,7 +21,6 @@
     "node": ">=14.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.7.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.2"
   }
 }

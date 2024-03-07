@@ -21,10 +21,11 @@ The purpose of this CIDL is to validate all the supported data types.
 
 
 [dependencies]
-solana-program = ">=1.14, <1.17"
+solana-program = ">=1.16, <1.18"
 borsh = "0.10.3"
+ahash = "=0.8.6"
 
 
 [lib]
 crate-type = ["cdylib", "lib"]
-path = "lib.rs"
+path = "./lib.rs"

@@ -8,7 +8,7 @@ use solana_program::program_error::{PrintProgramError, ProgramError};
 use thiserror::Error;
 
 #[derive(Error, FromPrimitive, Debug, Clone)]
-pub enum BudgetTrackerError {
+pub enum ValidateBudgetTrackerError {
     #[error("Invalid Instruction")]
     InvalidInstruction,
 
@@ -27,22 +27,25 @@ pub enum BudgetTrackerError {
     #[error("Executable Account Expected")]
     ExecutableAccountExpected,
 
+	#[error("Account Already Closed")]
+	AccountAlreadyClosed,
+
  
 }
 
-impl From<BudgetTrackerError> for ProgramError {
-    fn from(e: BudgetTrackerError) -> Self {
+impl From<ValidateBudgetTrackerError> for ProgramError {
+    fn from(e: ValidateBudgetTrackerError) -> Self {
         ProgramError::Custom(e as u32)
     }
 }
 
-impl<T> DecodeError<T> for BudgetTrackerError {
+impl<T> DecodeError<T> for ValidateBudgetTrackerError {
     fn type_of() -> &'static str {
-        "BudgetTrackerError"
+        "ValidateBudgetTrackerError"
     }
 }
 
-impl PrintProgramError for BudgetTrackerError {
+impl PrintProgramError for ValidateBudgetTrackerError {
     fn print<E>(&self)
     where
         E: 'static
@@ -52,14 +55,15 @@ impl PrintProgramError for BudgetTrackerError {
             + num_traits::FromPrimitive,
     {
         match self {
-            BudgetTrackerError::InvalidInstruction => msg!("Error: Invalid instruction"),
-            BudgetTrackerError::InvalidSignerPermission => msg!("Error: The account is_signer value is not the expected one"),
-            BudgetTrackerError::NotExpectedAddress => {
+            ValidateBudgetTrackerError::InvalidInstruction => msg!("Error: Invalid instruction"),
+            ValidateBudgetTrackerError::InvalidSignerPermission => msg!("Error: The account is_signer value is not the expected one"),
+            ValidateBudgetTrackerError::NotExpectedAddress => {
                 msg!("Error: Not the expected account address")
             }
-            BudgetTrackerError::WrongAccountOwner => msg!("Error: Wrong account owner"),
-            BudgetTrackerError::InvalidAccountLen => msg!("Error: Invalid account length"),
-            BudgetTrackerError::ExecutableAccountExpected => msg!("Error: Executable account expected"),
+            ValidateBudgetTrackerError::WrongAccountOwner => msg!("Error: Wrong account owner"),
+            ValidateBudgetTrackerError::InvalidAccountLen => msg!("Error: Invalid account length"),
+            ValidateBudgetTrackerError::ExecutableAccountExpected => msg!("Error: Executable account expected"),
+            ValidateBudgetTrackerError::AccountAlreadyClosed => msg!("Error: Account Already Closed"),
  
         }
     }

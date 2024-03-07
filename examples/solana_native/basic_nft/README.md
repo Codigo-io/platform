@@ -1,6 +1,7 @@
 # Código Platform
 
 Código is an AI-Powered Code Generation Platform for blockchain developers and web3 teams that saves development time and increases the code's security across various blockchains.
+
 ## Getting started
 
 - You can immediately start using [Código Studio](https://studio.codigo.ai). Código Studio is a web-based IDE environment that comes with all the tools and programs to develop Solana programs using the CIDL.
@@ -18,36 +19,45 @@ Create a `nft.yaml` file and copy and paste the following CIDL.
 ```yaml
 cidl: "0.8"
 info:
-  name: nft
-  title: RiseIn NFT
-  version: 0.0.1
+  name: validate_basic_nft
+  title: Validate Basic NFT
+  summary: |-
+    The purpose of this CIDL is to validate the basic use case of NFT: Digital art and Collectibles
+    - Verifies we can mint a Token
+    - Verifies we can transfer
+    - Verifies we can burn
+  version: 0.0.0
+  contact:
+    name: Codigo
+    web: https://codigo.ai
+    git: https://github.com/Codigo-ai
+    email: support@codigo.ai
   license:
-    name: Unlicense
-    identifier: Unlicense
-types:
-  GemMetadata:
-    solana:
-      seeds:
+    name: Codigo
+    url: https://codigo.ai/documents/Codigo---Terms-of-Service.pdf
+solana:
+  seeds:
+    Metadata:
+      items:
         - name: "gem"
         - name: mint
           type: sol:pubkey
+types:
+  Gem:
     fields:
       - name: color
         type: string
-        solana:
-          attributes: [ cap:16 ]
+        attributes: [ cap=16 ]
       - name: rarity
         type: string
-        solana:
-          attributes: [ cap:16 ]
+        attributes: [ cap=16 ]
       - name: short_description
         type: string
-        solana:
-          attributes: [ cap:255 ]
+        attributes: [ cap=255 ]
       - name: mint
         type: sol:pubkey
       - name: assoc_account
-        type: rs:option<sol:pubkey>
+        type: sol:pubkey?
 methods:
   - name: mint
     uses:
@@ -57,15 +67,11 @@ methods:
       - csl_spl_token.set_authority
     inputs:
       - name: mint
-        type: csl_spl_token.Mint
-        solana:
-          attributes: [ init ]
+        type: sol:account<csl_spl_token.Mint>
+        attributes: [ sol:init ]
       - name: gem
-        type: GemMetadata
-        solana:
-          attributes: [ init ]
-          seeds:
-            mint: mint
+        type: sol:account<Gem, seeds.Metadata(mint=mint)>
+        attributes: [ sol:init ]
       - name: color
         type: string
       - name: rarity
@@ -78,25 +84,19 @@ methods:
       - csl_spl_token.transfer_checked
     inputs:
       - name: mint
-        type: csl_spl_token.Mint
+        type: sol:account<csl_spl_token.Mint>
       - name: gem
-        type: GemMetadata
-        solana:
-          attributes: [ mut ]
-          seeds:
-            mint: mint
+        type: sol:account<Gem, seeds.Metadata(mint=mint)>
+        attributes: [ sol:writable ]
   - name: burn
     uses:
       - csl_spl_token.burn
     inputs:
       - name: mint
-        type: csl_spl_token.Mint
+        type: sol:account<csl_spl_token.Mint>
       - name: gem
-        type: GemMetadata
-        solana:
-          attributes: [ mut ]
-          seeds:
-            mint: mint
+        type: sol:account<Gem, seeds.Metadata(mint=mint)>
+        attributes: [ sol:writable ]
 ```
 
 ### 2. Generate the Solana program and client library
@@ -104,10 +104,10 @@ methods:
 Open the terminal and type the following command
 
 ```shell
-codigo solana generate nft.yaml
+codigo solana generate main.yaml
 ```
 
-After generating the Solana program and client library, two new directories will be created relative to the `nft.yaml` file named `program_client` and `program`.
+After generating the Solana program and client library, two new directories will be created relative to the `main.cidl` file named `program_client` and `program`.
 
 ### 3. Implement the business logic
 
@@ -124,7 +124,7 @@ gem.data.short_description = short_description;
 gem.data.mint = *mint.info.key;
 gem.data.assoc_account = Some(*assoc_token_account.key);
 
-csl_spl_token::src::cpi::initialize_mint_2(for_initialize_mint_2, 0, *wallet.key, None)?;
+csl_spl_token::src::cpi::initialize_mint2(for_initialize_mint2, 0, *wallet.key, None)?;
 csl_spl_assoc_token::src::cpi::create(for_create)?;
 csl_spl_token::src::cpi::mint_to(for_mint_to, 1)?;
 csl_spl_token::src::cpi::set_authority(for_set_authority, 0, None)?;
@@ -173,7 +173,7 @@ solana-test-validator
 Deploy the program by opening a new terminal and navigating to the `program` directory; from there, execute the following command:
 
 ```shell
-solana program deploy target/deploy/nft.so
+solana program deploy target/deploy/validate_basic_nft.so
 ```
 
 After deploying the program, you will receive the program id; copy and paste it somewhere for later.
@@ -192,8 +192,8 @@ import * as os from "os";
 import {
     burnSendAndConfirm,
     CslSplTokenPDAs,
-    deriveGemMetadataPDA,
-    getGemMetadata,
+    deriveMetadataPDA,
+    getGem,
     initializeClient,
     mintSendAndConfirm,
     transferSendAndConfirm,
@@ -201,14 +201,13 @@ import {
 import {getMinimumBalanceForRentExemptAccount, getMint, TOKEN_PROGRAM_ID,} from "@solana/spl-token";
 
 async function main(feePayer: Keypair) {
-    const connection = new Connection("http://127.0.0.1:8899/", {
-        commitment: "confirmed",
+    const connection = new Connection("http://127.0.0.1:8899", {
+        commitment: "confirmed"
     });
 
     const progId = new PublicKey("PASTE_YOUR_PROGRAM_ID");
 
     initializeClient(progId, connection);
-
 
     /**
      * Create a keypair for the mint
@@ -230,37 +229,37 @@ async function main(feePayer: Keypair) {
 
     const rent = await getMinimumBalanceForRentExemptAccount(connection);
     await sendAndConfirmTransaction(
-        connection,
-        new Transaction()
-            .add(
-                SystemProgram.createAccount({
-                    fromPubkey: feePayer.publicKey,
-                    newAccountPubkey: johnDoeWallet.publicKey,
-                    space: 0,
-                    lamports: rent,
-                    programId: SystemProgram.programId,
-                }),
-            )
-            .add(
-                SystemProgram.createAccount({
-                    fromPubkey: feePayer.publicKey,
-                    newAccountPubkey: janeDoeWallet.publicKey,
-                    space: 0,
-                    lamports: rent,
-                    programId: SystemProgram.programId,
-                }),
-            ),
-        [feePayer, johnDoeWallet, janeDoeWallet],
+      connection,
+      new Transaction()
+        .add(
+          SystemProgram.createAccount({
+              fromPubkey: feePayer.publicKey,
+              newAccountPubkey: johnDoeWallet.publicKey,
+              space: 0,
+              lamports: rent,
+              programId: SystemProgram.programId,
+          }),
+        )
+        .add(
+          SystemProgram.createAccount({
+              fromPubkey: feePayer.publicKey,
+              newAccountPubkey: janeDoeWallet.publicKey,
+              space: 0,
+              lamports: rent,
+              programId: SystemProgram.programId,
+          }),
+        ),
+      [feePayer, johnDoeWallet, janeDoeWallet],
     );
 
     /**
      * Derive the Gem Metadata so we can retrieve it later
      */
-    const [gemPub] = deriveGemMetadataPDA(
-        {
-            mint: mint.publicKey,
-        },
-        progId,
+    const [gemPub] = deriveMetadataPDA(
+      {
+          mint: mint.publicKey,
+      },
+      progId,
     );
     console.info("+==== Gem Metadata Address ====+");
     console.info(gemPub.toBase58());
@@ -273,7 +272,7 @@ async function main(feePayer: Keypair) {
         wallet: johnDoeWallet.publicKey,
         mint: mint.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
-    });
+    }, new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"));
     console.info("+==== John Doe ATA ====+");
     console.info(johnDoeATA.toBase58());
 
@@ -285,7 +284,7 @@ async function main(feePayer: Keypair) {
         wallet: janeDoeWallet.publicKey,
         mint: mint.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
-    });
+    }, new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"));
     console.info("+==== Jane Doe ATA ====+");
     console.info(janeDoeATA.toBase58());
 
@@ -295,7 +294,6 @@ async function main(feePayer: Keypair) {
     console.info("+==== Minting... ====+");
     await mintSendAndConfirm({
         wallet: johnDoeWallet.publicKey,
-        assocTokenAccount: johnDoeATA,
         color: "Purple",
         rarity: "Rare",
         shortDescription: "Only possible to collect from the lost temple event",
@@ -318,7 +316,7 @@ async function main(feePayer: Keypair) {
     /**
      * Get the Gem Metadata
      */
-    let gem = await getGemMetadata(gemPub);
+    let gem = await getGem(gemPub);
     console.info("+==== Gem Metadata ====+");
     console.info(gem);
     console.assert(gem!.assocAccount!.toBase58(), johnDoeATA.toBase58());
@@ -329,7 +327,6 @@ async function main(feePayer: Keypair) {
     console.info("+==== Transferring... ====+");
     await transferSendAndConfirm({
         wallet: janeDoeWallet.publicKey,
-        assocTokenAccount: janeDoeATA,
         mint: mint.publicKey,
         source: johnDoeATA,
         destination: janeDoeATA,
@@ -351,7 +348,7 @@ async function main(feePayer: Keypair) {
     /**
      * Get the Gem Metadata
      */
-    gem = await getGemMetadata(gemPub);
+    gem = await getGem(gemPub);
     console.info("+==== Gem Metadata ====+");
     console.info(gem);
     console.assert(gem!.assocAccount!.toBase58(), janeDoeATA.toBase58());
@@ -380,14 +377,14 @@ async function main(feePayer: Keypair) {
     /**
      * Get the Gem Metadata
      */
-    gem = await getGemMetadata(gemPub);
+    gem = await getGem(gemPub);
     console.info("+==== Gem Metadata ====+");
     console.info(gem);
     console.assert(typeof gem!.assocAccount, "undefined");
 }
 
 fs.readFile(path.join(os.homedir(), ".config/solana/id.json")).then((file) =>
-    main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))),
+  main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))),
 );
 ```
 

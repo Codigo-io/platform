@@ -1,23 +1,24 @@
 // This file is auto-generated from the CIDL source.
 // Editing this file directly is not recommended as it may be overwritten.
 
-pub mod instruction_1;
-pub mod instruction_2;
-pub mod instruction_3;
-pub mod instruction_4;
-pub mod instruction_5;
-pub mod instruction_6;
-pub mod instruction_7;
-pub mod instruction_8;
-pub mod instruction_9;
-pub mod instruction_10;
-pub mod instruction_11;
-pub mod instruction_12;
-pub mod instruction_13;
-pub mod instruction_14;
-pub mod instruction_15;
-pub mod instruction_16;
-pub mod instruction_17;
-pub mod instruction_18;
-pub mod instruction_19;
-pub mod instruction_20;
+pub mod instruction1;
+pub mod instruction10;
+pub mod instruction11;
+pub mod instruction12;
+pub mod instruction13;
+pub mod instruction14;
+pub mod instruction15;
+pub mod instruction16;
+pub mod instruction17;
+pub mod instruction18;
+pub mod instruction19;
+pub mod instruction2;
+pub mod instruction20;
+pub mod instruction3;
+pub mod instruction4;
+pub mod instruction5;
+pub mod instruction6;
+pub mod instruction7;
+pub mod instruction8;
+pub mod instruction9;
+pub mod safe_instruction17;

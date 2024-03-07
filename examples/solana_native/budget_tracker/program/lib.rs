@@ -3,4 +3,3 @@
 
 pub mod generated;
 pub mod src;
-pub mod test;

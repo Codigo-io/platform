@@ -1,0 +1,136 @@
+cidl: "0.8"
+info:
+  name: validate_inventory
+  title: Inventory Contract for an E-Commerce
+  summary: This is a simple inventory contract for an e-commerce platform
+  version: 0.0.0
+  contact:
+    name: Codigo
+    web: https://codigo.ai
+    git: https://github.com/Codigo-ai
+    email: support@codigo.ai
+  license:
+    name: Codigo
+    url: https://codigo.ai/documents/Codigo---Terms-of-Service.pdf
+solana:
+  seeds:
+    UniquePerUser:
+      items:
+        - name: owner
+          type: sol:pubkey
+types:
+  Warehouse:
+    fields:
+      - name: name
+        type: string
+        attributes: [ cap=96 ]
+      - name: description
+        type: string
+        attributes: [ cap=255 ]
+      - name: owner
+        type: sol:pubkey
+      - name: delegates
+        type: array<sol:pubkey>
+        attributes: [ cap=10 ]
+  Article:
+    fields:
+      - name: name
+        type: string
+        attributes: [ cap=96 ]
+      - name: description
+        type: string
+        attributes: [ cap=255 ]
+      - name: thumbnail
+        type: string
+        attributes: [ cap=2048 ]
+      - name: mint
+        type: sol:pubkey
+      - name: owner
+        type: sol:pubkey
+      - name: current_warehouse
+        type: sol:pubkey?
+methods:
+  - name: create_warehouse
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+      - input: owner
+    inputs:
+      - name: warehouse
+        type: sol:account<Warehouse, seeds.UniquePerUser(owner=owner)>
+        attributes: [ sol:init ]
+      - name: name
+        type: string
+      - name: description
+        type: string
+      - name: owner
+        type: sol:account
+        attributes: [ sol:owner=11111111111111111111111111111111 ]
+  - name: assign_warehouse_delegate
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+      - input: owner
+    inputs:
+      - name: warehouse
+        type: sol:account<Warehouse, seeds.UniquePerUser(owner=owner)>
+        attributes: [ sol:writable ]
+      - name: owner
+        type: sol:account
+        attributes: [ sol:owner=11111111111111111111111111111111 ]
+      - name: delegate
+        type: sol:pubkey
+  - name: transfer_warehouse_owner
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+      - input: owner
+    inputs:
+      - name: warehouse
+        type: sol:account<Warehouse, seeds.UniquePerUser(owner=owner)>
+        attributes: [ sol:writable ]
+      - name: owner
+        type: sol:account
+        attributes: [ sol:owner=11111111111111111111111111111111 ]
+      - name: new_owner
+        type: sol:pubkey
+  - name: initialize_merkle_tree
+    uses:
+      - csl_spl_account_compression.init_empty_merkle_tree
+    inputs:
+      - name: merkle_tree
+        type: sol:merkle_tree
+        attributes: [ sol:init, cap=100000000 ]
+  - name: create_article
+    solana:
+      compress:
+        - type: Article
+          mode: append
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+      - input: delegate
+    uses:
+      - csl_spl_token.initialize_mint2
+      - csl_spl_assoc_token.create
+      - csl_spl_token.mint_to
+      - csl_spl_token.set_authority
+    inputs:
+      - name: warehouse
+        type: sol:account<Warehouse, seeds.UniquePerUser(owner=owner)>
+      - name: mint
+        type: sol:account<csl_spl_token.Mint>
+        attributes: [ sol:init ]
+      - name: delegate
+        type: sol:account
+        attributes: [ sol:owner=11111111111111111111111111111111 ]
+      - name: name
+        type: string
+      - name: description
+        type: string
+      - name: thumbnail
+        type: string

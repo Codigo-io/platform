@@ -1,0 +1,28 @@
+[package]
+name = "validate_data_types"
+version = "0.0.0"
+description = """
+The purpose of this CIDL is to validate all the supported data types.
+- Verifies all the supported types for PDA accounts
+- Verifies all the supported types for Non-PDA accounts
+- Verifies all the supported types for inputs
+- The business logic should assign the input to the account's field
+- The business logic test should verified that the input's values is the same value assign to the account's field"""
+
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "validate_data_types"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.29.0"
+bumpalo = "=3.14.0"
+

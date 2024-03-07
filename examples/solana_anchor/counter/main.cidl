@@ -1,0 +1,78 @@
+cidl: "0.8"
+info:
+  name: validate_counter
+  title: Validate Counter
+  summary: |
+    The purpose of this CIDL is to test basic functionality:
+    - PDA init/init_if_needed
+    - Rent payer other than fee_payer
+    - serdes of u64
+    - mut / signer input attrs
+  version: 0.0.0
+  contact:
+    name: Codigo
+    web: https://codigo.ai
+    git: https://github.com/Codigo-ai
+    email: support@codigo.ai
+  license:
+    name: Codigo
+    url: https://codigo.ai/documents/Codigo---Terms-of-Service.pdf
+solana:
+  seeds:
+    Counter:
+      items:
+        - name: user
+          type: sol:pubkey
+types:
+  Counter:
+    summary: Account to increment
+    fields:
+      - name: count
+        type: u64
+        description: The current count.
+methods:
+  - name: init_counter
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+    inputs:
+      - name: counter
+        type: sol:account<Counter, seeds.Counter(user=fee_payer)>
+        attributes: [ sol:init ]
+  - name: increment
+    summary: Increment counter account
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+    inputs:
+      - name: counter
+        type: sol:account<Counter, seeds.Counter(user=fee_payer)>
+        attributes: [ sol:writable ]
+  - name: init_if_needed_and_increment
+    summary: Init if needed, and then increment counter account
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+      - name: rent_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+    inputs:
+      - name: counter
+        type: sol:account<Counter, seeds.Counter(user=rent_payer)>
+        attributes: [ sol:init_if_needed, sol:rent-payer=rent_payer ]
+  - name: close_counter
+    summary: close the counter account
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+      - name: rent_receiver
+        type: sol:account
+        attributes: [ sol:writable ]
+    inputs:
+      - name: counter
+        type: sol:account<Counter, seeds.Counter(user=rent_receiver)>
+        attributes: [ sol:close, sol:rent-receiver=rent_receiver ]

@@ -4,12 +4,13 @@ import * as path from "path";
 import * as os from "os";
 import {
     createUserRecordSendAndConfirm,
-    deriveRecordPDA,
+    deriveRecordCollectionPDA,
     getRecord,
     initializeClient,
     registerIncomeSendAndConfirm,
     registerOutcomeSendAndConfirm
 } from "./index";
+import * as console from "console";
 
 async function main(feePayer: Keypair) {
     const connection = new Connection("http://127.0.0.1:8899", {
@@ -22,7 +23,7 @@ async function main(feePayer: Keypair) {
     /**
      * 0. Derive Record PDA to retrieve from Blockchain
      */
-    const [recordPub] = deriveRecordPDA({
+    const [recordPub] = deriveRecordCollectionPDA({
         index: 0,
         signer: feePayer.publicKey,
     }, progId);
@@ -68,4 +69,4 @@ async function main(feePayer: Keypair) {
 }
 
 fs.readFile(path.join(os.homedir(), ".config/solana/id.json"))
-    .then(file => main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))));
+  .then(file => main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))));

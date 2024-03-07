@@ -22,7 +22,7 @@ pub enum InformalLenderInstruction {
 /// - fee: [u8] 
 	CreateBroker(CreateBrokerArgs),
 
-/// Through this insturction any one can add capital to the broker
+/// Through this instruction any one can add capital to the broker
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] 
@@ -45,7 +45,7 @@ pub enum InformalLenderInstruction {
 /// Data:
 /// - amount: [u64] The request amount to borrow
 /// - kyc_url: [String] 
-/// - loan_seed_index: [u32] Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+/// - loan_seed_index: [u32] Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
 	RequestLoan(RequestLoanArgs),
 
 /// Through this instruction the delegate can approve a loan.
@@ -60,7 +60,7 @@ pub enum InformalLenderInstruction {
 /// 4. `[writable]` client: [AccountInfo] 
 ///
 /// Data:
-/// - loan_seed_index: [u32] Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+/// - loan_seed_index: [u32] Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
 	ApproveLoan(ApproveLoanArgs),
 
 /// A client can pay a loan through this instruction. When paying
@@ -76,7 +76,7 @@ pub enum InformalLenderInstruction {
 ///
 /// Data:
 /// - amount: [u64] The amount to pay to the loan
-/// - loan_seed_index: [u32] Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+/// - loan_seed_index: [u32] Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
 	PayLoan(PayLoanArgs),
 
 }
