@@ -1,4 +1,4 @@
-cidl: "0.8"
+cidl: "0.9"
 imports:
   - ref: validate_accounts_ref
     loc: ./basic_accounts.cidl

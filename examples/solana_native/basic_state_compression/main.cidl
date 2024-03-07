@@ -1,4 +1,4 @@
-cidl: "0.8"
+cidl: "0.9"
 info:
   name: validate_state_compression
   title: Validate State Compression

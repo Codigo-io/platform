@@ -1,4 +1,4 @@
-cidl: "0.8"
+cidl: "0.9"
 info:
   name: validate_big_account_for_anchor
   title: Validates that big accounts get initialize on client side
