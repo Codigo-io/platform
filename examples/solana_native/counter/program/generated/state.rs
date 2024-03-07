@@ -35,7 +35,3 @@ pub struct GreetingAccount {
 	pub counter: u32,
 }
 
-impl GreetingAccount {
-	pub const LEN: usize = 4; 
-	}
-

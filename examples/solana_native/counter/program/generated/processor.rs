@@ -2,9 +2,10 @@
 // Editing this file directly is not recommended as it may be overwritten.
 
 use std::str::FromStr;
-use borsh::BorshSerialize;
-use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
+use std::ops::DerefMut;
+use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::borsh0_10::try_from_slice_unchecked;
+use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
 use solana_program::entrypoint::ProgramResult;
 use solana_program::program::{invoke, invoke_signed};
 use solana_program::pubkey::Pubkey;
@@ -75,7 +76,7 @@ impl Processor {
 
 		// Accounts Initializations
 		if greeting_account_info.lamports() == 0 && *greeting_account_info.owner == system_program::id() {
-			let space = GreetingAccount::LEN;
+			let space: usize = 4;
 			let rent = Rent::get()?;
 			let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -101,7 +102,7 @@ impl Processor {
 			return Err(CounterError::WrongAccountOwner.into());
 		}
 
-		if greeting_account_info.data_len() != GreetingAccount::LEN {
+		if greeting_account_info.data_len() != 4usize {
 			return Err(CounterError::InvalidAccountLen.into());
 		}
 
@@ -153,7 +154,7 @@ impl Processor {
 
 		// Accounts Initializations
 		if greeting_account_info.lamports() == 0 && *greeting_account_info.owner == system_program::id() {
-			let space = GreetingAccount::LEN;
+			let space: usize = 4;
 			let rent = Rent::get()?;
 			let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -179,7 +180,7 @@ impl Processor {
 			return Err(CounterError::WrongAccountOwner.into());
 		}
 
-		if greeting_account_info.data_len() != GreetingAccount::LEN {
+		if greeting_account_info.data_len() != 4usize {
 			return Err(CounterError::InvalidAccountLen.into());
 		}
 

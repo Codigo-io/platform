@@ -2,9 +2,10 @@
 // Editing this file directly is not recommended as it may be overwritten.
 
 use std::str::FromStr;
-use borsh::BorshSerialize;
-use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
+use std::ops::DerefMut;
+use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::borsh0_10::try_from_slice_unchecked;
+use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
 use solana_program::entrypoint::ProgramResult;
 use solana_program::program::{invoke, invoke_signed};
 use solana_program::pubkey::Pubkey;
@@ -13,8 +14,8 @@ use solana_program::system_instruction::create_account;
 use solana_program::{msg, system_program};
 use solana_program::sysvar::Sysvar;
 use solana_program::program_pack::Pack;
-use crate::generated::errors::BudgetTrackerError;
-use crate::generated::instructions::BudgetTrackerInstruction;
+use crate::generated::errors::ValidateBudgetTrackerError;
+use crate::generated::instructions::ValidateBudgetTrackerInstruction;
 
 use crate::generated::state::{
 	Account,
@@ -31,10 +32,10 @@ impl Processor {
         accounts: &[AccountInfo],
         data: &[u8],
     ) -> ProgramResult {
-        let instruction = BudgetTrackerInstruction::unpack(data)?;
+        let instruction = ValidateBudgetTrackerInstruction::unpack(data)?;
 
         match instruction {
-			BudgetTrackerInstruction::CreateUserRecord(args) => {
+			ValidateBudgetTrackerInstruction::CreateUserRecord(args) => {
 				msg!("Instruction: CreateUserRecord");
 				Self::process_create_user_record(
 					program_id,
@@ -43,7 +44,7 @@ impl Processor {
 					args.user_record_seed_index,
 				)
 			}
-			BudgetTrackerInstruction::RegisterIncome(args) => {
+			ValidateBudgetTrackerInstruction::RegisterIncome(args) => {
 				msg!("Instruction: RegisterIncome");
 				Self::process_register_income(
 					program_id,
@@ -52,7 +53,7 @@ impl Processor {
 					args.user_record_seed_index,
 				)
 			}
-			BudgetTrackerInstruction::RegisterOutcome(args) => {
+			ValidateBudgetTrackerInstruction::RegisterOutcome(args) => {
 				msg!("Instruction: RegisterOutcome");
 				Self::process_register_outcome(
 					program_id,
@@ -73,7 +74,7 @@ impl Processor {
 ///
 /// Data:
 /// - user_name: [String] The username to be assigned to the Record.name property
-/// - user_record_seed_index: [u8] Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+/// - user_record_seed_index: [u8] Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
 	pub fn process_create_user_record(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
@@ -93,20 +94,20 @@ impl Processor {
 
 		// Security Checks
 		if fee_payer_info.is_signer != true {
-			return Err(BudgetTrackerError::InvalidSignerPermission.into());
+			return Err(ValidateBudgetTrackerError::InvalidSignerPermission.into());
 		}
 
 		if *user_record_info.key != user_record_pubkey {
-			return Err(BudgetTrackerError::NotExpectedAddress.into());
+			return Err(ValidateBudgetTrackerError::NotExpectedAddress.into());
 		}
 
 		if *system_program_info.key != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
-			return Err(BudgetTrackerError::NotExpectedAddress.into());
+			return Err(ValidateBudgetTrackerError::NotExpectedAddress.into());
 		}
 
 
 		// Accounts Initializations
-		let space = Record::LEN;
+		let space: usize = 72;
 		let rent = Rent::get()?;
 		let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -124,12 +125,12 @@ impl Processor {
 
 
 		// Security Checks
-		if *fee_payer_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
-			return Err(BudgetTrackerError::WrongAccountOwner.into());
+		if *user_record_info.owner != *program_id {
+			return Err(ValidateBudgetTrackerError::WrongAccountOwner.into());
 		}
 
-		if user_record_info.data_len() != Record::LEN {
-			return Err(BudgetTrackerError::InvalidAccountLen.into());
+		if user_record_info.data_len() != 72usize {
+			return Err(ValidateBudgetTrackerError::InvalidAccountLen.into());
 		}
 
 
@@ -161,7 +162,7 @@ impl Processor {
 ///
 /// Data:
 /// - amount: [u32] The amount to be registered as the income.
-/// - user_record_seed_index: [u8] Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+/// - user_record_seed_index: [u8] Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
 	pub fn process_register_income(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
@@ -180,22 +181,22 @@ impl Processor {
 
 		// Security Checks
 		if fee_payer_info.is_signer != true {
-			return Err(BudgetTrackerError::InvalidSignerPermission.into());
+			return Err(ValidateBudgetTrackerError::InvalidSignerPermission.into());
 		}
 
 		if *user_record_info.key != user_record_pubkey {
-			return Err(BudgetTrackerError::NotExpectedAddress.into());
+			return Err(ValidateBudgetTrackerError::NotExpectedAddress.into());
 		}
 
 
 
 		// Security Checks
-		if *fee_payer_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
-			return Err(BudgetTrackerError::WrongAccountOwner.into());
+		if *user_record_info.owner != *program_id {
+			return Err(ValidateBudgetTrackerError::WrongAccountOwner.into());
 		}
 
-		if user_record_info.data_len() != Record::LEN {
-			return Err(BudgetTrackerError::InvalidAccountLen.into());
+		if user_record_info.data_len() != 72usize {
+			return Err(ValidateBudgetTrackerError::InvalidAccountLen.into());
 		}
 
 
@@ -227,7 +228,7 @@ impl Processor {
 ///
 /// Data:
 /// - amount: [u32] Number to be added to the outcome accumulator
-/// - user_record_seed_index: [u8] Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+/// - user_record_seed_index: [u8] Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
 	pub fn process_register_outcome(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
@@ -246,22 +247,22 @@ impl Processor {
 
 		// Security Checks
 		if fee_payer_info.is_signer != true {
-			return Err(BudgetTrackerError::InvalidSignerPermission.into());
+			return Err(ValidateBudgetTrackerError::InvalidSignerPermission.into());
 		}
 
 		if *user_record_info.key != user_record_pubkey {
-			return Err(BudgetTrackerError::NotExpectedAddress.into());
+			return Err(ValidateBudgetTrackerError::NotExpectedAddress.into());
 		}
 
 
 
 		// Security Checks
-		if *fee_payer_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
-			return Err(BudgetTrackerError::WrongAccountOwner.into());
+		if *user_record_info.owner != *program_id {
+			return Err(ValidateBudgetTrackerError::WrongAccountOwner.into());
 		}
 
-		if user_record_info.data_len() != Record::LEN {
-			return Err(BudgetTrackerError::InvalidAccountLen.into());
+		if user_record_info.data_len() != 72usize {
+			return Err(ValidateBudgetTrackerError::InvalidAccountLen.into());
 		}
 
 

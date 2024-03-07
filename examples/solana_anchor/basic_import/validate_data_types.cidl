@@ -1,0 +1,359 @@
+cidl: "0.8"
+info:
+  name: validate_data_types
+  title: Validate Data Types
+  summary: |-
+    The purpose of this CIDL is to validate all the supported data types.
+    - Verifies all the supported types for PDA accounts
+    - Verifies all the supported types for Non-PDA accounts
+    - Verifies all the supported types for inputs
+    - The business logic should assign the input to the account's field
+    - The business logic test should verified that the input's values is the same value assign to the account's field
+  version: 0.0.0
+  license:
+    name: Codigo
+    url: https://codigo.ai/documents/Codigo---Terms-of-Service.pdf
+solana:
+  seeds:
+    MasterTypesPDA:
+      items:
+        - name: master_type_pda
+types:
+  State:
+    fields:
+      # Native types
+      - name: u8_type
+        type: u8
+      - name: u16_type
+        type: u16
+      - name: u32_type
+        type: u32
+      - name: u64_type
+        type: u64
+      - name: u128_type
+        type: u128
+      - name: i8_type
+        type: i8
+      - name: i16_type
+        type: i16
+      - name: i32_type
+        type: i32
+      - name: i64_type
+        type: i64
+      - name: i128_type
+        type: i128
+      - name: string_type
+        type: string
+        attributes: [ cap=10 ]
+      - name: bool_type
+        type: bool
+      - name: f32_type
+        type: f32
+      - name: f64_type
+        type: f64
+
+      # Extended type
+      - name: pubkey_type
+        type: sol:pubkey
+
+      # Options
+      - name: u8_type_option
+        type: u8?
+      - name: u16_type_option
+        type: u16?
+      - name: u32_type_option
+        type: u32?
+      - name: u64_type_option
+        type: u64?
+      - name: u128_type_option
+        type: u128?
+      - name: i8_type_option
+        type: i8?
+      - name: i16_type_option
+        type: i16?
+      - name: i32_type_option
+        type: i32?
+      - name: i64_type_option
+        type: i64?
+      - name: i128_type_option
+        type: i128?
+      - name: string_type_option
+        type: string?
+        attributes: [ cap=10 ]
+      - name: bool_type_option
+        type: bool?
+      - name: f32_type_option
+        type: f32?
+      - name: f64_type_option
+        type: f64?
+      - name: pubkey_type_option
+        type: sol:pubkey?
+
+      # Vector
+      - name: u8_type_vector
+        type: array<u8>
+        attributes: [ cap=10 ]
+      - name: u16_type_vector
+        type: array<u16>
+        attributes: [ cap=10 ]
+      - name: u32_type_vector
+        type: array<u32>
+        attributes: [ cap=10 ]
+      - name: u64_type_vector
+        type: array<u64>
+        attributes: [ cap=10 ]
+      - name: u128_type_vector
+        type: array<u128>
+        attributes: [ cap=10 ]
+      - name: i8_type_vector
+        type: array<i8>
+        attributes: [ cap=10 ]
+      - name: i16_type_vector
+        type: array<i16>
+        attributes: [ cap=10 ]
+      - name: i32_type_vector
+        type: array<i32>
+        attributes: [ cap=10 ]
+      - name: i64_type_vector
+        type: array<i64>
+        attributes: [ cap=10 ]
+      - name: i128_type_vector
+        type: array<i128>
+        attributes: [ cap=10 ]
+      # Not supported: The CIDL spec doesn't define how to set a capacity for the vector and for the string
+      #      - name: string_type
+      #        type: array<string>
+      #        attributes: [cap=10]
+      - name: bool_type_vector
+        type: array<bool>
+        attributes: [ cap=10 ]
+      - name: f32_type_vector
+        type: array<f32>
+        attributes: [ cap=10 ]
+      - name: f64_type_vector
+        type: array<f64>
+        attributes: [ cap=10 ]
+      - name: pubkey_type_vector
+        type: array<sol:pubkey>
+        attributes: [ cap=10 ]
+methods:
+  - name: instruction1
+    summary: Test MasterTypeNonPDA types
+    inputs:
+      - name: account
+        type: sol:account<State>
+        attributes: [ sol:init ]
+      # Native types
+      - name: u8_type
+        type: u8
+      - name: u16_type
+        type: u16
+      - name: u32_type
+        type: u32
+      - name: u64_type
+        type: u64
+      - name: u128_type
+        type: u128
+      - name: i8_type
+        type: i8
+      - name: i16_type
+        type: i16
+      - name: i32_type
+        type: i32
+      - name: i64_type
+        type: i64
+      - name: i128_type
+        type: i128
+      - name: string_type
+        type: string
+      - name: bool_type
+        type: bool
+      - name: f32_type
+        type: f32
+      - name: f64_type
+        type: f64
+
+      # Extended type
+      - name: pubkey_type
+        type: sol:pubkey
+      - name: account_info_type
+        type: sol:account
+        attributes: [ sol:uncheck_account ]
+      - name: account_info_type_mut
+        type: sol:account
+        attributes: [ sol:writable, sol:uncheck_account ]
+
+      # Options
+      - name: u8_type_option
+        type: u8?
+      - name: u16_type_option
+        type: u16?
+      - name: u32_type_option
+        type: u32?
+      - name: u64_type_option
+        type: u64?
+      - name: u128_type_option
+        type: u128?
+      - name: i8_type_option
+        type: i8?
+      - name: i16_type_option
+        type: i16?
+      - name: i32_type_option
+        type: i32?
+      - name: i64_type_option
+        type: i64?
+      - name: i128_type_option
+        type: i128?
+      - name: string_type_option
+        type: string?
+      - name: bool_type_option
+        type: bool?
+      - name: f32_type_option
+        type: f32?
+      - name: f64_type_option
+        type: f64?
+      - name: pubkey_type_option
+        type: sol:pubkey?
+
+      # Vector
+      - name: u8_type_vector
+        type: array<u8>
+      - name: u16_type_vector
+        type: array<u16>
+      - name: u32_type_vector
+        type: array<u32>
+      - name: u64_type_vector
+        type: array<u64>
+      - name: u128_type_vector
+        type: array<u128>
+      - name: i8_type_vector
+        type: array<i8>
+      - name: i16_type_vector
+        type: array<i16>
+      - name: i32_type_vector
+        type: array<i32>
+      - name: i64_type_vector
+        type: array<i64>
+      - name: i128_type_vector
+        type: array<i128>
+      # Not supported: The CIDL spec doesn't define how to set a capacity for the vector and for the string
+      #      - name: string_type
+      #        type: array<string>
+      - name: bool_type_vector
+        type: array<bool>
+      - name: f32_type_vector
+        type: array<f32>
+      - name: f64_type_vector
+        type: array<f64>
+      - name: pubkey_type_vector
+        type: array<sol:pubkey>
+  - name: instruction2
+    summary: Test MasterTypePDA types
+    inputs:
+      - name: account
+        type: sol:account<State, seeds.MasterTypesPDA>
+        attributes: [ sol:init ]
+      # Native types
+      - name: u8_type
+        type: u8
+      - name: u16_type
+        type: u16
+      - name: u32_type
+        type: u32
+      - name: u64_type
+        type: u64
+      - name: u128_type
+        type: u128
+      - name: i8_type
+        type: i8
+      - name: i16_type
+        type: i16
+      - name: i32_type
+        type: i32
+      - name: i64_type
+        type: i64
+      - name: i128_type
+        type: i128
+      - name: string_type
+        type: string
+      - name: bool_type
+        type: bool
+      - name: f32_type
+        type: f32
+      - name: f64_type
+        type: f64
+
+      # Extended type
+      - name: pubkey_type
+        type: sol:pubkey
+      - name: account_info_type
+        type: sol:account
+        attributes: [ sol:uncheck_account ]
+      - name: account_info_type_mut
+        type: sol:account
+        attributes: [ sol:writable, sol:uncheck_account ]
+
+      # Options
+      - name: u8_type_option
+        type: u8?
+      - name: u16_type_option
+        type: u16?
+      - name: u32_type_option
+        type: u32?
+      - name: u64_type_option
+        type: u64?
+      - name: u128_type_option
+        type: u128?
+      - name: i8_type_option
+        type: i8?
+      - name: i16_type_option
+        type: i16?
+      - name: i32_type_option
+        type: i32?
+      - name: i64_type_option
+        type: i64?
+      - name: i128_type_option
+        type: i128?
+      - name: string_type_option
+        type: string?
+      - name: bool_type_option
+        type: bool?
+      - name: f32_type_option
+        type: f32?
+      - name: f64_type_option
+        type: f64?
+      - name: pubkey_type_option
+        type: sol:pubkey?
+
+      # Vector
+      - name: u8_type_vector
+        type: array<u8>
+      - name: u16_type_vector
+        type: array<u16>
+      - name: u32_type_vector
+        type: array<u32>
+      - name: u64_type_vector
+        type: array<u64>
+      - name: u128_type_vector
+        type: array<u128>
+      - name: i8_type_vector
+        type: array<i8>
+      - name: i16_type_vector
+        type: array<i16>
+      - name: i32_type_vector
+        type: array<i32>
+      - name: i64_type_vector
+        type: array<i64>
+      - name: i128_type_vector
+        type: array<i128>
+      # Not supported: The CIDL spec doesn't define how to set a capacity for the vector and for the string
+      #      - name: string_type
+      #        type: array<string>
+      - name: bool_type_vector
+        type: array<bool>
+      - name: f32_type_vector
+        type: array<f32>
+      - name: f64_type_vector
+        type: array<f64>
+      - name: pubkey_type_vector
+        type: array<sol:pubkey>

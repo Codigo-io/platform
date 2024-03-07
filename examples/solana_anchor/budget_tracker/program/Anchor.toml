@@ -1,9 +1,14 @@
+# This file is auto-generated from the CIDL source.
+# Editing this file directly is not recommended as it may be overwritten.
+
+[toolchain]
 
 [features]
 seeds = false
 skip-lint = false
+
 [programs.localnet]
-workspace = "EdFcxcCZvYnTssF9MKZJxEERWNwJrbFdhHDgxNfqajnE"
+workspace = "GZwozvtQoWXLHjdobT7pM28nPC3R31pamqwww6gKvN39"
 
 [registry]
 url = "https://api.apr.dev"

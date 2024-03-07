@@ -3,12 +3,12 @@
 
 import {PublicKey} from "@solana/web3.js";
 
-export type GemMetadataSeeds = {
+export type MetadataSeeds = {
     mint: PublicKey, 
 };
 
-export const deriveGemMetadataPDA = (
-    seeds: GemMetadataSeeds,
+export const deriveMetadataPDA = (
+    seeds: MetadataSeeds,
     programId: PublicKey
 ): [PublicKey, number] => {
     return PublicKey.findProgramAddressSync(
@@ -27,16 +27,45 @@ export module CslSplTokenPDAs {
         mint: PublicKey, 
     };
     
-    export const deriveAccountPDA = (seeds: AccountSeeds): [PublicKey, number] => {
+    export const deriveAccountPDA = (
+        seeds: AccountSeeds,
+        programId: PublicKey
+    ): [PublicKey, number] => {
         return PublicKey.findProgramAddressSync(
             [
                 seeds.wallet.toBuffer(),
                 seeds.tokenProgram.toBuffer(),
                 seeds.mint.toBuffer(),
             ],
-            new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
+            programId,
         )
     };
+    
+}
+
+export module CslSplAssocTokenPDAs {
+    export module CslSplTokenPDAs {
+        export type AccountSeeds = {
+            wallet: PublicKey, 
+            tokenProgram: PublicKey, 
+            mint: PublicKey, 
+        };
+        
+        export const deriveAccountPDA = (
+            seeds: AccountSeeds,
+            programId: PublicKey
+        ): [PublicKey, number] => {
+            return PublicKey.findProgramAddressSync(
+                [
+                    seeds.wallet.toBuffer(),
+                    seeds.tokenProgram.toBuffer(),
+                    seeds.mint.toBuffer(),
+                ],
+                programId,
+            )
+        };
+        
+    }
     
 }
 

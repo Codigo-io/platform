@@ -12,7 +12,7 @@ pub enum ValidateAccountsInstruction {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [NonPdaaccountWithOneField] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
 /// - input_1: [u8] 
@@ -22,7 +22,7 @@ pub enum ValidateAccountsInstruction {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
 /// - input_1: [u8] 
@@ -32,77 +32,81 @@ pub enum ValidateAccountsInstruction {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticAndDynamicSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_dynamic: [u8] Auto-generated, from input account of type [PdaaccountWithOneStaticAndDynamicSeedAndOneField] set the seed named dynamic, required by the type
+/// - account_seed_dynamic: [u8] Auto-generated, from the input "account" for the its seed definition "DynamicPda", sets the seed named "dynamic"
 	Instruction3(Instruction3Args),
 
 /// Test `mut` using PDA account that has all the possible data types for dynamic seeds
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountVerifiesSeedsTypes] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_u_8_type: [u8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u8_type, required by the type
-/// - account_seed_u_16_type: [u16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u16_type, required by the type
-/// - account_seed_u_32_type: [u32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u32_type, required by the type
-/// - account_seed_i_8_type: [i8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i8_type, required by the type
-/// - account_seed_i_16_type: [i16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i16_type, required by the type
-/// - account_seed_i_32_type: [i32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i32_type, required by the type
-/// - account_seed_string_type: [String] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named string_type, required by the type
-/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named pubkey_type, required by the type
+/// - account_seed_u8_type: [u8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u8_type"
+/// - account_seed_u16_type: [u16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u16_type"
+/// - account_seed_u32_type: [u32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u32_type"
+/// - account_seed_u64_type: [u64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u64_type"
+/// - account_seed_i8_type: [i8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i8_type"
+/// - account_seed_i16_type: [i16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i16_type"
+/// - account_seed_i32_type: [i32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i32_type"
+/// - account_seed_i64_type: [i64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i64_type"
+/// - account_seed_string_type: [String] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "string_type"
+/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "pubkey_type"
 	Instruction4(Instruction4Args),
 
 /// Test `non-mut` using Non-PDA account that has one field
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[]` account: [NonPdaaccountWithOneField] 
+/// 1. `[]` account: [State] 
 	Instruction5,
 
 /// Test `non-mut` using PDA account that has one static seed and one field
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[]` account: [PdaaccountWithOneStaticSeedAndOneField] 
+/// 1. `[]` account: [State] 
 	Instruction6,
 
 /// Test `non-mut` using PDA account that has one static and dynamic seed, and one field
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[]` account: [PdaaccountWithOneStaticAndDynamicSeedAndOneField] 
+/// 1. `[]` account: [State] 
 ///
 /// Data:
-/// - account_seed_dynamic: [u8] Auto-generated, from input account of type [PdaaccountWithOneStaticAndDynamicSeedAndOneField] set the seed named dynamic, required by the type
+/// - account_seed_dynamic: [u8] Auto-generated, from the input "account" for the its seed definition "DynamicPda", sets the seed named "dynamic"
 	Instruction7(Instruction7Args),
 
 /// Test `non-mut` using PDA account that has all the possible data types for dynamic seeds
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[]` account: [PdaaccountVerifiesSeedsTypes] 
+/// 1. `[]` account: [State] 
 ///
 /// Data:
-/// - account_seed_u_8_type: [u8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u8_type, required by the type
-/// - account_seed_u_16_type: [u16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u16_type, required by the type
-/// - account_seed_u_32_type: [u32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u32_type, required by the type
-/// - account_seed_i_8_type: [i8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i8_type, required by the type
-/// - account_seed_i_16_type: [i16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i16_type, required by the type
-/// - account_seed_i_32_type: [i32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i32_type, required by the type
-/// - account_seed_string_type: [String] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named string_type, required by the type
-/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named pubkey_type, required by the type
+/// - account_seed_u8_type: [u8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u8_type"
+/// - account_seed_u16_type: [u16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u16_type"
+/// - account_seed_u32_type: [u32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u32_type"
+/// - account_seed_u64_type: [u64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u64_type"
+/// - account_seed_i8_type: [i8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i8_type"
+/// - account_seed_i16_type: [i16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i16_type"
+/// - account_seed_i32_type: [i32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i32_type"
+/// - account_seed_i64_type: [i64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i64_type"
+/// - account_seed_string_type: [String] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "string_type"
+/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "pubkey_type"
 	Instruction8(Instruction8Args),
 
 /// Test `init` using Non-PDA account that has one field
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable, signer]` account: [NonPdaaccountWithOneField] 
+/// 1. `[writable, signer]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
@@ -113,7 +117,7 @@ pub enum ValidateAccountsInstruction {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
@@ -124,38 +128,40 @@ pub enum ValidateAccountsInstruction {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticAndDynamicSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_dynamic: [u8] Auto-generated, from input account of type [PdaaccountWithOneStaticAndDynamicSeedAndOneField] set the seed named dynamic, required by the type
+/// - account_seed_dynamic: [u8] Auto-generated, from the input "account" for the its seed definition "DynamicPda", sets the seed named "dynamic"
 	Instruction11(Instruction11Args),
 
 /// Test `init` using PDA account that has all the possible data types for dynamic seeds
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountVerifiesSeedsTypes] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_u_8_type: [u8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u8_type, required by the type
-/// - account_seed_u_16_type: [u16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u16_type, required by the type
-/// - account_seed_u_32_type: [u32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u32_type, required by the type
-/// - account_seed_i_8_type: [i8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i8_type, required by the type
-/// - account_seed_i_16_type: [i16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i16_type, required by the type
-/// - account_seed_i_32_type: [i32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i32_type, required by the type
-/// - account_seed_string_type: [String] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named string_type, required by the type
-/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named pubkey_type, required by the type
+/// - account_seed_u8_type: [u8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u8_type"
+/// - account_seed_u16_type: [u16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u16_type"
+/// - account_seed_u32_type: [u32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u32_type"
+/// - account_seed_u64_type: [u64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u64_type"
+/// - account_seed_i8_type: [i8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i8_type"
+/// - account_seed_i16_type: [i16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i16_type"
+/// - account_seed_i32_type: [i32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i32_type"
+/// - account_seed_i64_type: [i64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i64_type"
+/// - account_seed_string_type: [String] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "string_type"
+/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "pubkey_type"
 	Instruction12(Instruction12Args),
 
 /// Test `init_if_needed` using Non-PDA account that has one field
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable, signer]` account: [NonPdaaccountWithOneField] 
+/// 1. `[writable, signer]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
@@ -166,7 +172,7 @@ pub enum ValidateAccountsInstruction {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
@@ -177,72 +183,83 @@ pub enum ValidateAccountsInstruction {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticAndDynamicSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_dynamic: [u8] Auto-generated, from input account of type [PdaaccountWithOneStaticAndDynamicSeedAndOneField] set the seed named dynamic, required by the type
+/// - account_seed_dynamic: [u8] Auto-generated, from the input "account" for the its seed definition "DynamicPda", sets the seed named "dynamic"
 	Instruction15(Instruction15Args),
 
 /// Test `init_if_needed` using PDA account that has all the possible data types for dynamic seeds
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountVerifiesSeedsTypes] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_u_8_type: [u8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u8_type, required by the type
-/// - account_seed_u_16_type: [u16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u16_type, required by the type
-/// - account_seed_u_32_type: [u32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u32_type, required by the type
-/// - account_seed_i_8_type: [i8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i8_type, required by the type
-/// - account_seed_i_16_type: [i16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i16_type, required by the type
-/// - account_seed_i_32_type: [i32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i32_type, required by the type
-/// - account_seed_string_type: [String] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named string_type, required by the type
-/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named pubkey_type, required by the type
+/// - account_seed_u8_type: [u8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u8_type"
+/// - account_seed_u16_type: [u16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u16_type"
+/// - account_seed_u32_type: [u32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u32_type"
+/// - account_seed_u64_type: [u64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u64_type"
+/// - account_seed_i8_type: [i8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i8_type"
+/// - account_seed_i16_type: [i16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i16_type"
+/// - account_seed_i32_type: [i32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i32_type"
+/// - account_seed_i64_type: [i64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i64_type"
+/// - account_seed_string_type: [String] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "string_type"
+/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "pubkey_type"
 	Instruction16(Instruction16Args),
+
+/// Test `close_uncheck` using Non-PDA account that has one field
+///
+/// Accounts:
+/// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
+/// 1. `[writable]` account: [State] 
+	Instruction17,
 
 /// Test `close` using Non-PDA account that has one field
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [NonPdaaccountWithOneField] 
-	Instruction17,
+/// 1. `[writable, signer]` account: [State] 
+	SafeInstruction17,
 
 /// Test `close` using PDA account that has one static seed and one field
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 	Instruction18,
 
 /// Test `close` using PDA account that has one static and dynamic seed, and one field
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticAndDynamicSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
-/// - account_seed_dynamic: [u8] Auto-generated, from input account of type [PdaaccountWithOneStaticAndDynamicSeedAndOneField] set the seed named dynamic, required by the type
+/// - account_seed_dynamic: [u8] Auto-generated, from the input "account" for the its seed definition "DynamicPda", sets the seed named "dynamic"
 	Instruction19(Instruction19Args),
 
 /// Test `close` using PDA account that has all the possible data types for dynamic seeds
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountVerifiesSeedsTypes] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
-/// - account_seed_u_8_type: [u8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u8_type, required by the type
-/// - account_seed_u_16_type: [u16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u16_type, required by the type
-/// - account_seed_u_32_type: [u32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u32_type, required by the type
-/// - account_seed_i_8_type: [i8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i8_type, required by the type
-/// - account_seed_i_16_type: [i16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i16_type, required by the type
-/// - account_seed_i_32_type: [i32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i32_type, required by the type
-/// - account_seed_string_type: [String] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named string_type, required by the type
-/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named pubkey_type, required by the type
+/// - account_seed_u8_type: [u8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u8_type"
+/// - account_seed_u16_type: [u16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u16_type"
+/// - account_seed_u32_type: [u32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u32_type"
+/// - account_seed_u64_type: [u64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u64_type"
+/// - account_seed_i8_type: [i8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i8_type"
+/// - account_seed_i16_type: [i16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i16_type"
+/// - account_seed_i32_type: [i32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i32_type"
+/// - account_seed_i64_type: [i64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i64_type"
+/// - account_seed_string_type: [String] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "string_type"
+/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "pubkey_type"
 	Instruction20(Instruction20Args),
 
 }
@@ -266,12 +283,14 @@ pub struct Instruction3Args {
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct Instruction4Args {
 	pub input_1: u8,
-	pub account_seed_u_8_type: u8,
-	pub account_seed_u_16_type: u16,
-	pub account_seed_u_32_type: u32,
-	pub account_seed_i_8_type: i8,
-	pub account_seed_i_16_type: i16,
-	pub account_seed_i_32_type: i32,
+	pub account_seed_u8_type: u8,
+	pub account_seed_u16_type: u16,
+	pub account_seed_u32_type: u32,
+	pub account_seed_u64_type: u64,
+	pub account_seed_i8_type: i8,
+	pub account_seed_i16_type: i16,
+	pub account_seed_i32_type: i32,
+	pub account_seed_i64_type: i64,
 	pub account_seed_string_type: String,
 	pub account_seed_pubkey_type: Pubkey,
 }
@@ -283,12 +302,14 @@ pub struct Instruction7Args {
 
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct Instruction8Args {
-	pub account_seed_u_8_type: u8,
-	pub account_seed_u_16_type: u16,
-	pub account_seed_u_32_type: u32,
-	pub account_seed_i_8_type: i8,
-	pub account_seed_i_16_type: i16,
-	pub account_seed_i_32_type: i32,
+	pub account_seed_u8_type: u8,
+	pub account_seed_u16_type: u16,
+	pub account_seed_u32_type: u32,
+	pub account_seed_u64_type: u64,
+	pub account_seed_i8_type: i8,
+	pub account_seed_i16_type: i16,
+	pub account_seed_i32_type: i32,
+	pub account_seed_i64_type: i64,
 	pub account_seed_string_type: String,
 	pub account_seed_pubkey_type: Pubkey,
 }
@@ -312,12 +333,14 @@ pub struct Instruction11Args {
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct Instruction12Args {
 	pub input_1: u8,
-	pub account_seed_u_8_type: u8,
-	pub account_seed_u_16_type: u16,
-	pub account_seed_u_32_type: u32,
-	pub account_seed_i_8_type: i8,
-	pub account_seed_i_16_type: i16,
-	pub account_seed_i_32_type: i32,
+	pub account_seed_u8_type: u8,
+	pub account_seed_u16_type: u16,
+	pub account_seed_u32_type: u32,
+	pub account_seed_u64_type: u64,
+	pub account_seed_i8_type: i8,
+	pub account_seed_i16_type: i16,
+	pub account_seed_i32_type: i32,
+	pub account_seed_i64_type: i64,
 	pub account_seed_string_type: String,
 	pub account_seed_pubkey_type: Pubkey,
 }
@@ -341,12 +364,14 @@ pub struct Instruction15Args {
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct Instruction16Args {
 	pub input_1: u8,
-	pub account_seed_u_8_type: u8,
-	pub account_seed_u_16_type: u16,
-	pub account_seed_u_32_type: u32,
-	pub account_seed_i_8_type: i8,
-	pub account_seed_i_16_type: i16,
-	pub account_seed_i_32_type: i32,
+	pub account_seed_u8_type: u8,
+	pub account_seed_u16_type: u16,
+	pub account_seed_u32_type: u32,
+	pub account_seed_u64_type: u64,
+	pub account_seed_i8_type: i8,
+	pub account_seed_i16_type: i16,
+	pub account_seed_i32_type: i32,
+	pub account_seed_i64_type: i64,
 	pub account_seed_string_type: String,
 	pub account_seed_pubkey_type: Pubkey,
 }
@@ -358,12 +383,14 @@ pub struct Instruction19Args {
 
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct Instruction20Args {
-	pub account_seed_u_8_type: u8,
-	pub account_seed_u_16_type: u16,
-	pub account_seed_u_32_type: u32,
-	pub account_seed_i_8_type: i8,
-	pub account_seed_i_16_type: i16,
-	pub account_seed_i_32_type: i32,
+	pub account_seed_u8_type: u8,
+	pub account_seed_u16_type: u16,
+	pub account_seed_u32_type: u32,
+	pub account_seed_u64_type: u64,
+	pub account_seed_i8_type: i8,
+	pub account_seed_i16_type: i16,
+	pub account_seed_i32_type: i32,
+	pub account_seed_i64_type: i64,
 	pub account_seed_string_type: String,
 	pub account_seed_pubkey_type: Pubkey,
 }
@@ -390,9 +417,10 @@ impl ValidateAccountsInstruction {
 			14 => Self::Instruction15(Instruction15Args::try_from_slice(rest).unwrap()),
 			15 => Self::Instruction16(Instruction16Args::try_from_slice(rest).unwrap()),
 			16 => Self::Instruction17,
-			17 => Self::Instruction18,
-			18 => Self::Instruction19(Instruction19Args::try_from_slice(rest).unwrap()),
-			19 => Self::Instruction20(Instruction20Args::try_from_slice(rest).unwrap()),
+			17 => Self::SafeInstruction17,
+			18 => Self::Instruction18,
+			19 => Self::Instruction19(Instruction19Args::try_from_slice(rest).unwrap()),
+			20 => Self::Instruction20(Instruction20Args::try_from_slice(rest).unwrap()),
 			_ => return Err(ValidateAccountsError::InvalidInstruction.into())
         })
     }

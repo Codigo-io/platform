@@ -2,9 +2,10 @@
 // Editing this file directly is not recommended as it may be overwritten.
 
 use std::str::FromStr;
-use borsh::BorshSerialize;
-use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
+use std::ops::DerefMut;
+use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::borsh0_10::try_from_slice_unchecked;
+use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
 use solana_program::entrypoint::ProgramResult;
 use solana_program::program::{invoke, invoke_signed};
 use solana_program::pubkey::Pubkey;
@@ -131,7 +132,7 @@ impl Processor {
 
 
 		// Accounts Initializations
-		let space = Broker::LEN;
+		let space: usize = 81;
 		let rent = Rent::get()?;
 		let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -149,11 +150,15 @@ impl Processor {
 
 
 		// Security Checks
-		if *fee_payer_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
+		if *delegate_info.owner != *program_id {
 			return Err(InformalLenderError::WrongAccountOwner.into());
 		}
 
-		if broker_info.data_len() != Broker::LEN {
+		if *broker_info.owner != *program_id {
+			return Err(InformalLenderError::WrongAccountOwner.into());
+		}
+
+		if broker_info.data_len() != 81usize {
 			return Err(InformalLenderError::InvalidAccountLen.into());
 		}
 
@@ -180,7 +185,7 @@ impl Processor {
 		Ok(())
 	}
 
-/// Through this insturction any one can add capital to the broker
+/// Through this instruction any one can add capital to the broker
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] 
@@ -221,11 +226,15 @@ impl Processor {
 
 
 		// Security Checks
-		if *fee_payer_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
+		if *delegate_info.owner != *program_id {
 			return Err(InformalLenderError::WrongAccountOwner.into());
 		}
 
-		if broker_info.data_len() != Broker::LEN {
+		if *broker_info.owner != *program_id {
+			return Err(InformalLenderError::WrongAccountOwner.into());
+		}
+
+		if broker_info.data_len() != 81usize {
 			return Err(InformalLenderError::InvalidAccountLen.into());
 		}
 
@@ -263,7 +272,7 @@ impl Processor {
 /// Data:
 /// - amount: [u64] The request amount to borrow
 /// - kyc_url: [String] 
-/// - loan_seed_index: [u32] Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+/// - loan_seed_index: [u32] Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
 	pub fn process_request_loan(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
@@ -311,7 +320,7 @@ impl Processor {
 
 
 		// Accounts Initializations
-		let space = Loan::LEN;
+		let space: usize = 150;
 		let rent = Rent::get()?;
 		let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -329,15 +338,23 @@ impl Processor {
 
 
 		// Security Checks
-		if *fee_payer_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
+		if *client_info.owner != *program_id {
 			return Err(InformalLenderError::WrongAccountOwner.into());
 		}
 
-		if loan_info.data_len() != Loan::LEN {
+		if *loan_info.owner != *program_id {
+			return Err(InformalLenderError::WrongAccountOwner.into());
+		}
+
+		if *broker_info.owner != *program_id {
+			return Err(InformalLenderError::WrongAccountOwner.into());
+		}
+
+		if loan_info.data_len() != 150usize {
 			return Err(InformalLenderError::InvalidAccountLen.into());
 		}
 
-		if broker_info.data_len() != Broker::LEN {
+		if broker_info.data_len() != 81usize {
 			return Err(InformalLenderError::InvalidAccountLen.into());
 		}
 
@@ -382,7 +399,7 @@ impl Processor {
 /// 4. `[writable]` client: [AccountInfo] 
 ///
 /// Data:
-/// - loan_seed_index: [u32] Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+/// - loan_seed_index: [u32] Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
 	pub fn process_approve_loan(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
@@ -425,15 +442,27 @@ impl Processor {
 
 
 		// Security Checks
-		if *fee_payer_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
+		if *delegate_info.owner != *program_id {
 			return Err(InformalLenderError::WrongAccountOwner.into());
 		}
 
-		if loan_info.data_len() != Loan::LEN {
+		if *loan_info.owner != *program_id {
+			return Err(InformalLenderError::WrongAccountOwner.into());
+		}
+
+		if *broker_info.owner != *program_id {
+			return Err(InformalLenderError::WrongAccountOwner.into());
+		}
+
+		if *client_info.owner != *program_id {
+			return Err(InformalLenderError::WrongAccountOwner.into());
+		}
+
+		if loan_info.data_len() != 150usize {
 			return Err(InformalLenderError::InvalidAccountLen.into());
 		}
 
-		if broker_info.data_len() != Broker::LEN {
+		if broker_info.data_len() != 81usize {
 			return Err(InformalLenderError::InvalidAccountLen.into());
 		}
 
@@ -478,7 +507,7 @@ impl Processor {
 ///
 /// Data:
 /// - amount: [u64] The amount to pay to the loan
-/// - loan_seed_index: [u32] Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+/// - loan_seed_index: [u32] Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
 	pub fn process_pay_loan(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
@@ -521,15 +550,23 @@ impl Processor {
 
 
 		// Security Checks
-		if *fee_payer_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
+		if *client_info.owner != *program_id {
 			return Err(InformalLenderError::WrongAccountOwner.into());
 		}
 
-		if loan_info.data_len() != Loan::LEN {
+		if *loan_info.owner != *program_id {
+			return Err(InformalLenderError::WrongAccountOwner.into());
+		}
+
+		if *broker_info.owner != *program_id {
+			return Err(InformalLenderError::WrongAccountOwner.into());
+		}
+
+		if loan_info.data_len() != 150usize {
 			return Err(InformalLenderError::InvalidAccountLen.into());
 		}
 
-		if broker_info.data_len() != Broker::LEN {
+		if broker_info.data_len() != 81usize {
 			return Err(InformalLenderError::InvalidAccountLen.into());
 		}
 

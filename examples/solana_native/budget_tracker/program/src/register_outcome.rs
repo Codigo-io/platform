@@ -16,7 +16,7 @@ use crate::generated::state::{
 ///
 /// Data:
 /// - amount: [u32] Number to be added to the outcome accumulator
-/// - user_record_seed_index: [u8] Auto-generated, from input user_record of type [Record] set the seed named index, required by the type
+/// - user_record_seed_index: [u8] Auto-generated, from the input "user_record" for the its seed definition "RecordCollection", sets the seed named "index"
 pub fn register_outcome(
 	_program_id: &Pubkey,
 	user_record: &mut AccountPDA<Record>,

@@ -10,15 +10,16 @@ use crate::generated::{
 /// This instruction is used by a client to request a loan
 ///
 /// Accounts:
-/// 0. `[writable, signer]` client: [AccountInfo]
-/// 1. `[writable]` loan: [Loan]
-/// 2. `[]` broker: [Broker]
-/// 3. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
+/// 0. `[writable, signer]` fee_payer: [AccountInfo] 
+/// 1. `[signer]` client: [AccountInfo] 
+/// 2. `[writable]` loan: [Loan] 
+/// 3. `[]` broker: [Broker] 
+/// 4. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - amount: [u64] The request amount to borrow
 /// - kyc_url: [String]
-/// - loan_seed_index: [u32] Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+/// - loan_seed_index: [u32] Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
 pub fn request_loan(
     program_id: &Pubkey,
     client: &AccountInfo,

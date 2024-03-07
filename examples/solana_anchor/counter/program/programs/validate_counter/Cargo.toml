@@ -1,8 +1,14 @@
-
 [package]
 name = "validate_counter"
 version = "0.0.0"
-description = "The purpose of this CIDL is to test basic functionality: - PDA init/init_if_needed - Rent payer other than fee_payer - serdes of u64 - mut / signer input attrs "
+description = """
+The purpose of this CIDL is to test basic functionality:
+- PDA init/init_if_needed
+- Rent payer other than fee_payer
+- serdes of u64
+- mut / signer input attrs
+"""
+
 edition = "2021"
 
 [lib]
@@ -17,4 +23,7 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = { version = "0.28.0", features = ["init-if-needed"] }
+anchor-lang = { version = "0.29.0", features = ["init-if-needed"] }
+solana-program = "=1.17.0"
+ahash = "=0.8.6"
+bumpalo = "=3.14.0"

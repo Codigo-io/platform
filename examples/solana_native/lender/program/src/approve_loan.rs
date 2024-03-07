@@ -19,7 +19,7 @@ use crate::generated::{
 /// 4. `[writable]` client: [AccountInfo] 
 ///
 /// Data:
-/// - loan_seed_index: [u32] Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+/// - loan_seed_index: [u32] Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
 pub fn approve_loan(
 	program_id: &Pubkey,
 	delegate: &AccountInfo,

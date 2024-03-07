@@ -2,9 +2,10 @@
 // Editing this file directly is not recommended as it may be overwritten.
 
 use std::str::FromStr;
-use borsh::BorshSerialize;
-use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
+use std::ops::DerefMut;
+use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::borsh0_10::try_from_slice_unchecked;
+use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
 use solana_program::entrypoint::ProgramResult;
 use solana_program::program::{invoke, invoke_signed};
 use solana_program::pubkey::Pubkey;
@@ -19,7 +20,7 @@ use crate::generated::instructions::ValidateBasicNftInstruction;
 use crate::generated::state::{
 	Account,
 	AccountPDA,
-	GemMetadata,
+	Gem,
 };
 use crate::src::*;
 
@@ -58,15 +59,15 @@ impl Processor {
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
 /// 1. `[writable, signer]` mint: [Mint] 
-/// 2. `[writable]` gem: [GemMetadata] 
+/// 2. `[writable]` gem: [Gem] 
 /// 3. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 /// 4. `[writable, signer]` funding: [AccountInfo] Funding account (must be a system account)
 /// 5. `[writable]` assoc_token_account: [AccountInfo] Associated token account address to be created
 /// 6. `[]` wallet: [AccountInfo] Wallet address for the new associated token account
 /// 7. `[]` token_program: [AccountInfo] SPL Token program
 /// 8. `[signer]` owner: [AccountInfo] The mint's minting authority.
-/// 9. `[]` csl_spl_token_v_0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
-/// 10. `[]` csl_spl_assoc_token_v_0_0_0: [AccountInfo] Auto-generated, CslSplAssocTokenProgram v0.0.0
+/// 9. `[]` csl_spl_token_v0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
+/// 10. `[]` csl_spl_assoc_token_v0_0_0: [AccountInfo] Auto-generated, CslSplAssocTokenProgram v0.0.0
 ///
 /// Data:
 /// - color: [String] 
@@ -89,13 +90,17 @@ impl Processor {
 		let wallet_info = next_account_info(account_info_iter)?;
 		let token_program_info = next_account_info(account_info_iter)?;
 		let owner_info = next_account_info(account_info_iter)?;
-		let csl_spl_token_v_0_0_0_info = next_account_info(account_info_iter)?;
-		let csl_spl_assoc_token_v_0_0_0_info = next_account_info(account_info_iter)?;
+		let csl_spl_token_v0_0_0_info = next_account_info(account_info_iter)?;
+		let csl_spl_assoc_token_v0_0_0_info = next_account_info(account_info_iter)?;
 
 		// Derive PDAs
 		let (gem_pubkey, gem_bump) = Pubkey::find_program_address(
 			&[b"gem", mint_info.key.as_ref()],
 			program_id,
+		);
+		let (assoc_token_account_pubkey, assoc_token_account_bump) = Pubkey::find_program_address(
+			&[wallet_info.key.as_ref(), token_program_info.key.as_ref(), mint_info.key.as_ref()],
+			&Pubkey::from_str("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL").unwrap(),
 		);
 
 		// Security Checks
@@ -119,6 +124,10 @@ impl Processor {
 			return Err(ValidateBasicNftError::InvalidSignerPermission.into());
 		}
 
+		if *assoc_token_account_info.key != assoc_token_account_pubkey {
+			return Err(ValidateBasicNftError::NotExpectedAddress.into());
+		}
+
 		if *token_program_info.key != Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap() {
 			return Err(ValidateBasicNftError::NotExpectedAddress.into());
 		}
@@ -127,17 +136,17 @@ impl Processor {
 			return Err(ValidateBasicNftError::InvalidSignerPermission.into());
 		}
 
-		if *csl_spl_token_v_0_0_0_info.key != Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap() {
+		if *csl_spl_token_v0_0_0_info.key != Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap() {
 			return Err(ValidateBasicNftError::NotExpectedAddress.into());
 		}
 
-		if *csl_spl_assoc_token_v_0_0_0_info.key != Pubkey::from_str("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL").unwrap() {
+		if *csl_spl_assoc_token_v0_0_0_info.key != Pubkey::from_str("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL").unwrap() {
 			return Err(ValidateBasicNftError::NotExpectedAddress.into());
 		}
 
 
 		// Accounts Initializations
-		let space = spl_token::state::Mint::LEN;
+		let space: usize = 82;
 		let rent = Rent::get()?;
 		let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -152,7 +161,7 @@ impl Processor {
 			&[fee_payer_info.clone(), mint_info.clone()],
 		)?;
 
-		let space = GemMetadata::LEN;
+		let space: usize = 364;
 		let rent = Rent::get()?;
 		let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -178,6 +187,10 @@ impl Processor {
 			return Err(ValidateBasicNftError::WrongAccountOwner.into());
 		}
 
+		if *gem_info.owner != *program_id {
+			return Err(ValidateBasicNftError::WrongAccountOwner.into());
+		}
+
 		if *funding_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
 			return Err(ValidateBasicNftError::WrongAccountOwner.into());
 		}
@@ -186,11 +199,11 @@ impl Processor {
 			return Err(ValidateBasicNftError::WrongAccountOwner.into());
 		}
 
-		if mint_info.data_len() != spl_token::state::Mint::LEN {
+		if mint_info.data_len() != 82usize {
 			return Err(ValidateBasicNftError::InvalidAccountLen.into());
 		}
 
-		if gem_info.data_len() != GemMetadata::LEN {
+		if gem_info.data_len() != 364usize {
 			return Err(ValidateBasicNftError::InvalidAccountLen.into());
 		}
 
@@ -202,7 +215,7 @@ impl Processor {
 		);
 		let gem = &mut AccountPDA::new(
 			&gem_info,
-			try_from_slice_unchecked::<GemMetadata>(&gem_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<Gem>(&gem_info.data.borrow()).unwrap(),
 			gem_bump,
 		);
 
@@ -251,7 +264,7 @@ impl Processor {
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
 /// 1. `[]` mint: [Mint] 
-/// 2. `[writable]` gem: [GemMetadata] 
+/// 2. `[writable]` gem: [Gem] 
 /// 3. `[writable, signer]` funding: [AccountInfo] Funding account (must be a system account)
 /// 4. `[writable]` assoc_token_account: [AccountInfo] Associated token account address to be created
 /// 5. `[]` wallet: [AccountInfo] Wallet address for the new associated token account
@@ -260,8 +273,8 @@ impl Processor {
 /// 8. `[writable]` source: [AccountInfo] The source account.
 /// 9. `[writable]` destination: [AccountInfo] The destination account.
 /// 10. `[signer]` authority: [AccountInfo] The source account's owner/delegate.
-/// 11. `[]` csl_spl_assoc_token_v_0_0_0: [AccountInfo] Auto-generated, CslSplAssocTokenProgram v0.0.0
-/// 12. `[]` csl_spl_token_v_0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
+/// 11. `[]` csl_spl_assoc_token_v0_0_0: [AccountInfo] Auto-generated, CslSplAssocTokenProgram v0.0.0
+/// 12. `[]` csl_spl_token_v0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
 	pub fn process_transfer(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
@@ -278,13 +291,17 @@ impl Processor {
 		let source_info = next_account_info(account_info_iter)?;
 		let destination_info = next_account_info(account_info_iter)?;
 		let authority_info = next_account_info(account_info_iter)?;
-		let csl_spl_assoc_token_v_0_0_0_info = next_account_info(account_info_iter)?;
-		let csl_spl_token_v_0_0_0_info = next_account_info(account_info_iter)?;
+		let csl_spl_assoc_token_v0_0_0_info = next_account_info(account_info_iter)?;
+		let csl_spl_token_v0_0_0_info = next_account_info(account_info_iter)?;
 
 		// Derive PDAs
 		let (gem_pubkey, gem_bump) = Pubkey::find_program_address(
 			&[b"gem", mint_info.key.as_ref()],
 			program_id,
+		);
+		let (assoc_token_account_pubkey, assoc_token_account_bump) = Pubkey::find_program_address(
+			&[wallet_info.key.as_ref(), token_program_info.key.as_ref(), mint_info.key.as_ref()],
+			&Pubkey::from_str("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL").unwrap(),
 		);
 
 		// Security Checks
@@ -300,6 +317,10 @@ impl Processor {
 			return Err(ValidateBasicNftError::InvalidSignerPermission.into());
 		}
 
+		if *assoc_token_account_info.key != assoc_token_account_pubkey {
+			return Err(ValidateBasicNftError::NotExpectedAddress.into());
+		}
+
 		if *system_program_info.key != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
 			return Err(ValidateBasicNftError::NotExpectedAddress.into());
 		}
@@ -312,11 +333,11 @@ impl Processor {
 			return Err(ValidateBasicNftError::InvalidSignerPermission.into());
 		}
 
-		if *csl_spl_assoc_token_v_0_0_0_info.key != Pubkey::from_str("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL").unwrap() {
+		if *csl_spl_assoc_token_v0_0_0_info.key != Pubkey::from_str("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL").unwrap() {
 			return Err(ValidateBasicNftError::NotExpectedAddress.into());
 		}
 
-		if *csl_spl_token_v_0_0_0_info.key != Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap() {
+		if *csl_spl_token_v0_0_0_info.key != Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap() {
 			return Err(ValidateBasicNftError::NotExpectedAddress.into());
 		}
 
@@ -331,6 +352,10 @@ impl Processor {
 			return Err(ValidateBasicNftError::WrongAccountOwner.into());
 		}
 
+		if *gem_info.owner != *program_id {
+			return Err(ValidateBasicNftError::WrongAccountOwner.into());
+		}
+
 		if *funding_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
 			return Err(ValidateBasicNftError::WrongAccountOwner.into());
 		}
@@ -339,11 +364,11 @@ impl Processor {
 			return Err(ValidateBasicNftError::WrongAccountOwner.into());
 		}
 
-		if mint_info.data_len() != spl_token::state::Mint::LEN {
+		if mint_info.data_len() != 82usize {
 			return Err(ValidateBasicNftError::InvalidAccountLen.into());
 		}
 
-		if gem_info.data_len() != GemMetadata::LEN {
+		if gem_info.data_len() != 364usize {
 			return Err(ValidateBasicNftError::InvalidAccountLen.into());
 		}
 
@@ -355,7 +380,7 @@ impl Processor {
 		);
 		let gem = &mut AccountPDA::new(
 			&gem_info,
-			try_from_slice_unchecked::<GemMetadata>(&gem_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<Gem>(&gem_info.data.borrow()).unwrap(),
 			gem_bump,
 		);
 
@@ -394,12 +419,12 @@ impl Processor {
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
 /// 1. `[writable]` mint: [Mint] 
-/// 2. `[writable]` gem: [GemMetadata] 
+/// 2. `[writable]` gem: [Gem] 
 /// 3. `[writable]` account: [Account] The account to burn from.
 /// 4. `[signer]` owner: [AccountInfo] The account's owner/delegate.
 /// 5. `[]` wallet: [AccountInfo] Wallet address for the new associated token account
 /// 6. `[]` token_program: [AccountInfo] SPL Token program
-/// 7. `[]` csl_spl_token_v_0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
+/// 7. `[]` csl_spl_token_v0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
 	pub fn process_burn(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
@@ -412,7 +437,7 @@ impl Processor {
 		let owner_info = next_account_info(account_info_iter)?;
 		let wallet_info = next_account_info(account_info_iter)?;
 		let token_program_info = next_account_info(account_info_iter)?;
-		let csl_spl_token_v_0_0_0_info = next_account_info(account_info_iter)?;
+		let csl_spl_token_v0_0_0_info = next_account_info(account_info_iter)?;
 
 		// Derive PDAs
 		let (gem_pubkey, gem_bump) = Pubkey::find_program_address(
@@ -445,7 +470,7 @@ impl Processor {
 			return Err(ValidateBasicNftError::NotExpectedAddress.into());
 		}
 
-		if *csl_spl_token_v_0_0_0_info.key != Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap() {
+		if *csl_spl_token_v0_0_0_info.key != Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap() {
 			return Err(ValidateBasicNftError::NotExpectedAddress.into());
 		}
 
@@ -460,19 +485,27 @@ impl Processor {
 			return Err(ValidateBasicNftError::WrongAccountOwner.into());
 		}
 
+		if *gem_info.owner != *program_id {
+			return Err(ValidateBasicNftError::WrongAccountOwner.into());
+		}
+
+		if *account_info.owner != Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap() {
+			return Err(ValidateBasicNftError::WrongAccountOwner.into());
+		}
+
 		if *wallet_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
 			return Err(ValidateBasicNftError::WrongAccountOwner.into());
 		}
 
-		if mint_info.data_len() != spl_token::state::Mint::LEN {
+		if mint_info.data_len() != 82usize {
 			return Err(ValidateBasicNftError::InvalidAccountLen.into());
 		}
 
-		if gem_info.data_len() != GemMetadata::LEN {
+		if gem_info.data_len() != 364usize {
 			return Err(ValidateBasicNftError::InvalidAccountLen.into());
 		}
 
-		if account_info.data_len() != spl_token::state::Account::LEN {
+		if account_info.data_len() != 165usize {
 			return Err(ValidateBasicNftError::InvalidAccountLen.into());
 		}
 
@@ -484,7 +517,7 @@ impl Processor {
 		);
 		let gem = &mut AccountPDA::new(
 			&gem_info,
-			try_from_slice_unchecked::<GemMetadata>(&gem_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<Gem>(&gem_info.data.borrow()).unwrap(),
 			gem_bump,
 		);
 		let account = AccountPDA::new(

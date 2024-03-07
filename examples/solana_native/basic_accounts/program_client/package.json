@@ -11,7 +11,7 @@
   "repository": {
     "url": "https://github.com/Codigo-ai"
   },
-  "description": "- The purpose of this CIDL is to validate all the supported features for an account\n- Verifies it can define a Non-PDA account with one field\n- Verifies it can define PDA account with one field and a static seed\n- Verifies it can define PDA account with one field, a static and dynamic seed\n- Verifies it can define PDA account with all the possible seeds data types\n- Verifies account space is calculated automatically\n- Verifies it can mark an account as mutable\n- Verifies it can mark an account as immutable\n- Verifies it can generate the code to initialize an account in \"Singleton mode\" a.k.a init\n- Verifies it can generate the code to initialize an account in \"Non-Singleton mode\" a.k.a init_if_needed\n- Verifies the fee payer is the default payer when using an initialization method without explicitly specifying the payer\n- Verifies it can close a Non-PDA account\n- Verifies it can close a PDA account\n- Verifies the fee payer is the default lamport receiver when a rent receiver is not specify\n\nSome useful links:\n\n  - [Blockchain Extensions](https://docs.codigo.ai/category/blockchain-extensions)\n  - [Learning the Basics](https://docs.codigo.ai/código-interface-description-language/learning-the-basics)\n  - [Building Solana Programs with CIDL: A Comprehensive Guide Part I](https://docs.codigo.ai/guides/part-1-building-solana-programs)",
+  "description": "- The purpose of this CIDL is to validate all the supported features for an account\n- Verifies it can define a Non-PDA account with one field\n- Verifies it can define PDA account with one field and a static seed\n- Verifies it can define PDA account with one field, a static and dynamic seed\n- Verifies it can define PDA account with all the possible seeds data types\n- Verifies account space is calculated automatically\n- Verifies it can mark an account as mutable\n- Verifies it can mark an account as immutable\n- Verifies it can generate the code to initialize an account in \"Singleton mode\" a.k.a init\n- Verifies it can generate the code to initialize an account in \"Non-Singleton mode\" a.k.a init_if_needed\n- Verifies the fee payer is the default payer when using an initialization method without explicitly specifying the payer\n- Verifies it can close_unsafe a Non-PDA account\n- Verifies it can close a Non-PDA account\n- Verifies it can close a PDA account\n- Verifies the fee payer is the default lamport receiver when a rent receiver is not specify\n\nSome useful links:\n\n  - [Blockchain Extensions](https://docs.codigo.ai/category/blockchain-extensions)\n  - [Learning the Basics](https://docs.codigo.ai/código-interface-description-language/learning-the-basics)\n  - [Building Solana Programs with CIDL: A Comprehensive Guide Part I](https://docs.codigo.ai/guides/part-1-building-solana-programs)",
   "dependencies": {
     "@solana/web3.js": "^1.78.3",
     "borsh": "^1.0.0",
@@ -21,7 +21,6 @@
     "node": ">=14.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.7.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.2"
   }
 }

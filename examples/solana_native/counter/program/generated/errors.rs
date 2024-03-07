@@ -27,6 +27,9 @@ pub enum CounterError {
     #[error("Executable Account Expected")]
     ExecutableAccountExpected,
 
+	#[error("Account Already Closed")]
+	AccountAlreadyClosed,
+
  
 }
 
@@ -60,6 +63,7 @@ impl PrintProgramError for CounterError {
             CounterError::WrongAccountOwner => msg!("Error: Wrong account owner"),
             CounterError::InvalidAccountLen => msg!("Error: Invalid account length"),
             CounterError::ExecutableAccountExpected => msg!("Error: Executable account expected"),
+            CounterError::AccountAlreadyClosed => msg!("Error: Account Already Closed"),
  
         }
     }

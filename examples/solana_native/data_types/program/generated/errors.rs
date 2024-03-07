@@ -27,6 +27,9 @@ pub enum ValidateDataTypesError {
     #[error("Executable Account Expected")]
     ExecutableAccountExpected,
 
+	#[error("Account Already Closed")]
+	AccountAlreadyClosed,
+
  
 }
 
@@ -60,6 +63,7 @@ impl PrintProgramError for ValidateDataTypesError {
             ValidateDataTypesError::WrongAccountOwner => msg!("Error: Wrong account owner"),
             ValidateDataTypesError::InvalidAccountLen => msg!("Error: Invalid account length"),
             ValidateDataTypesError::ExecutableAccountExpected => msg!("Error: Executable account expected"),
+            ValidateDataTypesError::AccountAlreadyClosed => msg!("Error: Account Already Closed"),
  
         }
     }

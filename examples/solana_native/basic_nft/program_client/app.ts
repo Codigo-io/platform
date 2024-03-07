@@ -5,8 +5,8 @@ import * as os from "os";
 import {
     burnSendAndConfirm,
     CslSplTokenPDAs,
-    deriveGemMetadataPDA,
-    getGemMetadata,
+    deriveMetadataPDA,
+    getGem,
     initializeClient,
     mintSendAndConfirm,
     transferSendAndConfirm,
@@ -41,37 +41,37 @@ async function main(feePayer: Keypair) {
 
     const rent = await getMinimumBalanceForRentExemptAccount(connection);
     await sendAndConfirmTransaction(
-        connection,
-        new Transaction()
-            .add(
-                SystemProgram.createAccount({
-                    fromPubkey: feePayer.publicKey,
-                    newAccountPubkey: johnDoeWallet.publicKey,
-                    space: 0,
-                    lamports: rent,
-                    programId: SystemProgram.programId,
-                }),
-            )
-            .add(
-                SystemProgram.createAccount({
-                    fromPubkey: feePayer.publicKey,
-                    newAccountPubkey: janeDoeWallet.publicKey,
-                    space: 0,
-                    lamports: rent,
-                    programId: SystemProgram.programId,
-                }),
-            ),
-        [feePayer, johnDoeWallet, janeDoeWallet],
+      connection,
+      new Transaction()
+        .add(
+          SystemProgram.createAccount({
+              fromPubkey: feePayer.publicKey,
+              newAccountPubkey: johnDoeWallet.publicKey,
+              space: 0,
+              lamports: rent,
+              programId: SystemProgram.programId,
+          }),
+        )
+        .add(
+          SystemProgram.createAccount({
+              fromPubkey: feePayer.publicKey,
+              newAccountPubkey: janeDoeWallet.publicKey,
+              space: 0,
+              lamports: rent,
+              programId: SystemProgram.programId,
+          }),
+        ),
+      [feePayer, johnDoeWallet, janeDoeWallet],
     );
 
     /**
      * Derive the Gem Metadata so we can retrieve it later
      */
-    const [gemPub] = deriveGemMetadataPDA(
-        {
-            mint: mint.publicKey,
-        },
-        progId,
+    const [gemPub] = deriveMetadataPDA(
+      {
+          mint: mint.publicKey,
+      },
+      progId,
     );
     console.info("+==== Gem Metadata Address ====+");
     console.info(gemPub.toBase58());
@@ -84,7 +84,7 @@ async function main(feePayer: Keypair) {
         wallet: johnDoeWallet.publicKey,
         mint: mint.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
-    });
+    }, new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"));
     console.info("+==== John Doe ATA ====+");
     console.info(johnDoeATA.toBase58());
 
@@ -96,7 +96,7 @@ async function main(feePayer: Keypair) {
         wallet: janeDoeWallet.publicKey,
         mint: mint.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
-    });
+    }, new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"));
     console.info("+==== Jane Doe ATA ====+");
     console.info(janeDoeATA.toBase58());
 
@@ -106,7 +106,6 @@ async function main(feePayer: Keypair) {
     console.info("+==== Minting... ====+");
     await mintSendAndConfirm({
         wallet: johnDoeWallet.publicKey,
-        assocTokenAccount: johnDoeATA,
         color: "Purple",
         rarity: "Rare",
         shortDescription: "Only possible to collect from the lost temple event",
@@ -129,7 +128,7 @@ async function main(feePayer: Keypair) {
     /**
      * Get the Gem Metadata
      */
-    let gem = await getGemMetadata(gemPub);
+    let gem = await getGem(gemPub);
     console.info("+==== Gem Metadata ====+");
     console.info(gem);
     console.assert(gem!.assocAccount!.toBase58(), johnDoeATA.toBase58());
@@ -140,7 +139,6 @@ async function main(feePayer: Keypair) {
     console.info("+==== Transferring... ====+");
     await transferSendAndConfirm({
         wallet: janeDoeWallet.publicKey,
-        assocTokenAccount: janeDoeATA,
         mint: mint.publicKey,
         source: johnDoeATA,
         destination: janeDoeATA,
@@ -162,7 +160,7 @@ async function main(feePayer: Keypair) {
     /**
      * Get the Gem Metadata
      */
-    gem = await getGemMetadata(gemPub);
+    gem = await getGem(gemPub);
     console.info("+==== Gem Metadata ====+");
     console.info(gem);
     console.assert(gem!.assocAccount!.toBase58(), janeDoeATA.toBase58());
@@ -191,12 +189,12 @@ async function main(feePayer: Keypair) {
     /**
      * Get the Gem Metadata
      */
-    gem = await getGemMetadata(gemPub);
+    gem = await getGem(gemPub);
     console.info("+==== Gem Metadata ====+");
     console.info(gem);
     console.assert(typeof gem!.assocAccount, "undefined");
 }
 
 fs.readFile(path.join(os.homedir(), ".config/solana/id.json")).then((file) =>
-    main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))),
+  main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))),
 );

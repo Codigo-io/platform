@@ -31,15 +31,11 @@ impl<'a, 'b, T> AccountPDA<'a, 'b, T> {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Debug, Clone, Default)]
-pub struct GemMetadata {
+pub struct Gem {
 	pub color: String,
 	pub rarity: String,
 	pub short_description: String,
 	pub mint: Pubkey,
 	pub assoc_account: Option<Pubkey>,
 }
-
-impl GemMetadata {
-	pub const LEN: usize = 364; 
-	}
 

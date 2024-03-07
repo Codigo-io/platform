@@ -27,6 +27,9 @@ pub enum ValidateAccountsError {
     #[error("Executable Account Expected")]
     ExecutableAccountExpected,
 
+	#[error("Account Already Closed")]
+	AccountAlreadyClosed,
+
  
 }
 
@@ -60,6 +63,7 @@ impl PrintProgramError for ValidateAccountsError {
             ValidateAccountsError::WrongAccountOwner => msg!("Error: Wrong account owner"),
             ValidateAccountsError::InvalidAccountLen => msg!("Error: Invalid account length"),
             ValidateAccountsError::ExecutableAccountExpected => msg!("Error: Executable account expected"),
+            ValidateAccountsError::AccountAlreadyClosed => msg!("Error: Account Already Closed"),
  
         }
     }

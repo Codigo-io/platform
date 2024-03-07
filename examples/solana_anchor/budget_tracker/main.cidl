@@ -1,0 +1,94 @@
+cidl: "0.8"
+info:
+  name: validate_budget_tracker
+  title: Validate Budget Tracker
+  version: 0.0.1
+  summary: |-
+    The purpose of this contract is to track the income and outcome of a given user. For this contract, we are going to 
+    target the Solana blockchain. Thus, we define the data structure **Record** that will be transpiled to a PDA Account 
+    based on the seeds defined in the solana extension. In addition, the contract defines three methods, also known as 
+    instruction; through this method, we add behavior.
+
+    Some useful links:
+
+      - [Blockchain Extensions](https://docs.codigo.ai/category/blockchain-extensions)
+      - [Learning the Basics](https://docs.codigo.ai/código-interface-description-language/learning-the-basics)
+      - [Building Solana Programs with CIDL: A Comprehensive Guide Part I](https://docs.codigo.ai/guides/part-1-building-solana-programs)
+  contact:
+    name: Código
+    web: https://codigo.ai
+    email: support@codigo.ai
+    git: https://github.com/Codigo-io/examples
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit
+solana:
+  seeds:
+    RecordCollection:
+      items:
+        - name: record
+        - name: signer
+          type: sol:pubkey
+        - name: index
+          type: u8
+types:
+  Record:
+    summary: Through this data structure we will store the relevant information to track the income and outcome of a given user.
+    fields:
+      - name: name
+        type: string
+        attributes: [ cap=50 ]
+        description: The name of the user.
+      - name: moves
+        type: u16
+        description: Number incomes/outcomes registered.
+      - name: outcome
+        type: u32
+        description: Sum of all outcomes.
+      - name: income
+        type: u32
+        description: Sum of all incomes.
+      - name: total_balance
+        type: i64
+        description: The current balance of the user
+methods:
+  - name: create_user_record
+    summary: To call once per account. Initialize a Record account. The total_balance of the account will be set to 0.
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+    inputs:
+      - name: user_record
+        type: sol:account<Record, seeds.RecordCollection(signer=fee_payer)>
+        attributes: [ sol:init ]
+      - name: user_name
+        type: string
+        description: The username to be assigned to the Record.name property
+  - name: register_income
+    summary: Register the given amount as an income for the given record account. The total total_balance of the account will be increased.
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+    inputs:
+      - name: user_record
+        type: sol:account<Record, seeds.RecordCollection(signer=fee_payer)>
+        attributes: [ sol:writable ]
+      - name: amount
+        type: u32
+        description: The amount to be registered as the income.
+  - name: register_outcome
+    summary: Register the given amount as an outcome for the given record account. The total total_balance of the account will be decreased.
+    signers:
+      - name: fee_payer
+        type: sol:account
+        attributes: [ sol:writable ]
+    inputs:
+      - name: user_record
+        type: sol:account<Record, seeds.RecordCollection(signer=fee_payer)>
+        description: The user record account
+        attributes: [ sol:writable ]
+      - name: amount
+        type: u32
+        description: Number to be added to the outcome accumulator

@@ -11,15 +11,15 @@ pub enum ValidateBasicNftInstruction {
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
 /// 1. `[writable, signer]` mint: [Mint] 
-/// 2. `[writable]` gem: [GemMetadata] 
+/// 2. `[writable]` gem: [Gem] 
 /// 3. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 /// 4. `[writable, signer]` funding: [AccountInfo] Funding account (must be a system account)
 /// 5. `[writable]` assoc_token_account: [AccountInfo] Associated token account address to be created
 /// 6. `[]` wallet: [AccountInfo] Wallet address for the new associated token account
 /// 7. `[]` token_program: [AccountInfo] SPL Token program
 /// 8. `[signer]` owner: [AccountInfo] The mint's minting authority.
-/// 9. `[]` csl_spl_token_v_0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
-/// 10. `[]` csl_spl_assoc_token_v_0_0_0: [AccountInfo] Auto-generated, CslSplAssocTokenProgram v0.0.0
+/// 9. `[]` csl_spl_token_v0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
+/// 10. `[]` csl_spl_assoc_token_v0_0_0: [AccountInfo] Auto-generated, CslSplAssocTokenProgram v0.0.0
 ///
 /// Data:
 /// - color: [String] 
@@ -30,7 +30,7 @@ pub enum ValidateBasicNftInstruction {
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
 /// 1. `[]` mint: [Mint] 
-/// 2. `[writable]` gem: [GemMetadata] 
+/// 2. `[writable]` gem: [Gem] 
 /// 3. `[writable, signer]` funding: [AccountInfo] Funding account (must be a system account)
 /// 4. `[writable]` assoc_token_account: [AccountInfo] Associated token account address to be created
 /// 5. `[]` wallet: [AccountInfo] Wallet address for the new associated token account
@@ -39,19 +39,19 @@ pub enum ValidateBasicNftInstruction {
 /// 8. `[writable]` source: [AccountInfo] The source account.
 /// 9. `[writable]` destination: [AccountInfo] The destination account.
 /// 10. `[signer]` authority: [AccountInfo] The source account's owner/delegate.
-/// 11. `[]` csl_spl_assoc_token_v_0_0_0: [AccountInfo] Auto-generated, CslSplAssocTokenProgram v0.0.0
-/// 12. `[]` csl_spl_token_v_0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
+/// 11. `[]` csl_spl_assoc_token_v0_0_0: [AccountInfo] Auto-generated, CslSplAssocTokenProgram v0.0.0
+/// 12. `[]` csl_spl_token_v0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
 	Transfer,
 
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
 /// 1. `[writable]` mint: [Mint] 
-/// 2. `[writable]` gem: [GemMetadata] 
+/// 2. `[writable]` gem: [Gem] 
 /// 3. `[writable]` account: [Account] The account to burn from.
 /// 4. `[signer]` owner: [AccountInfo] The account's owner/delegate.
 /// 5. `[]` wallet: [AccountInfo] Wallet address for the new associated token account
 /// 6. `[]` token_program: [AccountInfo] SPL Token program
-/// 7. `[]` csl_spl_token_v_0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
+/// 7. `[]` csl_spl_token_v0_0_0: [AccountInfo] Auto-generated, CslSplTokenProgram v0.0.0
 	Burn,
 
 }

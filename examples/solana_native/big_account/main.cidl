@@ -1,0 +1,78 @@
+cidl: "0.8"
+info:
+  name: validate_big_account
+  title: Validates that big accounts get initialize on client side
+  version: 0.0.0
+  summary: |-
+    This CIDL is use to validate that accounts greater than 10KB (10_240) gets
+    initialize on-client side.
+  license:
+    name: Codigo
+    url: https://codigo.ai/documents/Codigo---Terms-of-Service.pdf
+solana:
+  seeds:
+    Array:
+      items:
+        - name: index
+          type: u32
+types:
+  Account10KB:
+    fields:
+      - name: big_field
+        type: array<sol:pubkey>
+        attributes: [ cap=319 ]
+      - name: complete_the_bytes
+        type: string
+        attributes: [ cap=24 ]
+  Account10Mib:
+    fields:
+      - name: big_field
+        type: array<sol:pubkey>
+        attributes: [ cap=327679 ]
+      - name: complete_the_bytes
+        type: string
+        attributes: [ cap=24 ]
+methods:
+  - name: init_pda_on_contract
+    inputs:
+      - name: account
+        type: sol:account<Account10KB, seeds.Array>
+        attributes: [ sol:init ]
+  - name: init_on_contract
+    inputs:
+      - name: account
+        type: sol:account<Account10KB>
+        attributes: [ sol:init ]
+  - name: init_on_client
+    inputs:
+      - name: account
+        type: sol:account<Account10Mib>
+        attributes: [ sol:init ]
+  - name: init_on_client_with_custom_owner
+    inputs:
+      - name: account
+        type: sol:account<Account10Mib>
+        attributes: [ sol:init, sol:owner=11111111111111111111111111111111 ]
+  - name: init_account_info_on_client
+    inputs:
+      - name: account
+        type: sol:account
+        attributes: [ sol:init, sol:space=10485760 ]
+  - name: init_account_info_on_client_with_custom_owner
+    inputs:
+      - name: account
+        type: sol:account
+        attributes: [ sol:init, sol:space=10485760, sol:owner=11111111111111111111111111111111 ]
+  - name: init_account_info_on_contract
+    inputs:
+      - name: account
+        type: sol:account
+        attributes: [ sol:init, sol:space=10240 ]
+  - name: init_two_big_account_on_client
+    inputs:
+      - name: account
+        type: sol:account<Account10Mib>
+        attributes: [ sol:init ]
+      - name: account_info
+        type: sol:account
+        attributes: [ sol:init_if_needed, sol:space=10485760 ]

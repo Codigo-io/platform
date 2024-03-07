@@ -48,10 +48,9 @@ export enum CounterInstruction {
 }
 
 export type IncrementArgs = {
-    feePayer: PublicKey;
-    greetingAccount: PublicKey;
+	feePayer: PublicKey;
+	greetingAccount: PublicKey;
 };
-
 
 /**
  * ### Returns a {@link TransactionInstruction}
@@ -60,25 +59,29 @@ export type IncrementArgs = {
  * 1. `[writable, signer]` greeting_account: {@link GreetingAccount} 
  * 2. `[]` system_program: {@link PublicKey} Auto-generated, for account initialization
  */
-export const increment = (args: IncrementArgs): TransactionInstruction => {
-    const data = serialize(
+export const increment = (args: IncrementArgs, remainingAccounts: Array<PublicKey> = []): TransactionInstruction => {
+		const data = serialize(
         {
             struct: {
                 id: "u8",
+
             },
         },
         {
             id: CounterInstruction.Increment,
+
         }
     );
+
 
 
     return new TransactionInstruction({
         data: Buffer.from(data),
         keys: [
-            {pubkey: args.feePayer, isSigner: true, isWritable: true},
-            {pubkey: args.greetingAccount, isSigner: true, isWritable: true},
-            {pubkey: new PublicKey("11111111111111111111111111111111"), isSigner: false, isWritable: false},
+						{pubkey: args.feePayer, isSigner: true, isWritable: true},
+						{pubkey: args.greetingAccount, isSigner: true, isWritable: true},
+						{pubkey: new PublicKey("11111111111111111111111111111111"), isSigner: false, isWritable: false},
+            ...remainingAccounts.map(e => ({pubkey: e, isSigner: false, isWritable: false})),
         ],
         programId: _programId,
     });
@@ -92,31 +95,37 @@ export const increment = (args: IncrementArgs): TransactionInstruction => {
  * 2. `[]` system_program: {@link PublicKey} Auto-generated, for account initialization
  */
 export const incrementSendAndConfirm = async (
-    args: Omit<IncrementArgs, "feePayer" |"greetingAccount"> & { 
-        signers: { feePayer: Keypair,  greetingAccount: Keypair, }
- }
+	args: Omit<IncrementArgs, "feePayer" | "greetingAccount"> & {
+	  signers: {
+			feePayer: Keypair,
+			greetingAccount: Keypair,
+	  }
+  }, 
+  remainingAccounts: Array<PublicKey> = []
 ): Promise<TransactionSignature> => {
-    const trx = new Transaction();
+  const trx = new Transaction();
 
 
-    trx.add(increment({
-        ...args,
-        feePayer: args.signers.feePayer.publicKey,
-        greetingAccount: args.signers.greetingAccount.publicKey,
-    }));
+	trx.add(increment({
+		...args,
+		feePayer: args.signers.feePayer.publicKey,
+		greetingAccount: args.signers.greetingAccount.publicKey,
+	}, remainingAccounts));
 
-    return await sendAndConfirmTransaction(
-        _connection,
-        trx,
-        [args.signers.feePayer, args.signers.greetingAccount, ]
-    );
+  return await sendAndConfirmTransaction(
+    _connection,
+    trx,
+    [
+				args.signers.feePayer,
+				args.signers.greetingAccount,
+    ]
+  );
 };
 
 export type DecrementArgs = {
-    feePayer: PublicKey;
-    greetingAccount: PublicKey;
+	feePayer: PublicKey;
+	greetingAccount: PublicKey;
 };
-
 
 /**
  * ### Returns a {@link TransactionInstruction}
@@ -125,25 +134,29 @@ export type DecrementArgs = {
  * 1. `[writable, signer]` greeting_account: {@link GreetingAccount} 
  * 2. `[]` system_program: {@link PublicKey} Auto-generated, for account initialization
  */
-export const decrement = (args: DecrementArgs): TransactionInstruction => {
-    const data = serialize(
+export const decrement = (args: DecrementArgs, remainingAccounts: Array<PublicKey> = []): TransactionInstruction => {
+		const data = serialize(
         {
             struct: {
                 id: "u8",
+
             },
         },
         {
             id: CounterInstruction.Decrement,
+
         }
     );
+
 
 
     return new TransactionInstruction({
         data: Buffer.from(data),
         keys: [
-            {pubkey: args.feePayer, isSigner: true, isWritable: true},
-            {pubkey: args.greetingAccount, isSigner: true, isWritable: true},
-            {pubkey: new PublicKey("11111111111111111111111111111111"), isSigner: false, isWritable: false},
+						{pubkey: args.feePayer, isSigner: true, isWritable: true},
+						{pubkey: args.greetingAccount, isSigner: true, isWritable: true},
+						{pubkey: new PublicKey("11111111111111111111111111111111"), isSigner: false, isWritable: false},
+            ...remainingAccounts.map(e => ({pubkey: e, isSigner: false, isWritable: false})),
         ],
         programId: _programId,
     });
@@ -157,24 +170,31 @@ export const decrement = (args: DecrementArgs): TransactionInstruction => {
  * 2. `[]` system_program: {@link PublicKey} Auto-generated, for account initialization
  */
 export const decrementSendAndConfirm = async (
-    args: Omit<DecrementArgs, "feePayer" |"greetingAccount"> & { 
-        signers: { feePayer: Keypair,  greetingAccount: Keypair, }
- }
+	args: Omit<DecrementArgs, "feePayer" | "greetingAccount"> & {
+	  signers: {
+			feePayer: Keypair,
+			greetingAccount: Keypair,
+	  }
+  }, 
+  remainingAccounts: Array<PublicKey> = []
 ): Promise<TransactionSignature> => {
-    const trx = new Transaction();
+  const trx = new Transaction();
 
 
-    trx.add(decrement({
-        ...args,
-        feePayer: args.signers.feePayer.publicKey,
-        greetingAccount: args.signers.greetingAccount.publicKey,
-    }));
+	trx.add(decrement({
+		...args,
+		feePayer: args.signers.feePayer.publicKey,
+		greetingAccount: args.signers.greetingAccount.publicKey,
+	}, remainingAccounts));
 
-    return await sendAndConfirmTransaction(
-        _connection,
-        trx,
-        [args.signers.feePayer, args.signers.greetingAccount, ]
-    );
+  return await sendAndConfirmTransaction(
+    _connection,
+    trx,
+    [
+				args.signers.feePayer,
+				args.signers.greetingAccount,
+    ]
+  );
 };
 
 // Getters

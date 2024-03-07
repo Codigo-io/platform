@@ -37,8 +37,3 @@ pub struct Article {
 	pub thumbnail: String,
 }
 
-impl Article {
-	pub const LEN: usize = 2411; 
-	pub const DISCRIMINATOR: u32 = 1;
-}
-

@@ -3,13 +3,13 @@
 
 import {PublicKey} from "@solana/web3.js";
 
-export type RecordSeeds = {
+export type RecordCollectionSeeds = {
     signer: PublicKey, 
     index: number, 
 };
 
-export const deriveRecordPDA = (
-    seeds: RecordSeeds,
+export const deriveRecordCollectionPDA = (
+    seeds: RecordCollectionSeeds,
     programId: PublicKey
 ): [PublicKey, number] => {
     return PublicKey.findProgramAddressSync(

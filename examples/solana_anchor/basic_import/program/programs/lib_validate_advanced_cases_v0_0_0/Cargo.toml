@@ -1,0 +1,29 @@
+[package]
+name = "validate_advanced_cases"
+version = "0.0.0"
+description = """
+The purpose of this CIDL is to validate all the supported advanced cases
+- Verifies the usage of multiple signers
+- Verifies we can specify a rent-payer to an account when initializing
+- Verifies we can specify a rent-receiver to an account when closing it
+- Verifies we can map a signer to an account seed
+- Verifies we can map an input to an account seed
+- Verifies a Non-PDA account can be signer"""
+
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "validate_advanced_cases"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = { version = "0.29.0", features = ["init-if-needed"] }
+bumpalo = "=3.14.0"
+

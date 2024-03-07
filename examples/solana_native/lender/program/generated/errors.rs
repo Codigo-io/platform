@@ -27,6 +27,9 @@ pub enum InformalLenderError {
     #[error("Executable Account Expected")]
     ExecutableAccountExpected,
 
+	#[error("Account Already Closed")]
+	AccountAlreadyClosed,
+
  
 }
 
@@ -60,6 +63,7 @@ impl PrintProgramError for InformalLenderError {
             InformalLenderError::WrongAccountOwner => msg!("Error: Wrong account owner"),
             InformalLenderError::InvalidAccountLen => msg!("Error: Invalid account length"),
             InformalLenderError::ExecutableAccountExpected => msg!("Error: Executable account expected"),
+            InformalLenderError::AccountAlreadyClosed => msg!("Error: Account Already Closed"),
  
         }
     }

@@ -41,10 +41,6 @@ pub struct Broker {
 	pub fee: u8,
 }
 
-impl Broker {
-	pub const LEN: usize = 81; 
-	}
-
 /// Loan is an account that will exist as many times is required
 /// per client it stores a request to a Loan and if the loan is approved
 /// it stores the amount payed.
@@ -57,8 +53,4 @@ pub struct Loan {
 	pub fee: u8,
 	pub approved: bool,
 }
-
-impl Loan {
-	pub const LEN: usize = 150; 
-	}
 

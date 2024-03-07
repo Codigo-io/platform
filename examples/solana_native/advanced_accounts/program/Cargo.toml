@@ -1,0 +1,36 @@
+
+[package]
+name = "validate_advanced_cases"
+version = "0.0.0"
+edition = "2021"
+license = "codigo"
+publish = false
+
+
+description = """
+The purpose of this CIDL is to validate all the supported advanced cases
+- Verifies the usage of multiple signers
+- Verifies we can specify a rent-payer to an account when initializing
+- Verifies we can specify a rent-receiver to an account when closing it
+- Verifies we can map a signer to an account seed
+- Verifies we can map an input to an account seed
+- Verifies a Non-PDA account can be signer
+"""
+
+
+
+[dependencies]
+solana-program = ">=1.16, <1.18"
+borsh = "0.10.3"
+thiserror = "1"
+num-derive = "0.4"
+num-traits = "0.2"
+num_enum = "0.7.0"
+ahash = "=0.8.6"
+toml_edit = "=0.21.0"
+
+
+
+[lib]
+crate-type = ["cdylib", "lib"]
+path = "./lib.rs"

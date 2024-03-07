@@ -1,0 +1,25 @@
+[package]
+name = "validate_big_account_for_anchor"
+version = "0.0.0"
+description = """
+This CIDL is use to validate that accounts greater than 10KB (10_240) gets
+initialize on-client side. It is a variation of validate_big_accounts to take into account Anchor's 8bytes discriminator."""
+
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "validate_big_account_for_anchor"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = { version = "0.29.0", features = ["init-if-needed"] }
+solana-program = "=1.17.0"
+ahash = "=0.8.6"
+bumpalo = "=3.14.0"

@@ -2,9 +2,10 @@
 // Editing this file directly is not recommended as it may be overwritten.
 
 use std::str::FromStr;
-use borsh::BorshSerialize;
-use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
+use std::ops::DerefMut;
+use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::borsh0_10::try_from_slice_unchecked;
+use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
 use solana_program::entrypoint::ProgramResult;
 use solana_program::program::{invoke, invoke_signed};
 use solana_program::pubkey::Pubkey;
@@ -100,11 +101,11 @@ impl Processor {
 
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` merkle_tree: [AccountInfo] 
+/// 1. `[writable, signer]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
 /// 3. `[]` noop: [AccountInfo] Program used to emit changelogs as cpi instruction data.
 /// 4. `[]` account_compression: [AccountInfo] Account Compression program it self
-/// 5. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 5. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 	pub fn process_initialize_merkle_tree(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
@@ -115,11 +116,15 @@ impl Processor {
 		let authority_info = next_account_info(account_info_iter)?;
 		let noop_info = next_account_info(account_info_iter)?;
 		let account_compression_info = next_account_info(account_info_iter)?;
-		let csl_spl_account_compression_v_0_0_0_info = next_account_info(account_info_iter)?;
+		let csl_spl_account_compression_v0_0_0_info = next_account_info(account_info_iter)?;
 
 
 		// Security Checks
 		if fee_payer_info.is_signer != true {
+			return Err(ValidateStateCompressionError::InvalidSignerPermission.into());
+		}
+
+		if merkle_tree_info.is_signer != true {
 			return Err(ValidateStateCompressionError::InvalidSignerPermission.into());
 		}
 
@@ -135,7 +140,7 @@ impl Processor {
 			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
 		}
 
-		if *csl_spl_account_compression_v_0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
+		if *csl_spl_account_compression_v0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
 			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
 		}
 
@@ -179,7 +184,7 @@ impl Processor {
 /// 1. `[writable]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
 /// 3. `[]` noop: [AccountInfo] Program used to emit changelogs as cpi instruction data.
-/// 4. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 4. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
 /// - name: [String] 
@@ -197,7 +202,7 @@ impl Processor {
 		let merkle_tree_info = next_account_info(account_info_iter)?;
 		let authority_info = next_account_info(account_info_iter)?;
 		let noop_info = next_account_info(account_info_iter)?;
-		let csl_spl_account_compression_v_0_0_0_info = next_account_info(account_info_iter)?;
+		let csl_spl_account_compression_v0_0_0_info = next_account_info(account_info_iter)?;
 
 
 		// Security Checks
@@ -213,7 +218,7 @@ impl Processor {
 			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
 		}
 
-		if *csl_spl_account_compression_v_0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
+		if *csl_spl_account_compression_v0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
 			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
 		}
 
@@ -256,7 +261,7 @@ impl Processor {
 /// 1. `[writable]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
 /// 3. `[]` noop: [AccountInfo] Program used to emit changelogs as cpi instruction data.
-/// 4. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 4. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
 /// - root: [Vec<u8>] 
@@ -278,10 +283,9 @@ impl Processor {
 		let merkle_tree_info = next_account_info(account_info_iter)?;
 		let authority_info = next_account_info(account_info_iter)?;
 		let noop_info = next_account_info(account_info_iter)?;
-		let csl_spl_account_compression_v_0_0_0_info = next_account_info(account_info_iter)?;
-
+		let csl_spl_account_compression_v0_0_0_info = next_account_info(account_info_iter)?;
 		let remaining_accounts = next_account_infos(account_info_iter, 8)?;
-		
+
 
 		// Security Checks
 		if fee_payer_info.is_signer != true {
@@ -296,7 +300,7 @@ impl Processor {
 			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
 		}
 
-		if *csl_spl_account_compression_v_0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
+		if *csl_spl_account_compression_v0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
 			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
 		}
 
@@ -352,7 +356,7 @@ impl Processor {
 /// 1. `[writable]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
 /// 3. `[]` noop: [AccountInfo] Program used to emit changelogs as cpi instruction data.
-/// 4. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 4. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
 /// - previous_leaf: [Vec<u8>] 
@@ -376,10 +380,9 @@ impl Processor {
 		let merkle_tree_info = next_account_info(account_info_iter)?;
 		let authority_info = next_account_info(account_info_iter)?;
 		let noop_info = next_account_info(account_info_iter)?;
-		let csl_spl_account_compression_v_0_0_0_info = next_account_info(account_info_iter)?;
-
+		let csl_spl_account_compression_v0_0_0_info = next_account_info(account_info_iter)?;
 		let remaining_accounts = next_account_infos(account_info_iter, 8)?;
-		
+
 
 		// Security Checks
 		if fee_payer_info.is_signer != true {
@@ -394,7 +397,7 @@ impl Processor {
 			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
 		}
 
-		if *csl_spl_account_compression_v_0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
+		if *csl_spl_account_compression_v0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
 			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
 		}
 
@@ -449,8 +452,7 @@ impl Processor {
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
 /// 1. `[]` merkle_tree: [AccountInfo] 
-/// 2. `[]` noop: [AccountInfo] Noop program
-/// 3. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 2. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
 /// - leaf: [Vec<u8>] 
@@ -466,22 +468,16 @@ impl Processor {
 		let account_info_iter = &mut accounts.iter();
 		let fee_payer_info = next_account_info(account_info_iter)?;
 		let merkle_tree_info = next_account_info(account_info_iter)?;
-		let noop_info = next_account_info(account_info_iter)?;
-		let csl_spl_account_compression_v_0_0_0_info = next_account_info(account_info_iter)?;
-
+		let csl_spl_account_compression_v0_0_0_info = next_account_info(account_info_iter)?;
 		let remaining_accounts = next_account_infos(account_info_iter, 8)?;
-		
+
 
 		// Security Checks
 		if fee_payer_info.is_signer != true {
 			return Err(ValidateStateCompressionError::InvalidSignerPermission.into());
 		}
 
-		if *noop_info.key != Pubkey::from_str("noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV").unwrap() {
-			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
-		}
-
-		if *csl_spl_account_compression_v_0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
+		if *csl_spl_account_compression_v0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
 			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
 		}
 
@@ -505,6 +501,7 @@ impl Processor {
 		// Calling STUB
 
 		let mut account_vec = vec![
+				fee_payer_info,
 				merkle_tree_info,
 		];
 
@@ -516,7 +513,6 @@ impl Processor {
 			program_id,
 			&account_vec,
 			merkle_tree_info,
-			noop_info,
 			leaf,
 			root,
 			index,
@@ -531,7 +527,7 @@ impl Processor {
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
 /// 1. `[writable]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
-/// 3. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 3. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
 /// - new_authority: [Pubkey] 
@@ -544,7 +540,7 @@ impl Processor {
 		let fee_payer_info = next_account_info(account_info_iter)?;
 		let merkle_tree_info = next_account_info(account_info_iter)?;
 		let authority_info = next_account_info(account_info_iter)?;
-		let csl_spl_account_compression_v_0_0_0_info = next_account_info(account_info_iter)?;
+		let csl_spl_account_compression_v0_0_0_info = next_account_info(account_info_iter)?;
 
 
 		// Security Checks
@@ -556,7 +552,7 @@ impl Processor {
 			return Err(ValidateStateCompressionError::InvalidSignerPermission.into());
 		}
 
-		if *csl_spl_account_compression_v_0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
+		if *csl_spl_account_compression_v0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
 			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
 		}
 
@@ -595,7 +591,7 @@ impl Processor {
 /// 1. `[writable]` merkle_tree: [AccountInfo] 
 /// 2. `[signer]` authority: [AccountInfo] Authority that controls write-access to the tree. Typically a program, e.g., the Bubblegum contract validates that leaves are valid NFTs.
 /// 3. `[writable]` recipient: [AccountInfo] The SOL recevier.
-/// 4. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 4. `[]` csl_spl_account_compression_v0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 	pub fn process_close_empty_tree(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
@@ -605,7 +601,7 @@ impl Processor {
 		let merkle_tree_info = next_account_info(account_info_iter)?;
 		let authority_info = next_account_info(account_info_iter)?;
 		let recipient_info = next_account_info(account_info_iter)?;
-		let csl_spl_account_compression_v_0_0_0_info = next_account_info(account_info_iter)?;
+		let csl_spl_account_compression_v0_0_0_info = next_account_info(account_info_iter)?;
 
 
 		// Security Checks
@@ -617,7 +613,7 @@ impl Processor {
 			return Err(ValidateStateCompressionError::InvalidSignerPermission.into());
 		}
 
-		if *csl_spl_account_compression_v_0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
+		if *csl_spl_account_compression_v0_0_0_info.key != Pubkey::from_str("cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK").unwrap() {
 			return Err(ValidateStateCompressionError::NotExpectedAddress.into());
 		}
 

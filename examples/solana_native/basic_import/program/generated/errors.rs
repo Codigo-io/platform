@@ -27,6 +27,9 @@ pub enum ValidateImportsError {
     #[error("Executable Account Expected")]
     ExecutableAccountExpected,
 
+	#[error("Account Already Closed")]
+	AccountAlreadyClosed,
+
  
 }
 
@@ -60,6 +63,7 @@ impl PrintProgramError for ValidateImportsError {
             ValidateImportsError::WrongAccountOwner => msg!("Error: Wrong account owner"),
             ValidateImportsError::InvalidAccountLen => msg!("Error: Invalid account length"),
             ValidateImportsError::ExecutableAccountExpected => msg!("Error: Executable account expected"),
+            ValidateImportsError::AccountAlreadyClosed => msg!("Error: Account Already Closed"),
  
         }
     }

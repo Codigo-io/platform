@@ -21,7 +21,7 @@ use crate::generated::{
 ///
 /// Data:
 /// - amount: [u64] The amount to pay to the loan
-/// - loan_seed_index: [u32] Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+/// - loan_seed_index: [u32] Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
 pub fn pay_loan(
 	program_id: &Pubkey,
 	client: &AccountInfo,

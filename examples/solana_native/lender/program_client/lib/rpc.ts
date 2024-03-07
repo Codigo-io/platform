@@ -47,7 +47,7 @@ export enum InformalLenderInstruction {
     CreateBroker = 0,
 
 /**
- * Through this insturction any one can add capital to the broker
+ * Through this instruction any one can add capital to the broker
  *
  * Accounts:
  * 0. `[writable, signer]` fee_payer: {@link PublicKey} 
@@ -72,7 +72,7 @@ export enum InformalLenderInstruction {
  * Data:
  * - amount: {@link BigInt} The request amount to borrow
  * - kyc_url: {@link string} 
- * - loan_seed_index: {@link number} Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+ * - loan_seed_index: {@link number} Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
  */
     RequestLoan = 2,
 
@@ -89,7 +89,7 @@ export enum InformalLenderInstruction {
  * 4. `[writable]` client: {@link PublicKey} 
  *
  * Data:
- * - loan_seed_index: {@link number} Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+ * - loan_seed_index: {@link number} Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
  */
     ApproveLoan = 3,
 
@@ -107,18 +107,17 @@ export enum InformalLenderInstruction {
  *
  * Data:
  * - amount: {@link BigInt} The amount to pay to the loan
- * - loan_seed_index: {@link number} Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+ * - loan_seed_index: {@link number} Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
  */
     PayLoan = 4,
 }
 
 export type CreateBrokerArgs = {
-    feePayer: PublicKey;
-    delegate: PublicKey;
-    amount: bigint;
-    fee: number;
+	feePayer: PublicKey;
+	delegate: PublicKey;
+	amount: bigint;
+	fee: number;
 };
-
 
 /**
  * ### Returns a {@link TransactionInstruction}
@@ -135,31 +134,32 @@ export type CreateBrokerArgs = {
  * - amount: {@link BigInt} The amount to be added to the capital. It will be debited from the delegate account
  * - fee: {@link number} 
  */
-export const createBroker = (args: CreateBrokerArgs): TransactionInstruction => {
-    const data = serialize(
+export const createBroker = (args: CreateBrokerArgs, remainingAccounts: Array<PublicKey> = []): TransactionInstruction => {
+		const data = serialize(
         {
             struct: {
                 id: "u8",
-                amount: "u64",
-                fee: "u8",
+								amount: "u64",
+								fee: "u8",
             },
         },
         {
             id: InformalLenderInstruction.CreateBroker,
-            amount: args.amount,
-            fee: args.fee,
+						amount: args.amount,
+						fee: args.fee,
         }
     );
 
-    const [brokerPubkey] = pda.deriveBrokerPDA(_programId);
+	const [brokerPubkey] = pda.deriveBrokerPDA(_programId);
 
     return new TransactionInstruction({
         data: Buffer.from(data),
         keys: [
-            {pubkey: args.feePayer, isSigner: true, isWritable: true},
-            {pubkey: args.delegate, isSigner: true, isWritable: true},
-            {pubkey: brokerPubkey, isSigner: false, isWritable: true},
-            {pubkey: new PublicKey("11111111111111111111111111111111"), isSigner: false, isWritable: false},
+						{pubkey: args.feePayer, isSigner: true, isWritable: true},
+						{pubkey: args.delegate, isSigner: true, isWritable: true},
+						{pubkey: brokerPubkey, isSigner: false, isWritable: true},
+						{pubkey: new PublicKey("11111111111111111111111111111111"), isSigner: false, isWritable: false},
+            ...remainingAccounts.map(e => ({pubkey: e, isSigner: false, isWritable: false})),
         ],
         programId: _programId,
     });
@@ -181,36 +181,42 @@ export const createBroker = (args: CreateBrokerArgs): TransactionInstruction => 
  * - fee: {@link number} 
  */
 export const createBrokerSendAndConfirm = async (
-    args: Omit<CreateBrokerArgs, "feePayer" |"delegate"> & { 
-        signers: { feePayer: Keypair,  delegate: Keypair, }
- }
+	args: Omit<CreateBrokerArgs, "feePayer" | "delegate"> & {
+	  signers: {
+			feePayer: Keypair,
+			delegate: Keypair,
+	  }
+  }, 
+  remainingAccounts: Array<PublicKey> = []
 ): Promise<TransactionSignature> => {
-    const trx = new Transaction();
+  const trx = new Transaction();
 
 
-    trx.add(createBroker({
-        ...args,
-        feePayer: args.signers.feePayer.publicKey,
-        delegate: args.signers.delegate.publicKey,
-    }));
+	trx.add(createBroker({
+		...args,
+		feePayer: args.signers.feePayer.publicKey,
+		delegate: args.signers.delegate.publicKey,
+	}, remainingAccounts));
 
-    return await sendAndConfirmTransaction(
-        _connection,
-        trx,
-        [args.signers.feePayer, args.signers.delegate, ]
-    );
+  return await sendAndConfirmTransaction(
+    _connection,
+    trx,
+    [
+				args.signers.feePayer,
+				args.signers.delegate,
+    ]
+  );
 };
 
 export type AddCapitalToBrokerArgs = {
-    feePayer: PublicKey;
-    delegate: PublicKey;
-    amount: bigint;
+	feePayer: PublicKey;
+	delegate: PublicKey;
+	amount: bigint;
 };
-
 
 /**
  * ### Returns a {@link TransactionInstruction}
- * Through this insturction any one can add capital to the broker
+ * Through this instruction any one can add capital to the broker
  *
  * Accounts:
  * 0. `[writable, signer]` fee_payer: {@link PublicKey} 
@@ -220,28 +226,29 @@ export type AddCapitalToBrokerArgs = {
  * Data:
  * - amount: {@link BigInt} The amount to be added to the capital. It will be debited from the delegate account
  */
-export const addCapitalToBroker = (args: AddCapitalToBrokerArgs): TransactionInstruction => {
-    const data = serialize(
+export const addCapitalToBroker = (args: AddCapitalToBrokerArgs, remainingAccounts: Array<PublicKey> = []): TransactionInstruction => {
+		const data = serialize(
         {
             struct: {
                 id: "u8",
-                amount: "u64",
+								amount: "u64",
             },
         },
         {
             id: InformalLenderInstruction.AddCapitalToBroker,
-            amount: args.amount,
+						amount: args.amount,
         }
     );
 
-    const [brokerPubkey] = pda.deriveBrokerPDA(_programId);
+	const [brokerPubkey] = pda.deriveBrokerPDA(_programId);
 
     return new TransactionInstruction({
         data: Buffer.from(data),
         keys: [
-            {pubkey: args.feePayer, isSigner: true, isWritable: true},
-            {pubkey: args.delegate, isSigner: true, isWritable: true},
-            {pubkey: brokerPubkey, isSigner: false, isWritable: true},
+						{pubkey: args.feePayer, isSigner: true, isWritable: true},
+						{pubkey: args.delegate, isSigner: true, isWritable: true},
+						{pubkey: brokerPubkey, isSigner: false, isWritable: true},
+            ...remainingAccounts.map(e => ({pubkey: e, isSigner: false, isWritable: false})),
         ],
         programId: _programId,
     });
@@ -249,7 +256,7 @@ export const addCapitalToBroker = (args: AddCapitalToBrokerArgs): TransactionIns
 
 /**
  * ### Returns a {@link TransactionSignature}
- * Through this insturction any one can add capital to the broker
+ * Through this instruction any one can add capital to the broker
  *
  * Accounts:
  * 0. `[writable, signer]` fee_payer: {@link PublicKey} 
@@ -260,34 +267,40 @@ export const addCapitalToBroker = (args: AddCapitalToBrokerArgs): TransactionIns
  * - amount: {@link BigInt} The amount to be added to the capital. It will be debited from the delegate account
  */
 export const addCapitalToBrokerSendAndConfirm = async (
-    args: Omit<AddCapitalToBrokerArgs, "feePayer" |"delegate"> & { 
-        signers: { feePayer: Keypair,  delegate: Keypair, }
- }
+	args: Omit<AddCapitalToBrokerArgs, "feePayer" | "delegate"> & {
+	  signers: {
+			feePayer: Keypair,
+			delegate: Keypair,
+	  }
+  }, 
+  remainingAccounts: Array<PublicKey> = []
 ): Promise<TransactionSignature> => {
-    const trx = new Transaction();
+  const trx = new Transaction();
 
 
-    trx.add(addCapitalToBroker({
-        ...args,
-        feePayer: args.signers.feePayer.publicKey,
-        delegate: args.signers.delegate.publicKey,
-    }));
+	trx.add(addCapitalToBroker({
+		...args,
+		feePayer: args.signers.feePayer.publicKey,
+		delegate: args.signers.delegate.publicKey,
+	}, remainingAccounts));
 
-    return await sendAndConfirmTransaction(
-        _connection,
-        trx,
-        [args.signers.feePayer, args.signers.delegate, ]
-    );
+  return await sendAndConfirmTransaction(
+    _connection,
+    trx,
+    [
+				args.signers.feePayer,
+				args.signers.delegate,
+    ]
+  );
 };
 
 export type RequestLoanArgs = {
-    feePayer: PublicKey;
-    client: PublicKey;
-    amount: bigint;
-    kycUrl: string;
-    loanSeedIndex: number;
+	feePayer: PublicKey;
+	client: PublicKey;
+	amount: bigint;
+	kycUrl: string;
+	loanSeedIndex: number;
 };
-
 
 /**
  * ### Returns a {@link TransactionInstruction}
@@ -303,40 +316,41 @@ export type RequestLoanArgs = {
  * Data:
  * - amount: {@link BigInt} The request amount to borrow
  * - kyc_url: {@link string} 
- * - loan_seed_index: {@link number} Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+ * - loan_seed_index: {@link number} Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
  */
-export const requestLoan = (args: RequestLoanArgs): TransactionInstruction => {
-    const data = serialize(
+export const requestLoan = (args: RequestLoanArgs, remainingAccounts: Array<PublicKey> = []): TransactionInstruction => {
+		const data = serialize(
         {
             struct: {
                 id: "u8",
-                amount: "u64",
-                kyc_url: "string",
-                loan_seed_index: "u32",
+								amount: "u64",
+								kyc_url: "string",
+								loan_seed_index: "u32",
             },
         },
         {
             id: InformalLenderInstruction.RequestLoan,
-            amount: args.amount,
-            kyc_url: args.kycUrl,
-            loan_seed_index: args.loanSeedIndex,
+						amount: args.amount,
+						kyc_url: args.kycUrl,
+						loan_seed_index: args.loanSeedIndex,
         }
     );
 
-    const [loanPubkey] = pda.deriveLoanPDA({
-        client: args.client,
-        index: args.loanSeedIndex,
+		const [loanPubkey] = pda.deriveLoanPDA({
+				client: args.client,
+				index: args.loanSeedIndex,
     }, _programId);
-    const [brokerPubkey] = pda.deriveBrokerPDA(_programId);
+	const [brokerPubkey] = pda.deriveBrokerPDA(_programId);
 
     return new TransactionInstruction({
         data: Buffer.from(data),
         keys: [
-            {pubkey: args.feePayer, isSigner: true, isWritable: true},
-            {pubkey: args.client, isSigner: true, isWritable: false},
-            {pubkey: loanPubkey, isSigner: false, isWritable: true},
-            {pubkey: brokerPubkey, isSigner: false, isWritable: false},
-            {pubkey: new PublicKey("11111111111111111111111111111111"), isSigner: false, isWritable: false},
+						{pubkey: args.feePayer, isSigner: true, isWritable: true},
+						{pubkey: args.client, isSigner: true, isWritable: false},
+						{pubkey: loanPubkey, isSigner: false, isWritable: true},
+						{pubkey: brokerPubkey, isSigner: false, isWritable: false},
+						{pubkey: new PublicKey("11111111111111111111111111111111"), isSigner: false, isWritable: false},
+            ...remainingAccounts.map(e => ({pubkey: e, isSigner: false, isWritable: false})),
         ],
         programId: _programId,
     });
@@ -356,36 +370,42 @@ export const requestLoan = (args: RequestLoanArgs): TransactionInstruction => {
  * Data:
  * - amount: {@link BigInt} The request amount to borrow
  * - kyc_url: {@link string} 
- * - loan_seed_index: {@link number} Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+ * - loan_seed_index: {@link number} Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
  */
 export const requestLoanSendAndConfirm = async (
-    args: Omit<RequestLoanArgs, "feePayer" |"client"> & { 
-        signers: { feePayer: Keypair,  client: Keypair, }
- }
+	args: Omit<RequestLoanArgs, "feePayer" | "client"> & {
+	  signers: {
+			feePayer: Keypair,
+			client: Keypair,
+	  }
+  }, 
+  remainingAccounts: Array<PublicKey> = []
 ): Promise<TransactionSignature> => {
-    const trx = new Transaction();
+  const trx = new Transaction();
 
 
-    trx.add(requestLoan({
-        ...args,
-        feePayer: args.signers.feePayer.publicKey,
-        client: args.signers.client.publicKey,
-    }));
+	trx.add(requestLoan({
+		...args,
+		feePayer: args.signers.feePayer.publicKey,
+		client: args.signers.client.publicKey,
+	}, remainingAccounts));
 
-    return await sendAndConfirmTransaction(
-        _connection,
-        trx,
-        [args.signers.feePayer, args.signers.client, ]
-    );
+  return await sendAndConfirmTransaction(
+    _connection,
+    trx,
+    [
+				args.signers.feePayer,
+				args.signers.client,
+    ]
+  );
 };
 
 export type ApproveLoanArgs = {
-    feePayer: PublicKey;
-    delegate: PublicKey;
-    client: PublicKey;
-    loanSeedIndex: number;
+	feePayer: PublicKey;
+	delegate: PublicKey;
+	client: PublicKey;
+	loanSeedIndex: number;
 };
-
 
 /**
  * ### Returns a {@link TransactionInstruction}
@@ -401,36 +421,37 @@ export type ApproveLoanArgs = {
  * 4. `[writable]` client: {@link PublicKey} 
  *
  * Data:
- * - loan_seed_index: {@link number} Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+ * - loan_seed_index: {@link number} Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
  */
-export const approveLoan = (args: ApproveLoanArgs): TransactionInstruction => {
-    const data = serialize(
+export const approveLoan = (args: ApproveLoanArgs, remainingAccounts: Array<PublicKey> = []): TransactionInstruction => {
+		const data = serialize(
         {
             struct: {
                 id: "u8",
-                loan_seed_index: "u32",
+								loan_seed_index: "u32",
             },
         },
         {
             id: InformalLenderInstruction.ApproveLoan,
-            loan_seed_index: args.loanSeedIndex,
+						loan_seed_index: args.loanSeedIndex,
         }
     );
 
-    const [loanPubkey] = pda.deriveLoanPDA({
-        client: args.client,
-        index: args.loanSeedIndex,
+		const [loanPubkey] = pda.deriveLoanPDA({
+				client: args.client,
+				index: args.loanSeedIndex,
     }, _programId);
-    const [brokerPubkey] = pda.deriveBrokerPDA(_programId);
+	const [brokerPubkey] = pda.deriveBrokerPDA(_programId);
 
     return new TransactionInstruction({
         data: Buffer.from(data),
         keys: [
-            {pubkey: args.feePayer, isSigner: true, isWritable: true},
-            {pubkey: args.delegate, isSigner: true, isWritable: false},
-            {pubkey: loanPubkey, isSigner: false, isWritable: true},
-            {pubkey: brokerPubkey, isSigner: false, isWritable: true},
-            {pubkey: args.client, isSigner: false, isWritable: true},
+						{pubkey: args.feePayer, isSigner: true, isWritable: true},
+						{pubkey: args.delegate, isSigner: true, isWritable: false},
+						{pubkey: loanPubkey, isSigner: false, isWritable: true},
+						{pubkey: brokerPubkey, isSigner: false, isWritable: true},
+						{pubkey: args.client, isSigner: false, isWritable: true},
+            ...remainingAccounts.map(e => ({pubkey: e, isSigner: false, isWritable: false})),
         ],
         programId: _programId,
     });
@@ -450,36 +471,42 @@ export const approveLoan = (args: ApproveLoanArgs): TransactionInstruction => {
  * 4. `[writable]` client: {@link PublicKey} 
  *
  * Data:
- * - loan_seed_index: {@link number} Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+ * - loan_seed_index: {@link number} Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
  */
 export const approveLoanSendAndConfirm = async (
-    args: Omit<ApproveLoanArgs, "feePayer" |"delegate"> & { 
-        signers: { feePayer: Keypair,  delegate: Keypair, }
- }
+	args: Omit<ApproveLoanArgs, "feePayer" | "delegate"> & {
+	  signers: {
+			feePayer: Keypair,
+			delegate: Keypair,
+	  }
+  }, 
+  remainingAccounts: Array<PublicKey> = []
 ): Promise<TransactionSignature> => {
-    const trx = new Transaction();
+  const trx = new Transaction();
 
 
-    trx.add(approveLoan({
-        ...args,
-        feePayer: args.signers.feePayer.publicKey,
-        delegate: args.signers.delegate.publicKey,
-    }));
+	trx.add(approveLoan({
+		...args,
+		feePayer: args.signers.feePayer.publicKey,
+		delegate: args.signers.delegate.publicKey,
+	}, remainingAccounts));
 
-    return await sendAndConfirmTransaction(
-        _connection,
-        trx,
-        [args.signers.feePayer, args.signers.delegate, ]
-    );
+  return await sendAndConfirmTransaction(
+    _connection,
+    trx,
+    [
+				args.signers.feePayer,
+				args.signers.delegate,
+    ]
+  );
 };
 
 export type PayLoanArgs = {
-    feePayer: PublicKey;
-    client: PublicKey;
-    amount: bigint;
-    loanSeedIndex: number;
+	feePayer: PublicKey;
+	client: PublicKey;
+	amount: bigint;
+	loanSeedIndex: number;
 };
-
 
 /**
  * ### Returns a {@link TransactionInstruction}
@@ -496,37 +523,38 @@ export type PayLoanArgs = {
  *
  * Data:
  * - amount: {@link BigInt} The amount to pay to the loan
- * - loan_seed_index: {@link number} Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+ * - loan_seed_index: {@link number} Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
  */
-export const payLoan = (args: PayLoanArgs): TransactionInstruction => {
-    const data = serialize(
+export const payLoan = (args: PayLoanArgs, remainingAccounts: Array<PublicKey> = []): TransactionInstruction => {
+		const data = serialize(
         {
             struct: {
                 id: "u8",
-                amount: "u64",
-                loan_seed_index: "u32",
+								amount: "u64",
+								loan_seed_index: "u32",
             },
         },
         {
             id: InformalLenderInstruction.PayLoan,
-            amount: args.amount,
-            loan_seed_index: args.loanSeedIndex,
+						amount: args.amount,
+						loan_seed_index: args.loanSeedIndex,
         }
     );
 
-    const [loanPubkey] = pda.deriveLoanPDA({
-        client: args.client,
-        index: args.loanSeedIndex,
+		const [loanPubkey] = pda.deriveLoanPDA({
+				client: args.client,
+				index: args.loanSeedIndex,
     }, _programId);
-    const [brokerPubkey] = pda.deriveBrokerPDA(_programId);
+	const [brokerPubkey] = pda.deriveBrokerPDA(_programId);
 
     return new TransactionInstruction({
         data: Buffer.from(data),
         keys: [
-            {pubkey: args.feePayer, isSigner: true, isWritable: true},
-            {pubkey: args.client, isSigner: true, isWritable: true},
-            {pubkey: loanPubkey, isSigner: false, isWritable: true},
-            {pubkey: brokerPubkey, isSigner: false, isWritable: true},
+						{pubkey: args.feePayer, isSigner: true, isWritable: true},
+						{pubkey: args.client, isSigner: true, isWritable: true},
+						{pubkey: loanPubkey, isSigner: false, isWritable: true},
+						{pubkey: brokerPubkey, isSigner: false, isWritable: true},
+            ...remainingAccounts.map(e => ({pubkey: e, isSigner: false, isWritable: false})),
         ],
         programId: _programId,
     });
@@ -547,27 +575,34 @@ export const payLoan = (args: PayLoanArgs): TransactionInstruction => {
  *
  * Data:
  * - amount: {@link BigInt} The amount to pay to the loan
- * - loan_seed_index: {@link number} Auto-generated, from input loan of type [Loan] set the seed named index, required by the type
+ * - loan_seed_index: {@link number} Auto-generated, from the input "loan" for the its seed definition "Loan", sets the seed named "index"
  */
 export const payLoanSendAndConfirm = async (
-    args: Omit<PayLoanArgs, "feePayer" |"client"> & { 
-        signers: { feePayer: Keypair,  client: Keypair, }
- }
+	args: Omit<PayLoanArgs, "feePayer" | "client"> & {
+	  signers: {
+			feePayer: Keypair,
+			client: Keypair,
+	  }
+  }, 
+  remainingAccounts: Array<PublicKey> = []
 ): Promise<TransactionSignature> => {
-    const trx = new Transaction();
+  const trx = new Transaction();
 
 
-    trx.add(payLoan({
-        ...args,
-        feePayer: args.signers.feePayer.publicKey,
-        client: args.signers.client.publicKey,
-    }));
+	trx.add(payLoan({
+		...args,
+		feePayer: args.signers.feePayer.publicKey,
+		client: args.signers.client.publicKey,
+	}, remainingAccounts));
 
-    return await sendAndConfirmTransaction(
-        _connection,
-        trx,
-        [args.signers.feePayer, args.signers.client, ]
-    );
+  return await sendAndConfirmTransaction(
+    _connection,
+    trx,
+    [
+				args.signers.feePayer,
+				args.signers.client,
+    ]
+  );
 };
 
 // Getters

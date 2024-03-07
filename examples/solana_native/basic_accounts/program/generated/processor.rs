@@ -2,9 +2,10 @@
 // Editing this file directly is not recommended as it may be overwritten.
 
 use std::str::FromStr;
-use borsh::BorshSerialize;
-use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
+use std::ops::DerefMut;
+use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::borsh0_10::try_from_slice_unchecked;
+use solana_program::account_info::{AccountInfo, next_account_info, next_account_infos};
 use solana_program::entrypoint::ProgramResult;
 use solana_program::program::{invoke, invoke_signed};
 use solana_program::pubkey::Pubkey;
@@ -19,10 +20,7 @@ use crate::generated::instructions::ValidateAccountsInstruction;
 use crate::generated::state::{
 	Account,
 	AccountPDA,
-	NonPdaaccountWithOneField,
-	PdaaccountWithOneStaticSeedAndOneField,
-	PdaaccountWithOneStaticAndDynamicSeedAndOneField,
-	PdaaccountVerifiesSeedsTypes,
+	State,
 };
 use crate::src::*;
 
@@ -39,7 +37,7 @@ impl Processor {
         match instruction {
 			ValidateAccountsInstruction::Instruction1(args) => {
 				msg!("Instruction: Instruction1");
-				Self::process_instruction_1(
+				Self::process_instruction1(
 					program_id,
 					accounts, 
 					args.input_1,
@@ -47,7 +45,7 @@ impl Processor {
 			}
 			ValidateAccountsInstruction::Instruction2(args) => {
 				msg!("Instruction: Instruction2");
-				Self::process_instruction_2(
+				Self::process_instruction2(
 					program_id,
 					accounts, 
 					args.input_1,
@@ -55,7 +53,7 @@ impl Processor {
 			}
 			ValidateAccountsInstruction::Instruction3(args) => {
 				msg!("Instruction: Instruction3");
-				Self::process_instruction_3(
+				Self::process_instruction3(
 					program_id,
 					accounts, 
 					args.input_1,
@@ -64,31 +62,33 @@ impl Processor {
 			}
 			ValidateAccountsInstruction::Instruction4(args) => {
 				msg!("Instruction: Instruction4");
-				Self::process_instruction_4(
+				Self::process_instruction4(
 					program_id,
 					accounts, 
 					args.input_1,
-					args.account_seed_u_8_type,
-					args.account_seed_u_16_type,
-					args.account_seed_u_32_type,
-					args.account_seed_i_8_type,
-					args.account_seed_i_16_type,
-					args.account_seed_i_32_type,
+					args.account_seed_u8_type,
+					args.account_seed_u16_type,
+					args.account_seed_u32_type,
+					args.account_seed_u64_type,
+					args.account_seed_i8_type,
+					args.account_seed_i16_type,
+					args.account_seed_i32_type,
+					args.account_seed_i64_type,
 					args.account_seed_string_type,
 					args.account_seed_pubkey_type,
 				)
 			}
 			ValidateAccountsInstruction::Instruction5 => {
 				msg!("Instruction: Instruction5");
-				Self::process_instruction_5(program_id, accounts)
+				Self::process_instruction5(program_id, accounts)
 			}
 			ValidateAccountsInstruction::Instruction6 => {
 				msg!("Instruction: Instruction6");
-				Self::process_instruction_6(program_id, accounts)
+				Self::process_instruction6(program_id, accounts)
 			}
 			ValidateAccountsInstruction::Instruction7(args) => {
 				msg!("Instruction: Instruction7");
-				Self::process_instruction_7(
+				Self::process_instruction7(
 					program_id,
 					accounts, 
 					args.account_seed_dynamic,
@@ -96,22 +96,24 @@ impl Processor {
 			}
 			ValidateAccountsInstruction::Instruction8(args) => {
 				msg!("Instruction: Instruction8");
-				Self::process_instruction_8(
+				Self::process_instruction8(
 					program_id,
 					accounts, 
-					args.account_seed_u_8_type,
-					args.account_seed_u_16_type,
-					args.account_seed_u_32_type,
-					args.account_seed_i_8_type,
-					args.account_seed_i_16_type,
-					args.account_seed_i_32_type,
+					args.account_seed_u8_type,
+					args.account_seed_u16_type,
+					args.account_seed_u32_type,
+					args.account_seed_u64_type,
+					args.account_seed_i8_type,
+					args.account_seed_i16_type,
+					args.account_seed_i32_type,
+					args.account_seed_i64_type,
 					args.account_seed_string_type,
 					args.account_seed_pubkey_type,
 				)
 			}
 			ValidateAccountsInstruction::Instruction9(args) => {
 				msg!("Instruction: Instruction9");
-				Self::process_instruction_9(
+				Self::process_instruction9(
 					program_id,
 					accounts, 
 					args.input_1,
@@ -119,7 +121,7 @@ impl Processor {
 			}
 			ValidateAccountsInstruction::Instruction10(args) => {
 				msg!("Instruction: Instruction10");
-				Self::process_instruction_10(
+				Self::process_instruction10(
 					program_id,
 					accounts, 
 					args.input_1,
@@ -127,7 +129,7 @@ impl Processor {
 			}
 			ValidateAccountsInstruction::Instruction11(args) => {
 				msg!("Instruction: Instruction11");
-				Self::process_instruction_11(
+				Self::process_instruction11(
 					program_id,
 					accounts, 
 					args.input_1,
@@ -136,23 +138,25 @@ impl Processor {
 			}
 			ValidateAccountsInstruction::Instruction12(args) => {
 				msg!("Instruction: Instruction12");
-				Self::process_instruction_12(
+				Self::process_instruction12(
 					program_id,
 					accounts, 
 					args.input_1,
-					args.account_seed_u_8_type,
-					args.account_seed_u_16_type,
-					args.account_seed_u_32_type,
-					args.account_seed_i_8_type,
-					args.account_seed_i_16_type,
-					args.account_seed_i_32_type,
+					args.account_seed_u8_type,
+					args.account_seed_u16_type,
+					args.account_seed_u32_type,
+					args.account_seed_u64_type,
+					args.account_seed_i8_type,
+					args.account_seed_i16_type,
+					args.account_seed_i32_type,
+					args.account_seed_i64_type,
 					args.account_seed_string_type,
 					args.account_seed_pubkey_type,
 				)
 			}
 			ValidateAccountsInstruction::Instruction13(args) => {
 				msg!("Instruction: Instruction13");
-				Self::process_instruction_13(
+				Self::process_instruction13(
 					program_id,
 					accounts, 
 					args.input_1,
@@ -160,7 +164,7 @@ impl Processor {
 			}
 			ValidateAccountsInstruction::Instruction14(args) => {
 				msg!("Instruction: Instruction14");
-				Self::process_instruction_14(
+				Self::process_instruction14(
 					program_id,
 					accounts, 
 					args.input_1,
@@ -168,7 +172,7 @@ impl Processor {
 			}
 			ValidateAccountsInstruction::Instruction15(args) => {
 				msg!("Instruction: Instruction15");
-				Self::process_instruction_15(
+				Self::process_instruction15(
 					program_id,
 					accounts, 
 					args.input_1,
@@ -177,31 +181,37 @@ impl Processor {
 			}
 			ValidateAccountsInstruction::Instruction16(args) => {
 				msg!("Instruction: Instruction16");
-				Self::process_instruction_16(
+				Self::process_instruction16(
 					program_id,
 					accounts, 
 					args.input_1,
-					args.account_seed_u_8_type,
-					args.account_seed_u_16_type,
-					args.account_seed_u_32_type,
-					args.account_seed_i_8_type,
-					args.account_seed_i_16_type,
-					args.account_seed_i_32_type,
+					args.account_seed_u8_type,
+					args.account_seed_u16_type,
+					args.account_seed_u32_type,
+					args.account_seed_u64_type,
+					args.account_seed_i8_type,
+					args.account_seed_i16_type,
+					args.account_seed_i32_type,
+					args.account_seed_i64_type,
 					args.account_seed_string_type,
 					args.account_seed_pubkey_type,
 				)
 			}
 			ValidateAccountsInstruction::Instruction17 => {
 				msg!("Instruction: Instruction17");
-				Self::process_instruction_17(program_id, accounts)
+				Self::process_instruction17(program_id, accounts)
+			}
+			ValidateAccountsInstruction::SafeInstruction17 => {
+				msg!("Instruction: SafeInstruction17");
+				Self::process_safe_instruction17(program_id, accounts)
 			}
 			ValidateAccountsInstruction::Instruction18 => {
 				msg!("Instruction: Instruction18");
-				Self::process_instruction_18(program_id, accounts)
+				Self::process_instruction18(program_id, accounts)
 			}
 			ValidateAccountsInstruction::Instruction19(args) => {
 				msg!("Instruction: Instruction19");
-				Self::process_instruction_19(
+				Self::process_instruction19(
 					program_id,
 					accounts, 
 					args.account_seed_dynamic,
@@ -209,15 +219,17 @@ impl Processor {
 			}
 			ValidateAccountsInstruction::Instruction20(args) => {
 				msg!("Instruction: Instruction20");
-				Self::process_instruction_20(
+				Self::process_instruction20(
 					program_id,
 					accounts, 
-					args.account_seed_u_8_type,
-					args.account_seed_u_16_type,
-					args.account_seed_u_32_type,
-					args.account_seed_i_8_type,
-					args.account_seed_i_16_type,
-					args.account_seed_i_32_type,
+					args.account_seed_u8_type,
+					args.account_seed_u16_type,
+					args.account_seed_u32_type,
+					args.account_seed_u64_type,
+					args.account_seed_i8_type,
+					args.account_seed_i16_type,
+					args.account_seed_i32_type,
+					args.account_seed_i64_type,
 					args.account_seed_string_type,
 					args.account_seed_pubkey_type,
 				)
@@ -229,11 +241,11 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [NonPdaaccountWithOneField] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
 /// - input_1: [u8] 
-	pub fn process_instruction_1(
+	pub fn process_instruction1(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
@@ -259,7 +271,7 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != NonPdaaccountWithOneField::LEN {
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -267,11 +279,11 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut Account::new(
 			&account_info,
-			try_from_slice_unchecked::<NonPdaaccountWithOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 		);
 
 		// Calling STUB
-		instruction_1::instruction_1(
+		instruction1::instruction1(
 			program_id,
 			account,
 			input_1,
@@ -287,11 +299,11 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
 /// - input_1: [u8] 
-	pub fn process_instruction_2(
+	pub fn process_instruction2(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
@@ -322,7 +334,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountWithOneStaticSeedAndOneField::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -330,12 +346,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountWithOneStaticSeedAndOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_2::instruction_2(
+		instruction2::instruction2(
 			program_id,
 			account,
 			input_1,
@@ -351,12 +367,12 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticAndDynamicSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_dynamic: [u8] Auto-generated, from input account of type [PdaaccountWithOneStaticAndDynamicSeedAndOneField] set the seed named dynamic, required by the type
-	pub fn process_instruction_3(
+/// - account_seed_dynamic: [u8] Auto-generated, from the input "account" for the its seed definition "DynamicPda", sets the seed named "dynamic"
+	pub fn process_instruction3(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
@@ -388,7 +404,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountWithOneStaticAndDynamicSeedAndOneField::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -396,12 +416,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountWithOneStaticAndDynamicSeedAndOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_3::instruction_3(
+		instruction3::instruction3(
 			program_id,
 			account,
 			input_1,
@@ -417,28 +437,32 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountVerifiesSeedsTypes] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_u_8_type: [u8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u8_type, required by the type
-/// - account_seed_u_16_type: [u16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u16_type, required by the type
-/// - account_seed_u_32_type: [u32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u32_type, required by the type
-/// - account_seed_i_8_type: [i8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i8_type, required by the type
-/// - account_seed_i_16_type: [i16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i16_type, required by the type
-/// - account_seed_i_32_type: [i32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i32_type, required by the type
-/// - account_seed_string_type: [String] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named string_type, required by the type
-/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named pubkey_type, required by the type
-	pub fn process_instruction_4(
+/// - account_seed_u8_type: [u8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u8_type"
+/// - account_seed_u16_type: [u16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u16_type"
+/// - account_seed_u32_type: [u32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u32_type"
+/// - account_seed_u64_type: [u64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u64_type"
+/// - account_seed_i8_type: [i8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i8_type"
+/// - account_seed_i16_type: [i16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i16_type"
+/// - account_seed_i32_type: [i32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i32_type"
+/// - account_seed_i64_type: [i64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i64_type"
+/// - account_seed_string_type: [String] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "string_type"
+/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "pubkey_type"
+	pub fn process_instruction4(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
-		account_seed_u_8_type: u8,
-		account_seed_u_16_type: u16,
-		account_seed_u_32_type: u32,
-		account_seed_i_8_type: i8,
-		account_seed_i_16_type: i16,
-		account_seed_i_32_type: i32,
+		account_seed_u8_type: u8,
+		account_seed_u16_type: u16,
+		account_seed_u32_type: u32,
+		account_seed_u64_type: u64,
+		account_seed_i8_type: i8,
+		account_seed_i16_type: i16,
+		account_seed_i32_type: i32,
+		account_seed_i64_type: i64,
 		account_seed_string_type: String,
 		account_seed_pubkey_type: Pubkey,
 	) -> ProgramResult {
@@ -448,7 +472,7 @@ impl Processor {
 
 		// Derive PDAs
 		let (account_pubkey, account_bump) = Pubkey::find_program_address(
-			&[account_seed_u_8_type.to_le_bytes().as_ref(), account_seed_u_16_type.to_le_bytes().as_ref(), account_seed_u_32_type.to_le_bytes().as_ref(), account_seed_i_8_type.to_le_bytes().as_ref(), account_seed_i_16_type.to_le_bytes().as_ref(), account_seed_i_32_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref()],
+			&[account_seed_u8_type.to_le_bytes().as_ref(), account_seed_u16_type.to_le_bytes().as_ref(), account_seed_u32_type.to_le_bytes().as_ref(), account_seed_u64_type.to_le_bytes().as_ref(), account_seed_i8_type.to_le_bytes().as_ref(), account_seed_i16_type.to_le_bytes().as_ref(), account_seed_i32_type.to_le_bytes().as_ref(), account_seed_i64_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref()],
 			program_id,
 		);
 
@@ -468,7 +492,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountVerifiesSeedsTypes::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -476,12 +504,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountVerifiesSeedsTypes>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_4::instruction_4(
+		instruction4::instruction4(
 			program_id,
 			account,
 			input_1,
@@ -497,8 +525,8 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[]` account: [NonPdaaccountWithOneField] 
-	pub fn process_instruction_5(
+/// 1. `[]` account: [State] 
+	pub fn process_instruction5(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 	) -> ProgramResult {
@@ -523,7 +551,7 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != NonPdaaccountWithOneField::LEN {
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -531,11 +559,11 @@ impl Processor {
 		// Accounts Deserialization
 		let account = Account::new(
 			&account_info,
-			try_from_slice_unchecked::<NonPdaaccountWithOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 		);
 
 		// Calling STUB
-		instruction_5::instruction_5(
+		instruction5::instruction5(
 			program_id,
 			&account,
 		)?;
@@ -547,8 +575,8 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[]` account: [PdaaccountWithOneStaticSeedAndOneField] 
-	pub fn process_instruction_6(
+/// 1. `[]` account: [State] 
+	pub fn process_instruction6(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 	) -> ProgramResult {
@@ -578,7 +606,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountWithOneStaticSeedAndOneField::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -586,12 +618,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountWithOneStaticSeedAndOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_6::instruction_6(
+		instruction6::instruction6(
 			program_id,
 			&account,
 		)?;
@@ -603,11 +635,11 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[]` account: [PdaaccountWithOneStaticAndDynamicSeedAndOneField] 
+/// 1. `[]` account: [State] 
 ///
 /// Data:
-/// - account_seed_dynamic: [u8] Auto-generated, from input account of type [PdaaccountWithOneStaticAndDynamicSeedAndOneField] set the seed named dynamic, required by the type
-	pub fn process_instruction_7(
+/// - account_seed_dynamic: [u8] Auto-generated, from the input "account" for the its seed definition "DynamicPda", sets the seed named "dynamic"
+	pub fn process_instruction7(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		account_seed_dynamic: u8,
@@ -638,7 +670,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountWithOneStaticAndDynamicSeedAndOneField::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -646,12 +682,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountWithOneStaticAndDynamicSeedAndOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_7::instruction_7(
+		instruction7::instruction7(
 			program_id,
 			&account,
 		)?;
@@ -665,26 +701,30 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[]` account: [PdaaccountVerifiesSeedsTypes] 
+/// 1. `[]` account: [State] 
 ///
 /// Data:
-/// - account_seed_u_8_type: [u8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u8_type, required by the type
-/// - account_seed_u_16_type: [u16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u16_type, required by the type
-/// - account_seed_u_32_type: [u32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u32_type, required by the type
-/// - account_seed_i_8_type: [i8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i8_type, required by the type
-/// - account_seed_i_16_type: [i16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i16_type, required by the type
-/// - account_seed_i_32_type: [i32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i32_type, required by the type
-/// - account_seed_string_type: [String] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named string_type, required by the type
-/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named pubkey_type, required by the type
-	pub fn process_instruction_8(
+/// - account_seed_u8_type: [u8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u8_type"
+/// - account_seed_u16_type: [u16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u16_type"
+/// - account_seed_u32_type: [u32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u32_type"
+/// - account_seed_u64_type: [u64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u64_type"
+/// - account_seed_i8_type: [i8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i8_type"
+/// - account_seed_i16_type: [i16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i16_type"
+/// - account_seed_i32_type: [i32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i32_type"
+/// - account_seed_i64_type: [i64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i64_type"
+/// - account_seed_string_type: [String] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "string_type"
+/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "pubkey_type"
+	pub fn process_instruction8(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
-		account_seed_u_8_type: u8,
-		account_seed_u_16_type: u16,
-		account_seed_u_32_type: u32,
-		account_seed_i_8_type: i8,
-		account_seed_i_16_type: i16,
-		account_seed_i_32_type: i32,
+		account_seed_u8_type: u8,
+		account_seed_u16_type: u16,
+		account_seed_u32_type: u32,
+		account_seed_u64_type: u64,
+		account_seed_i8_type: i8,
+		account_seed_i16_type: i16,
+		account_seed_i32_type: i32,
+		account_seed_i64_type: i64,
 		account_seed_string_type: String,
 		account_seed_pubkey_type: Pubkey,
 	) -> ProgramResult {
@@ -694,7 +734,7 @@ impl Processor {
 
 		// Derive PDAs
 		let (account_pubkey, account_bump) = Pubkey::find_program_address(
-			&[account_seed_u_8_type.to_le_bytes().as_ref(), account_seed_u_16_type.to_le_bytes().as_ref(), account_seed_u_32_type.to_le_bytes().as_ref(), account_seed_i_8_type.to_le_bytes().as_ref(), account_seed_i_16_type.to_le_bytes().as_ref(), account_seed_i_32_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref()],
+			&[account_seed_u8_type.to_le_bytes().as_ref(), account_seed_u16_type.to_le_bytes().as_ref(), account_seed_u32_type.to_le_bytes().as_ref(), account_seed_u64_type.to_le_bytes().as_ref(), account_seed_i8_type.to_le_bytes().as_ref(), account_seed_i16_type.to_le_bytes().as_ref(), account_seed_i32_type.to_le_bytes().as_ref(), account_seed_i64_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref()],
 			program_id,
 		);
 
@@ -714,7 +754,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountVerifiesSeedsTypes::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -722,12 +766,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountVerifiesSeedsTypes>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_8::instruction_8(
+		instruction8::instruction8(
 			program_id,
 			&account,
 		)?;
@@ -741,12 +785,12 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable, signer]` account: [NonPdaaccountWithOneField] 
+/// 1. `[writable, signer]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-	pub fn process_instruction_9(
+	pub fn process_instruction9(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
@@ -772,7 +816,7 @@ impl Processor {
 
 
 		// Accounts Initializations
-		let space = NonPdaaccountWithOneField::LEN;
+		let space: usize = 1;
 		let rent = Rent::get()?;
 		let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -797,7 +841,7 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != NonPdaaccountWithOneField::LEN {
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -805,11 +849,11 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut Account::new(
 			&account_info,
-			try_from_slice_unchecked::<NonPdaaccountWithOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 		);
 
 		// Calling STUB
-		instruction_9::instruction_9(
+		instruction9::instruction9(
 			program_id,
 			account,
 			input_1,
@@ -825,12 +869,12 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-	pub fn process_instruction_10(
+	pub fn process_instruction10(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
@@ -861,7 +905,7 @@ impl Processor {
 
 
 		// Accounts Initializations
-		let space = PdaaccountWithOneStaticSeedAndOneField::LEN;
+		let space: usize = 1;
 		let rent = Rent::get()?;
 		let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -883,7 +927,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountWithOneStaticSeedAndOneField::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -891,12 +939,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountWithOneStaticSeedAndOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_10::instruction_10(
+		instruction10::instruction10(
 			program_id,
 			account,
 			input_1,
@@ -912,13 +960,13 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticAndDynamicSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_dynamic: [u8] Auto-generated, from input account of type [PdaaccountWithOneStaticAndDynamicSeedAndOneField] set the seed named dynamic, required by the type
-	pub fn process_instruction_11(
+/// - account_seed_dynamic: [u8] Auto-generated, from the input "account" for the its seed definition "DynamicPda", sets the seed named "dynamic"
+	pub fn process_instruction11(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
@@ -950,7 +998,7 @@ impl Processor {
 
 
 		// Accounts Initializations
-		let space = PdaaccountWithOneStaticAndDynamicSeedAndOneField::LEN;
+		let space: usize = 1;
 		let rent = Rent::get()?;
 		let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -972,7 +1020,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountWithOneStaticAndDynamicSeedAndOneField::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -980,12 +1032,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountWithOneStaticAndDynamicSeedAndOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_11::instruction_11(
+		instruction11::instruction11(
 			program_id,
 			account,
 			input_1,
@@ -1001,29 +1053,33 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountVerifiesSeedsTypes] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_u_8_type: [u8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u8_type, required by the type
-/// - account_seed_u_16_type: [u16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u16_type, required by the type
-/// - account_seed_u_32_type: [u32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u32_type, required by the type
-/// - account_seed_i_8_type: [i8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i8_type, required by the type
-/// - account_seed_i_16_type: [i16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i16_type, required by the type
-/// - account_seed_i_32_type: [i32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i32_type, required by the type
-/// - account_seed_string_type: [String] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named string_type, required by the type
-/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named pubkey_type, required by the type
-	pub fn process_instruction_12(
+/// - account_seed_u8_type: [u8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u8_type"
+/// - account_seed_u16_type: [u16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u16_type"
+/// - account_seed_u32_type: [u32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u32_type"
+/// - account_seed_u64_type: [u64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u64_type"
+/// - account_seed_i8_type: [i8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i8_type"
+/// - account_seed_i16_type: [i16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i16_type"
+/// - account_seed_i32_type: [i32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i32_type"
+/// - account_seed_i64_type: [i64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i64_type"
+/// - account_seed_string_type: [String] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "string_type"
+/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "pubkey_type"
+	pub fn process_instruction12(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
-		account_seed_u_8_type: u8,
-		account_seed_u_16_type: u16,
-		account_seed_u_32_type: u32,
-		account_seed_i_8_type: i8,
-		account_seed_i_16_type: i16,
-		account_seed_i_32_type: i32,
+		account_seed_u8_type: u8,
+		account_seed_u16_type: u16,
+		account_seed_u32_type: u32,
+		account_seed_u64_type: u64,
+		account_seed_i8_type: i8,
+		account_seed_i16_type: i16,
+		account_seed_i32_type: i32,
+		account_seed_i64_type: i64,
 		account_seed_string_type: String,
 		account_seed_pubkey_type: Pubkey,
 	) -> ProgramResult {
@@ -1034,7 +1090,7 @@ impl Processor {
 
 		// Derive PDAs
 		let (account_pubkey, account_bump) = Pubkey::find_program_address(
-			&[account_seed_u_8_type.to_le_bytes().as_ref(), account_seed_u_16_type.to_le_bytes().as_ref(), account_seed_u_32_type.to_le_bytes().as_ref(), account_seed_i_8_type.to_le_bytes().as_ref(), account_seed_i_16_type.to_le_bytes().as_ref(), account_seed_i_32_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref()],
+			&[account_seed_u8_type.to_le_bytes().as_ref(), account_seed_u16_type.to_le_bytes().as_ref(), account_seed_u32_type.to_le_bytes().as_ref(), account_seed_u64_type.to_le_bytes().as_ref(), account_seed_i8_type.to_le_bytes().as_ref(), account_seed_i16_type.to_le_bytes().as_ref(), account_seed_i32_type.to_le_bytes().as_ref(), account_seed_i64_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref()],
 			program_id,
 		);
 
@@ -1053,7 +1109,7 @@ impl Processor {
 
 
 		// Accounts Initializations
-		let space = PdaaccountVerifiesSeedsTypes::LEN;
+		let space: usize = 1;
 		let rent = Rent::get()?;
 		let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -1066,7 +1122,7 @@ impl Processor {
 				program_id,
 			),
 			&[fee_payer_info.clone(), account_info.clone()],
-			&[&[account_seed_u_8_type.to_le_bytes().as_ref(), account_seed_u_16_type.to_le_bytes().as_ref(), account_seed_u_32_type.to_le_bytes().as_ref(), account_seed_i_8_type.to_le_bytes().as_ref(), account_seed_i_16_type.to_le_bytes().as_ref(), account_seed_i_32_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref(), &[account_bump]]],
+			&[&[account_seed_u8_type.to_le_bytes().as_ref(), account_seed_u16_type.to_le_bytes().as_ref(), account_seed_u32_type.to_le_bytes().as_ref(), account_seed_u64_type.to_le_bytes().as_ref(), account_seed_i8_type.to_le_bytes().as_ref(), account_seed_i16_type.to_le_bytes().as_ref(), account_seed_i32_type.to_le_bytes().as_ref(), account_seed_i64_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref(), &[account_bump]]],
 		)?;
 
 
@@ -1075,7 +1131,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountVerifiesSeedsTypes::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -1083,12 +1143,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountVerifiesSeedsTypes>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_12::instruction_12(
+		instruction12::instruction12(
 			program_id,
 			account,
 			input_1,
@@ -1104,12 +1164,12 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable, signer]` account: [NonPdaaccountWithOneField] 
+/// 1. `[writable, signer]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-	pub fn process_instruction_13(
+	pub fn process_instruction13(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
@@ -1136,7 +1196,7 @@ impl Processor {
 
 		// Accounts Initializations
 		if account_info.lamports() == 0 && *account_info.owner == system_program::id() {
-			let space = NonPdaaccountWithOneField::LEN;
+			let space: usize = 1;
 			let rent = Rent::get()?;
 			let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -1162,7 +1222,7 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != NonPdaaccountWithOneField::LEN {
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -1170,11 +1230,11 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut Account::new(
 			&account_info,
-			try_from_slice_unchecked::<NonPdaaccountWithOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 		);
 
 		// Calling STUB
-		instruction_13::instruction_13(
+		instruction13::instruction13(
 			program_id,
 			account,
 			input_1,
@@ -1190,12 +1250,12 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-	pub fn process_instruction_14(
+	pub fn process_instruction14(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
@@ -1227,7 +1287,7 @@ impl Processor {
 
 		// Accounts Initializations
 		if account_info.lamports() == 0 && *account_info.owner == system_program::id() {
-			let space = PdaaccountWithOneStaticSeedAndOneField::LEN;
+			let space: usize = 1;
 			let rent = Rent::get()?;
 			let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -1250,7 +1310,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountWithOneStaticSeedAndOneField::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -1258,12 +1322,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountWithOneStaticSeedAndOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_14::instruction_14(
+		instruction14::instruction14(
 			program_id,
 			account,
 			input_1,
@@ -1279,13 +1343,13 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticAndDynamicSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_dynamic: [u8] Auto-generated, from input account of type [PdaaccountWithOneStaticAndDynamicSeedAndOneField] set the seed named dynamic, required by the type
-	pub fn process_instruction_15(
+/// - account_seed_dynamic: [u8] Auto-generated, from the input "account" for the its seed definition "DynamicPda", sets the seed named "dynamic"
+	pub fn process_instruction15(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
@@ -1318,7 +1382,7 @@ impl Processor {
 
 		// Accounts Initializations
 		if account_info.lamports() == 0 && *account_info.owner == system_program::id() {
-			let space = PdaaccountWithOneStaticAndDynamicSeedAndOneField::LEN;
+			let space: usize = 1;
 			let rent = Rent::get()?;
 			let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -1341,7 +1405,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountWithOneStaticAndDynamicSeedAndOneField::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -1349,12 +1417,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountWithOneStaticAndDynamicSeedAndOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_15::instruction_15(
+		instruction15::instruction15(
 			program_id,
 			account,
 			input_1,
@@ -1370,29 +1438,33 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountVerifiesSeedsTypes] 
+/// 1. `[writable]` account: [State] 
 /// 2. `[]` system_program: [AccountInfo] Auto-generated, for account initialization
 ///
 /// Data:
 /// - input_1: [u8] 
-/// - account_seed_u_8_type: [u8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u8_type, required by the type
-/// - account_seed_u_16_type: [u16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u16_type, required by the type
-/// - account_seed_u_32_type: [u32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u32_type, required by the type
-/// - account_seed_i_8_type: [i8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i8_type, required by the type
-/// - account_seed_i_16_type: [i16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i16_type, required by the type
-/// - account_seed_i_32_type: [i32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i32_type, required by the type
-/// - account_seed_string_type: [String] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named string_type, required by the type
-/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named pubkey_type, required by the type
-	pub fn process_instruction_16(
+/// - account_seed_u8_type: [u8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u8_type"
+/// - account_seed_u16_type: [u16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u16_type"
+/// - account_seed_u32_type: [u32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u32_type"
+/// - account_seed_u64_type: [u64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u64_type"
+/// - account_seed_i8_type: [i8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i8_type"
+/// - account_seed_i16_type: [i16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i16_type"
+/// - account_seed_i32_type: [i32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i32_type"
+/// - account_seed_i64_type: [i64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i64_type"
+/// - account_seed_string_type: [String] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "string_type"
+/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "pubkey_type"
+	pub fn process_instruction16(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		input_1: u8,
-		account_seed_u_8_type: u8,
-		account_seed_u_16_type: u16,
-		account_seed_u_32_type: u32,
-		account_seed_i_8_type: i8,
-		account_seed_i_16_type: i16,
-		account_seed_i_32_type: i32,
+		account_seed_u8_type: u8,
+		account_seed_u16_type: u16,
+		account_seed_u32_type: u32,
+		account_seed_u64_type: u64,
+		account_seed_i8_type: i8,
+		account_seed_i16_type: i16,
+		account_seed_i32_type: i32,
+		account_seed_i64_type: i64,
 		account_seed_string_type: String,
 		account_seed_pubkey_type: Pubkey,
 	) -> ProgramResult {
@@ -1403,7 +1475,7 @@ impl Processor {
 
 		// Derive PDAs
 		let (account_pubkey, account_bump) = Pubkey::find_program_address(
-			&[account_seed_u_8_type.to_le_bytes().as_ref(), account_seed_u_16_type.to_le_bytes().as_ref(), account_seed_u_32_type.to_le_bytes().as_ref(), account_seed_i_8_type.to_le_bytes().as_ref(), account_seed_i_16_type.to_le_bytes().as_ref(), account_seed_i_32_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref()],
+			&[account_seed_u8_type.to_le_bytes().as_ref(), account_seed_u16_type.to_le_bytes().as_ref(), account_seed_u32_type.to_le_bytes().as_ref(), account_seed_u64_type.to_le_bytes().as_ref(), account_seed_i8_type.to_le_bytes().as_ref(), account_seed_i16_type.to_le_bytes().as_ref(), account_seed_i32_type.to_le_bytes().as_ref(), account_seed_i64_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref()],
 			program_id,
 		);
 
@@ -1423,7 +1495,7 @@ impl Processor {
 
 		// Accounts Initializations
 		if account_info.lamports() == 0 && *account_info.owner == system_program::id() {
-			let space = PdaaccountVerifiesSeedsTypes::LEN;
+			let space: usize = 1;
 			let rent = Rent::get()?;
 			let rent_minimum_balance = rent.minimum_balance(space);
 
@@ -1436,7 +1508,7 @@ impl Processor {
 					program_id,
 				),
 				&[fee_payer_info.clone(), account_info.clone()],
-				&[&[account_seed_u_8_type.to_le_bytes().as_ref(), account_seed_u_16_type.to_le_bytes().as_ref(), account_seed_u_32_type.to_le_bytes().as_ref(), account_seed_i_8_type.to_le_bytes().as_ref(), account_seed_i_16_type.to_le_bytes().as_ref(), account_seed_i_32_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref(), &[account_bump]]],
+				&[&[account_seed_u8_type.to_le_bytes().as_ref(), account_seed_u16_type.to_le_bytes().as_ref(), account_seed_u32_type.to_le_bytes().as_ref(), account_seed_u64_type.to_le_bytes().as_ref(), account_seed_i8_type.to_le_bytes().as_ref(), account_seed_i16_type.to_le_bytes().as_ref(), account_seed_i32_type.to_le_bytes().as_ref(), account_seed_i64_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref(), &[account_bump]]],
 			)?;
 		}
 
@@ -1446,7 +1518,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountVerifiesSeedsTypes::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -1454,12 +1530,12 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountVerifiesSeedsTypes>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_16::instruction_16(
+		instruction16::instruction16(
 			program_id,
 			account,
 			input_1,
@@ -1471,12 +1547,12 @@ impl Processor {
 		Ok(())
 	}
 
-/// Test `close` using Non-PDA account that has one field
+/// Test `close_uncheck` using Non-PDA account that has one field
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [NonPdaaccountWithOneField] 
-	pub fn process_instruction_17(
+/// 1. `[writable]` account: [State] 
+	pub fn process_instruction17(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 	) -> ProgramResult {
@@ -1501,7 +1577,7 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != NonPdaaccountWithOneField::LEN {
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -1509,17 +1585,103 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut Account::new(
 			&account_info,
-			try_from_slice_unchecked::<NonPdaaccountWithOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 		);
 
 		// Calling STUB
-		instruction_17::instruction_17(
+		instruction17::instruction17(
 			program_id,
 			account,
 		)?;
 
 		// Accounts Serialization
-		account.data.serialize(&mut &mut account_info.data.borrow_mut()[..])?;		
+		account.data.serialize(&mut &mut account_info.data.borrow_mut()[..])?;
+
+		// Close Accounts
+		if account_info.lamports() == 0 {
+			return Err(ValidateAccountsError::AccountAlreadyClosed.into());
+		}
+
+		**fee_payer_info.lamports.borrow_mut() = fee_payer_info.lamports().checked_add(account_info.lamports()).unwrap();
+		**account_info.lamports.borrow_mut() = 0;
+
+		let mut account_data = account_info.try_borrow_mut_data()?;
+
+		for byte in account_data.deref_mut().iter_mut() {
+			*byte = 0;
+		}
+		
+		Ok(())
+	}
+
+/// Test `close` using Non-PDA account that has one field
+///
+/// Accounts:
+/// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
+/// 1. `[writable, signer]` account: [State] 
+	pub fn process_safe_instruction17(
+		program_id: &Pubkey,
+		accounts: &[AccountInfo],
+	) -> ProgramResult {
+		let account_info_iter = &mut accounts.iter();
+		let fee_payer_info = next_account_info(account_info_iter)?;
+		let account_info = next_account_info(account_info_iter)?;
+
+
+		// Security Checks
+		if fee_payer_info.is_signer != true {
+			return Err(ValidateAccountsError::InvalidSignerPermission.into());
+		}
+
+		if account_info.is_signer != true {
+			return Err(ValidateAccountsError::InvalidSignerPermission.into());
+		}
+
+
+
+		// Security Checks
+		if *fee_payer_info.owner != Pubkey::from_str("11111111111111111111111111111111").unwrap() {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
+			return Err(ValidateAccountsError::InvalidAccountLen.into());
+		}
+
+
+		// Accounts Deserialization
+		let account = &mut Account::new(
+			&account_info,
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
+		);
+
+		// Calling STUB
+		safe_instruction17::safe_instruction17(
+			program_id,
+			account,
+		)?;
+
+		// Accounts Serialization
+		account.data.serialize(&mut &mut account_info.data.borrow_mut()[..])?;
+
+		// Close Accounts
+		if account_info.lamports() == 0 {
+			return Err(ValidateAccountsError::AccountAlreadyClosed.into());
+		}
+
+		**fee_payer_info.lamports.borrow_mut() = fee_payer_info.lamports().checked_add(account_info.lamports()).unwrap();
+		**account_info.lamports.borrow_mut() = 0;
+
+		let mut account_data = account_info.try_borrow_mut_data()?;
+
+		for byte in account_data.deref_mut().iter_mut() {
+			*byte = 0;
+		}
+		
 		Ok(())
 	}
 
@@ -1527,8 +1689,8 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticSeedAndOneField] 
-	pub fn process_instruction_18(
+/// 1. `[writable]` account: [State] 
+	pub fn process_instruction18(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 	) -> ProgramResult {
@@ -1558,7 +1720,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountWithOneStaticSeedAndOneField::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -1566,18 +1732,33 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountWithOneStaticSeedAndOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_18::instruction_18(
+		instruction18::instruction18(
 			program_id,
 			account,
 		)?;
 
 		// Accounts Serialization
-		account.data.serialize(&mut &mut account_info.data.borrow_mut()[..])?;		
+		account.data.serialize(&mut &mut account_info.data.borrow_mut()[..])?;
+
+		// Close Accounts
+		if account_info.lamports() == 0 {
+			return Err(ValidateAccountsError::AccountAlreadyClosed.into());
+		}
+
+		**fee_payer_info.lamports.borrow_mut() = fee_payer_info.lamports().checked_add(account_info.lamports()).unwrap();
+		**account_info.lamports.borrow_mut() = 0;
+
+		let mut account_data = account_info.try_borrow_mut_data()?;
+
+		for byte in account_data.deref_mut().iter_mut() {
+			*byte = 0;
+		}
+		
 		Ok(())
 	}
 
@@ -1585,11 +1766,11 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountWithOneStaticAndDynamicSeedAndOneField] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
-/// - account_seed_dynamic: [u8] Auto-generated, from input account of type [PdaaccountWithOneStaticAndDynamicSeedAndOneField] set the seed named dynamic, required by the type
-	pub fn process_instruction_19(
+/// - account_seed_dynamic: [u8] Auto-generated, from the input "account" for the its seed definition "DynamicPda", sets the seed named "dynamic"
+	pub fn process_instruction19(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
 		account_seed_dynamic: u8,
@@ -1620,7 +1801,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountWithOneStaticAndDynamicSeedAndOneField::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -1628,18 +1813,34 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountWithOneStaticAndDynamicSeedAndOneField>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_19::instruction_19(
+		instruction19::instruction19(
 			program_id,
 			account,
 		)?;
 
 		// Accounts Serialization
 		account.data.serialize(&mut &mut account_info.data.borrow_mut()[..])?;
+
+		// Close Accounts
+		if account_info.lamports() == 0 {
+			return Err(ValidateAccountsError::AccountAlreadyClosed.into());
+		}
+
+		**fee_payer_info.lamports.borrow_mut() = fee_payer_info.lamports().checked_add(account_info.lamports()).unwrap();
+		**account_info.lamports.borrow_mut() = 0;
+
+		let mut account_data = account_info.try_borrow_mut_data()?;
+
+		for byte in account_data.deref_mut().iter_mut() {
+			*byte = 0;
+		}
+
+
 		
 		Ok(())
 	}
@@ -1648,26 +1849,30 @@ impl Processor {
 ///
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
-/// 1. `[writable]` account: [PdaaccountVerifiesSeedsTypes] 
+/// 1. `[writable]` account: [State] 
 ///
 /// Data:
-/// - account_seed_u_8_type: [u8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u8_type, required by the type
-/// - account_seed_u_16_type: [u16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u16_type, required by the type
-/// - account_seed_u_32_type: [u32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named u32_type, required by the type
-/// - account_seed_i_8_type: [i8] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i8_type, required by the type
-/// - account_seed_i_16_type: [i16] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i16_type, required by the type
-/// - account_seed_i_32_type: [i32] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named i32_type, required by the type
-/// - account_seed_string_type: [String] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named string_type, required by the type
-/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from input account of type [PdaaccountVerifiesSeedsTypes] set the seed named pubkey_type, required by the type
-	pub fn process_instruction_20(
+/// - account_seed_u8_type: [u8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u8_type"
+/// - account_seed_u16_type: [u16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u16_type"
+/// - account_seed_u32_type: [u32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u32_type"
+/// - account_seed_u64_type: [u64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "u64_type"
+/// - account_seed_i8_type: [i8] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i8_type"
+/// - account_seed_i16_type: [i16] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i16_type"
+/// - account_seed_i32_type: [i32] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i32_type"
+/// - account_seed_i64_type: [i64] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "i64_type"
+/// - account_seed_string_type: [String] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "string_type"
+/// - account_seed_pubkey_type: [Pubkey] Auto-generated, from the input "account" for the its seed definition "PdaWithAllTypes", sets the seed named "pubkey_type"
+	pub fn process_instruction20(
 		program_id: &Pubkey,
 		accounts: &[AccountInfo],
-		account_seed_u_8_type: u8,
-		account_seed_u_16_type: u16,
-		account_seed_u_32_type: u32,
-		account_seed_i_8_type: i8,
-		account_seed_i_16_type: i16,
-		account_seed_i_32_type: i32,
+		account_seed_u8_type: u8,
+		account_seed_u16_type: u16,
+		account_seed_u32_type: u32,
+		account_seed_u64_type: u64,
+		account_seed_i8_type: i8,
+		account_seed_i16_type: i16,
+		account_seed_i32_type: i32,
+		account_seed_i64_type: i64,
 		account_seed_string_type: String,
 		account_seed_pubkey_type: Pubkey,
 	) -> ProgramResult {
@@ -1677,7 +1882,7 @@ impl Processor {
 
 		// Derive PDAs
 		let (account_pubkey, account_bump) = Pubkey::find_program_address(
-			&[account_seed_u_8_type.to_le_bytes().as_ref(), account_seed_u_16_type.to_le_bytes().as_ref(), account_seed_u_32_type.to_le_bytes().as_ref(), account_seed_i_8_type.to_le_bytes().as_ref(), account_seed_i_16_type.to_le_bytes().as_ref(), account_seed_i_32_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref()],
+			&[account_seed_u8_type.to_le_bytes().as_ref(), account_seed_u16_type.to_le_bytes().as_ref(), account_seed_u32_type.to_le_bytes().as_ref(), account_seed_u64_type.to_le_bytes().as_ref(), account_seed_i8_type.to_le_bytes().as_ref(), account_seed_i16_type.to_le_bytes().as_ref(), account_seed_i32_type.to_le_bytes().as_ref(), account_seed_i64_type.to_le_bytes().as_ref(), account_seed_string_type.as_bytes().as_ref(), account_seed_pubkey_type.as_ref()],
 			program_id,
 		);
 
@@ -1697,7 +1902,11 @@ impl Processor {
 			return Err(ValidateAccountsError::WrongAccountOwner.into());
 		}
 
-		if account_info.data_len() != PdaaccountVerifiesSeedsTypes::LEN {
+		if *account_info.owner != *program_id {
+			return Err(ValidateAccountsError::WrongAccountOwner.into());
+		}
+
+		if account_info.data_len() != 1usize {
 			return Err(ValidateAccountsError::InvalidAccountLen.into());
 		}
 
@@ -1705,18 +1914,34 @@ impl Processor {
 		// Accounts Deserialization
 		let account = &mut AccountPDA::new(
 			&account_info,
-			try_from_slice_unchecked::<PdaaccountVerifiesSeedsTypes>(&account_info.data.borrow()).unwrap(),
+			try_from_slice_unchecked::<State>(&account_info.data.borrow()).unwrap(),
 			account_bump,
 		);
 
 		// Calling STUB
-		instruction_20::instruction_20(
+		instruction20::instruction20(
 			program_id,
 			account,
 		)?;
 
 		// Accounts Serialization
 		account.data.serialize(&mut &mut account_info.data.borrow_mut()[..])?;
+
+		// Close Accounts
+		if account_info.lamports() == 0 {
+			return Err(ValidateAccountsError::AccountAlreadyClosed.into());
+		}
+
+		**fee_payer_info.lamports.borrow_mut() = fee_payer_info.lamports().checked_add(account_info.lamports()).unwrap();
+		**account_info.lamports.borrow_mut() = 0;
+
+		let mut account_data = account_info.try_borrow_mut_data()?;
+
+		for byte in account_data.deref_mut().iter_mut() {
+			*byte = 0;
+		}
+
+
 		
 		Ok(())
 	}

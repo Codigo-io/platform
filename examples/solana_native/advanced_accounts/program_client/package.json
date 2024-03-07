@@ -1,0 +1,18 @@
+{
+  "name": "validate_advanced_cases",
+  "version": "0.0.0",
+  "private": true,
+  "license": "Codigo",
+  "description": "The purpose of this CIDL is to validate all the supported advanced cases\n- Verifies the usage of multiple signers\n- Verifies we can specify a rent-payer to an account when initializing\n- Verifies we can specify a rent-receiver to an account when closing it\n- Verifies we can map a signer to an account seed\n- Verifies we can map an input to an account seed\n- Verifies a Non-PDA account can be signer",
+  "dependencies": {
+    "@solana/web3.js": "^1.78.3",
+    "borsh": "^1.0.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
+}

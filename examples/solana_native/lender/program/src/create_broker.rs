@@ -2,7 +2,11 @@ use solana_program::account_info::AccountInfo;
 use solana_program::entrypoint::ProgramResult;
 use solana_program::pubkey::Pubkey;
 
-use crate::generated::state::{AccountPDA, Broker};
+use crate::generated::state::{
+	AccountPDA,
+	Broker,
+};
+
 
 /// After deploying the contract this must be the first instruction
 /// to call. It will configure the broker account.

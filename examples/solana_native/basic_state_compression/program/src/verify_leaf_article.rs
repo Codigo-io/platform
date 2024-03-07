@@ -10,8 +10,7 @@ use crate::generated::state::{
 /// Accounts:
 /// 0. `[writable, signer]` fee_payer: [AccountInfo] Auto-generated, default fee payer
 /// 1. `[]` merkle_tree: [AccountInfo] 
-/// 2. `[]` noop: [AccountInfo] Noop program
-/// 3. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
+/// 2. `[]` csl_spl_account_compression_v_0_0_0: [AccountInfo] Auto-generated, CslSplAccountCompressionProgram v0.0.0
 ///
 /// Data:
 /// - leaf: [Vec<u8>] 
@@ -21,7 +20,6 @@ pub fn verify_leaf_article(
 	program_id: &Pubkey,
 	for_verify_leaf: &[&AccountInfo],
 	merkle_tree: &AccountInfo,
-	noop: &AccountInfo,
 	leaf: Vec<u8>,
 	root: Vec<u8>,
 	index: u32,

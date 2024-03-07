@@ -238,8 +238,5 @@ async function main(feePayer: Keypair) {
     console.info(broker);
 }
 
-// 5_000_000_000n
-// 450_000_007n
-
 fs.readFile(path.join(os.homedir(), ".config/solana/id.json"))
     .then(file => main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))));

@@ -1,17 +1,17 @@
-# Código Platform
+# Código Platform - PRERELEASE
 
 Código is an AI-Powered Code Generation Platform for blockchain developers and web3 teams that saves development time and increases the code's security across various blockchains.
 
 ## Getting started
 
 - You can immediately start using [Código Studio](https://studio.codigo.ai). Código Studio is a web-based IDE environment that comes with all the tools and programs to develop Solana programs using the CIDL.
-- You can work from your local environment by downloading the latest version of the [Código CLI](https://github.com/Codigo-io/platform/releases) that targets your operating system. After downloading, put the Código CLI in your preferred location and add this location to your environment PATH.
+- You can work from your local environment by downloading the latest version of the [Código CLI](https://github.com/Codigo-io/prerelease/releases) that targets your operating system. After downloading, put the Código CLI in your preferred location and add this location to your environment PATH.
 
 ## CIDL Quickstart
 
 In this Quickstart guide, you’ll learn how to start with Código’s Interface Description Language (CIDL) by building a simple Solana counter program.
 
-> If you are following along from your local environment, this guide assumes you have successfully installed and configured the Solana tool suite. If you are working from Código Studio, you don’t need to worry; the Solana tool suite comes installed and configured. 
+> If you are following along from your local environment, this guide assumes you have successfully installed and configured the Solana tool suite. If you are working from Código Studio, you don’t need to worry; the Solana tool suite comes installed and configured.
 
 ### 1. Counter Contract
 Create a `counter.yaml` file and copy and paste the following CIDL.
@@ -34,15 +34,13 @@ methods:
   - name: increment
     inputs:
       - name: greeting_account
-        type: GreetingAccount
-        solana:
-          attributes: [mut, init_if_needed]
+        type: sol:account<GreetingAccount>
+        attributes: [ sol:writable, sol:init_if_needed]
   - name: decrement
     inputs:
       - name: greeting_account
-        type: GreetingAccount
-        solana:
-          attributes: [mut, init_if_needed]
+        type: sol:account<GreetingAccount>
+        attributes: [ sol:writable, sol:init_if_needed]
 ```
 
 ### 2. Generate the Solana program and client library
@@ -113,40 +111,42 @@ import * as path from "path";
 import * as os from "os";
 
 async function main(feePayer: Keypair) {
-    // TODO: Specify the smart contract Program Id we saved from when we deploy the smart contract
-    const progId = new PublicKey("PASTE_YOUR_PROGRAM_ID");
+  // TODO: Specify the smart contract Program Id we saved from when we deploy the smart contract
+  const progId = new PublicKey("PASTE_YOUR_PROGRAM_ID");
 
-    // Create a new Solana connection
-    const connection = new Connection("http://127.0.0.1:8899");
+  // Create a new Solana connection
+  const connection = new Connection("http://127.0.0.1:8899", {
+    commitment: "confirmed"
+  });
 
-    initializeClient(progId, connection);
+  initializeClient(progId, connection);
 
-    // 0. Create keypair for the Greeting account
-    const greetingAccount = Keypair.generate();
+  // 0. Create keypair for the Greeting account
+  const greetingAccount = Keypair.generate();
 
-    // 1. Increment the counter by 1
-    await incrementSendAndConfirm({
-        signers: {
-            feePayer,
-            greetingAccount
-        }
-    });
-    let account = await getGreetingAccount(greetingAccount.publicKey);
-    console.info(account);
+  // 1. Increment the counter by 1
+  await incrementSendAndConfirm({
+    signers: {
+      feePayer,
+      greetingAccount
+    }
+  });
+  let account = await getGreetingAccount(greetingAccount.publicKey);
+  console.info(account);
 
-    // 2. Decrement the count by 1
-    await decrementSendAndConfirm({
-        signers: {
-            feePayer,
-            greetingAccount
-        }
-    });
-    account = await getGreetingAccount(greetingAccount.publicKey);
-    console.info(account);
+  // 2. Decrement the count by 1
+  await decrementSendAndConfirm({
+    signers: {
+      feePayer,
+      greetingAccount
+    }
+  });
+  account = await getGreetingAccount(greetingAccount.publicKey);
+  console.info(account);
 }
 
 fs.readFile(path.join(os.homedir(), ".config/solana/id.json"))
-.then(file => main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))));
+  .then(file => main(Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())))));
 ```
 
 Open the terminal, navigate to the `program_client` directory, and execute the following commands:

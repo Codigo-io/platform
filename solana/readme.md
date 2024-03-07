@@ -1,5 +1,5 @@
 The CIDLs present in this `solana` directory is
-internalize into Código's Generator; thus, you can use any
+internalized into Código's Generator; thus, you can use any
 of its instructions or types without explicitly importing them.
 
 Check the `examples/basic_nft` for reference.
