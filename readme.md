@@ -5,7 +5,7 @@ Código is an AI-Powered Code Generation Platform for blockchain developers and 
 ## Getting started
 
 - You can immediately start using [Código Studio](https://studio.codigo.ai). Código Studio is a web-based IDE environment that comes with all the tools and programs to develop Solana programs using the CIDL.
-- You can work from your local environment by downloading the latest version of the [Código CLI](https://github.com/Codigo-io/prerelease/releases) that targets your operating system. After downloading, put the Código CLI in your preferred location and add this location to your environment PATH.
+- You can work from your local environment by downloading the latest version of the [Código CLI]([https://github.com/Codigo-io/platform/releases](https://docs.codigo.ai/getting-started/installation#código-cli)) that targets your operating system.
 
 ## CIDL Quickstart
 
@@ -170,13 +170,17 @@ After the execution completes, you should receive the following output:
 
 ## Next steps
 
-**Congratulations!** 🎉👏 you created your first Solana smart contract using the CIDL and integrated the generated TypeScript client library with an application. To summarize what we learned:
+**Congratulations!** 🎉👏 you just created your first Solana program using the CIDL and integrated the generated
+TypeScript client library with an application. To summarize what we learned:
 
-- CIDL stands for Código Interface Description Language, and it is the input for Código’s Generator.
-- After completing the CIDL, developers only need to concentrate on implementing the business logic of the smart contract. 100% of the client libraries and smart contracts boilerplate are automatically generated.
+- CIDL stands for Código Interface Description Language, and it is the input for Código’s AI Generator.
+- After completing the CIDL, developers only need to implement the business logic of the program.
+- 100% of the client libraries and program boilerplate are generated.
+- Código Studio has all the tools and programs to develop Solana programs using the CIDL.
 
-These links may help you on your journey to writing smart contracts with the CIDL:
+These links may help you on your journey to writing Solana programs with the CIDL:
 
-- [Overview](https://docs.codigo.ai/)
-- [Learning the Basics](https://docs.codigo.ai/c%C3%B3digo-interface-description-language/learning-the-basics)
-- [Part I - Building Solana Programs](https://docs.codigo.ai/guides/part-1-building-solana-programs)
+- [Overview](https://docs.codigo.ai)
+- [Learning the Basics](https://docs.codigo.ai/learning-the-basics/)
+- [Implementing business logic](https://docs.codigo.ai/guides/implementing-business-logic)
+- [Integrating client library](https://docs.codigo.ai/guides/integrating-the-sdk)
