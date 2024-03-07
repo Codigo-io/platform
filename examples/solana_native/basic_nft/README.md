@@ -17,7 +17,7 @@ In this Quickstart guide, you’ll learn how to start with Código’s Interface
 Create a `nft.yaml` file and copy and paste the following CIDL.
 
 ```yaml
-cidl: "0.8"
+cidl: "0.9"
 info:
   name: validate_basic_nft
   title: Validate Basic NFT
