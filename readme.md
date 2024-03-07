@@ -1,4 +1,4 @@
-# Código Platform - PRERELEASE
+# Código Platform
 
 Código is an AI-Powered Code Generation Platform for blockchain developers and web3 teams that saves development time and increases the code's security across various blockchains.
 
