@@ -22,6 +22,8 @@ pub fn add_member(
 	group_account: &mut AccountPDA<GroupAccount>,
 	new_member: Pubkey,
 ) -> ProgramResult {
+	assert!( group_account.members.contains(group_account.info.key), "only group members can add new members to the group account" );
+
     assert!( !group_account.members.contains(new_member), "provided new member is already a member of this group" );
 
     group_account.members.push(new_member);

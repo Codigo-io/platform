@@ -22,6 +22,8 @@ pub fn remove_member(
 	group_account: &mut AccountPDA<GroupAccount>,
 	member: Pubkey,
 ) -> ProgramResult {
+    assert!( group_account.members.contains(group_account.info.key), "only group members can remove members from the group account" );
+
     member_idx = group_account.members.iter().position(|&address| address == member).expect("could not find member to remove within this group");
 
     assert!(group_account.balances[member_idx] == 0, "member balance should be zero before removal");

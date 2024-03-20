@@ -28,6 +28,8 @@ pub fn log_payment(
 	amounts: Vec<u64>,
 	participation_factors: Vec<u64>,
 ) -> ProgramResult {
+    assert!( group_account.members.contains(group_account.info.key), "only group members can log payments in the group account" );
+
     assert!(participants.len() > 0, "participants list should provide at least one address");
     assert!(participants.len() ==  amounts.len() == participation_factors.len(), "participants, amounts and participation factors lists should be of equal size");
 
