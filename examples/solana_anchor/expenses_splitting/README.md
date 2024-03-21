@@ -15,7 +15,7 @@ Creates a user, and tracks the income and outcome amount per user
 ## Generate code
 
 ```shell
-codigo solana generate cidl.yaml
+codigo solana generate cidl.yaml -a
 ```
 
 ## Build contract
@@ -23,23 +23,7 @@ codigo solana generate cidl.yaml
 From within the program directory
 
 ```shell
-cargo build-sbf
-```
-
-## Run solana validator
-
-From another terminal (keep it open after running the command)
-
-```shell
-solana-test-validator
-```
-
-## Deploy to validator
-
-From within the program directory
-
-```shell
-solana program deploy target/deploy/validate_expenses_splitting.so --program-id ../expenses_splitting_kp.josn
+anchor build
 ```
 
 ## Install program client dependencies
@@ -50,18 +34,10 @@ From within the program_client directory
 npm install
 ```
 
-## Install ts-node for running `app.ts`
+## Test contract
 
-From within the program_client directory
-
-```shell
-npm install --save-dev ts-node
-```
-
-## Run client
-
-From within the program_client directory
+From within the program directory
 
 ```shell
-npx ts-node app.ts
+anchor test
 ```
