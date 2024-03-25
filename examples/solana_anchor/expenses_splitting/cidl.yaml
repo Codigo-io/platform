@@ -1,0 +1,112 @@
+cidl: "0.9"
+info:
+  name: ExpenseSplitter
+  title: Expense Splitter Contract
+  version: "1.0.0"
+  summary: A contract for managing group expenses, allowing members to split costs fairly.
+  contact:
+    name: "Developer Name"
+    web: "https://developerwebsite.com"
+    email: "contact@developerwebsite.com"
+    git: "https://github.com/developer/ExpenseSplitter"
+  license:
+    name: "MIT License"
+    identifier: "MIT"
+    url: "https://opensource.org/licenses/MIT"
+
+solana:
+  seeds:
+    groupAccount:
+      items:
+        - name: "group_name"
+          type: "string"
+
+types:
+  GroupAccount:
+    summary: Represents a group account with members and their balances.
+    fields:
+      - name: "group_name"
+        type: "string"
+        description: "The name of the group."
+        attributes: [cap=100]
+      - name: "members"
+        type: "array<sol:pubkey>"
+        description: "Array of member public keys."
+        attributes: [cap=100]
+      - name: "balances"
+        type: "array<i64>"
+        description: "Array of member balances in lamports."
+        attributes: [cap=100]
+    
+methods:
+  - name: "createGroup"
+    summary: "Creates a new group with initial members and balances."
+    inputs:
+      - name: "group_account"
+        type: sol:account<GroupAccount, seeds.groupAccount(signer=fee_payer)>
+        attributes: [ sol:init ]
+      - name: "group_name"
+        type: "string"
+        description: "The name of the group."
+      - name: "members"
+        type: "array<sol:pubkey>"
+        description: "Array of member public keys."
+        attributes: [cap=100]
+      - name: "initial_balances"
+        type: "array<i64>"
+        description: "Array of initial balances for each member."
+        attributes: [cap=100]
+    solana:
+      default-payer: true
+
+  - name: "addMember"
+    summary: "Adds a new member to the group."
+    inputs:
+      - name: "group_account"
+        type: sol:account<GroupAccount, seeds.groupAccount(signer=fee_payer)>
+        attributes: [sol:writable]
+      - name: "new_member"
+        type: "sol:pubkey"
+        description: "Public key of the new member."
+
+  - name: "removeMember"
+    summary: "Removes a member from the group."
+    inputs:
+      - name: "group_account"
+        type: sol:account<GroupAccount, seeds.groupAccount(signer=fee_payer)>
+        attributes: [sol:writable]
+      - name: "member"
+        type: "sol:pubkey"
+        description: "Public key of the member to remove."
+
+  - name: "logPayment"
+    summary: "Logs a payment made by or for group members, updating balances accordingly."
+    inputs:
+      - name: "group_account"
+        type: sol:account<GroupAccount, seeds.groupAccount(signer=fee_payer)>
+        attributes: [sol:writable]
+      - name: "title"
+        type: "string"
+        description: "Title or description of the payment."
+      - name: "participants"
+        type: "array<sol:pubkey>"
+        description: "Array of participating member public keys."
+        attributes: [cap=100]
+      - name: "amounts"
+        type: "array<u64>"
+        description: "Array of amounts each participant gave to the group."
+        attributes: [cap=100]
+      - name: "participation_factors"
+        type: "array<u64>"
+        description: "Array of participation factors for each participant."
+        attributes: [cap=100]
+
+errors:
+  - id: "GroupBalanceError"
+    msg: "The sum of balances in the group must always sum to zero."
+  - id: "InvalidMemberError"
+    msg: "The specified member does not exist in the group."
+  - id: "InvalidGroupError"
+    msg: "The specified group does not exist."
+  - id: "BalanceMismatchError"
+    msg: "The sum of initial balances does not sum to zero."

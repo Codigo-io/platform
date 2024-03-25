@@ -1,0 +1,30 @@
+
+[package]
+name = "expense_splitter"
+version = "1.0.0"
+edition = "2021"
+license = "mit_license"
+publish = false
+
+authors = ["Developer Name <contact@developerwebsite.com>"]
+description = """
+A contract for managing group expenses, allowing members to split costs fairly.
+"""
+homepage = "https://developerwebsite.com"
+repository = "https://github.com/developer/ExpenseSplitter"
+
+[dependencies]
+solana-program = ">=1.16, <1.18"
+borsh = "0.10.3"
+thiserror = "1"
+num-derive = "0.4"
+num-traits = "0.2"
+num_enum = "0.7.0"
+ahash = "=0.8.6"
+toml_edit = "=0.21.0"
+
+
+
+[lib]
+crate-type = ["cdylib", "lib"]
+path = "./lib.rs"

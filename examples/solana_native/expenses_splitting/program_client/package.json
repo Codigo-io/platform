@@ -1,0 +1,23 @@
+{
+  "name": "expense_splitter",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT License",
+  "author": {
+    "name": "Developer Name",
+    "email": "contact@developerwebsite.com",
+    "url": "https://developerwebsite.com"
+  },
+  "repository": {
+    "url": "https://github.com/developer/ExpenseSplitter"
+  },
+  "description": "A contract for managing group expenses, allowing members to split costs fairly.",
+  "dependencies": {
+    "@solana/web3.js": "^1.78.3",
+    "borsh": "^1.0.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
