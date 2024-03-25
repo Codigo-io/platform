@@ -11,10 +11,10 @@ use anchor_lang::prelude::*;
 /// - member: [Pubkey] Public key of the member to remove.
 /// - group_account_seed_group_name: [String] Auto-generated, from the input "group_account" for the its seed definition "GroupAccount", sets the seed named "group_name"
 pub fn handler(ctx: Context<RemoveMember>, member: Pubkey) -> Result<()> {
-    let group_account = ctx.accounts.group_account;
+    let group_account = &mut ctx.accounts.group_account;
 
     assert!(
-        group_account.members.contains(group_account.info.key),
+        group_account.members.contains(&group_account.key()),
         "only group members can remove members from the group account"
     );
 

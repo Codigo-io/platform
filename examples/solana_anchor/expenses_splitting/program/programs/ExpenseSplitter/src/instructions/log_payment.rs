@@ -20,10 +20,10 @@ pub fn handler(
     amounts: Vec<u64>,
     participation_factors: Vec<u64>,
 ) -> Result<()> {
-    let group_account = ctx.accounts.group_account;
+    let group_account = &mut ctx.accounts.group_account;
 
     assert!(
-        group_account.members.contains(group_account.info.key),
+        group_account.members.contains(&group_account.key()),
         "only group members can log payments in the group account"
     );
 
@@ -65,6 +65,7 @@ pub fn handler(
         // high-level formula: member balance += payment - total expenditure * participation
         let expenditure =
             total_amount * participation_factors[participant_idx] / total_participation;
+
         group_account.balances[member_idx] += (amounts[participant_idx] - expenditure) as i64;
 
         msg!(
@@ -80,7 +81,7 @@ pub fn handler(
 
     // just in case
     assert!(
-        group_account.balances.iter().sum() == 0,
+        group_account.balances.iter().sum::<i64>() == 0,
         "group balances should sum zero, something went wrong"
     );
 

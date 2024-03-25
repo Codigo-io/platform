@@ -11,10 +11,10 @@ use anchor_lang::prelude::*;
 /// - new_member: [Pubkey] Public key of the new member.
 /// - group_account_seed_group_name: [String] Auto-generated, from the input "group_account" for the its seed definition "GroupAccount", sets the seed named "group_name"
 pub fn handler(ctx: Context<AddMember>, new_member: Pubkey) -> Result<()> {
-    let group_account = ctx.accounts.group_account;
+    let group_account = &mut ctx.accounts.group_account;
 
     assert!(
-        group_account.members.contains(group_account.info.key),
+        group_account.members.contains(&group_account.key()),
         "only group members can add new members to the group account"
     );
 

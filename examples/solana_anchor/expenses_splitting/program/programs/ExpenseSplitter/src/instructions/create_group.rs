@@ -34,7 +34,7 @@ pub fn handler(
         "initial balances should sum zero"
     );
 
-    let mut group_account = ctx.accounts.group_account;
+    let group_account = &mut ctx.accounts.group_account;
 
     group_account.group_name = group_name;
     group_account.members = members;
