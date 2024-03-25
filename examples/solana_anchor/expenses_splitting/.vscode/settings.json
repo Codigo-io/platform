@@ -1,0 +1,6 @@
+{
+  "rust-analyzer.linkedProjects": [
+    "./program/programs/ExpenseSplitter/Cargo.toml",
+    "./program/programs/ExpenseSplitter/Cargo.toml"
+  ]
+}
